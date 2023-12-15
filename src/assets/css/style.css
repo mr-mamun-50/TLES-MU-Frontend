@@ -1,0 +1,337 @@
+body {
+    background: #f0f4f7;
+    font-family: "Roboto", "Noto Serif Bengali", sans-serif !important;
+    zoom: 95%;
+}
+
+.text-primary {
+    color: #3b71ca !important;
+}
+.text-secondary {
+    color: #6c757d !important;
+}
+.text-success {
+    color: #00c292 !important;
+}
+.text-info {
+    color: #00b0f0 !important;
+}
+.text-warning {
+    color: #ffba00 !important;
+}
+.text-light {
+    color: #f0f4f7 !important;
+}
+.text-dark {
+    color: #36344d !important;
+}
+.text-white {
+    color: #fff !important;
+}
+.text-grey {
+    color: #bdbdbd !important;
+}
+.text-muted {
+    color: #757575 !important;
+}
+.bg-primary {
+    background-color: #3b71ca !important;
+}
+.bg-secondary {
+    background-color: #6c757d !important;
+}
+.bg-success {
+    background-color: #00c292 !important;
+}
+.bg-info {
+    background-color: #00b0f0 !important;
+}
+.bg-warning {
+    background-color: #ffba00 !important;
+}
+.bg-danger {
+    background-color: #ff4546 !important;
+}
+.bg-light {
+    background-color: #f0f4f7 !important;
+}
+.bg-light-primary {
+    background-color: #e3ebf750 !important;
+}
+.bg-dark {
+    background-color: #36344d !important;
+}
+.bg-white {
+    background-color: #fff !important;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    /* Height of navbar */
+    padding: 0 0 20px;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
+    width: 240px;
+    z-index: 600;
+    background: #36344d;
+    font-size: 15px;
+    overflow-y: scroll !important;
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    transition: ease-in-out;
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+.sidebar::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+}
+
+.sidebar .active {
+    /* border-radius: 10px; */
+    background: #5e75f8 !important;
+    color: #fff;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: 0.5rem;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+
+.sidebar .list-group-item {
+    border: none;
+    margin: 3px 0;
+    background: none;
+    color: #fbfbfb;
+    font-size: 14px;
+}
+
+.sidebar .list-group-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* nav-drop down list */
+.glassy {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    margin: 0 10px 10px !important;
+    padding: 0;
+}
+.glassy .list-group-item {
+    margin: 0;
+}
+.glassy .active {
+    color: #fff !important;
+}
+
+.btn {
+    /* text-transform: none; */
+    box-shadow: none !important;
+}
+
+/* bottom border input */
+.bb-input {
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid #dedede;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    box-shadow: none;
+}
+.bb-input:focus {
+    box-shadow: none !important;
+    border-bottom: 1px solid #3b71ca !important;
+    border-radius: 0;
+}
+
+/* ck editor */
+.ck-editor__editable {
+    min-height: 150px;
+}
+
+/* add-btn */
+.add-btn {
+    position: relative;
+    padding: 0.5rem 2rem;
+    border-radius: 0 0 25px 25px;
+}
+
+.wrap50p {
+    /* width: 50%; */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* level 4 special styles */
+
+.nav-item {
+    border-radius: 10px;
+    color: #fbfbfb;
+}
+
+.menu .nav-item .nav-link:hover {
+    /* color: #ed3e80; */
+    color: #3b71ca;
+}
+
+.menu .nav-item .nav-link {
+    padding: 7px 20px !important;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.nav-item .active {
+    /* background: #ed3e80; */
+    background: #3b71ca;
+    border-radius: 10px;
+    color: #fff !important;
+}
+
+@media (max-width: 991.98px) {
+    .heroSection {
+        margin-bottom: 800px;
+    }
+}
+
+@media (min-width: 768px) {
+    .p-relative {
+        position: relative !important;
+    }
+    .p-absolute {
+        position: absolute !important;
+    }
+    .t-100 {
+        top: 100% !important;
+    }
+    .s-50 {
+        left: 50% !important;
+    }
+    .tr-middle {
+        transform: translate(-50%, -50%) !important;
+    }
+}
+
+/* data table heading */
+.hcgwbo,
+.bRaWwA {
+    font-weight: bold !important;
+    color: #3b71ca !important;
+    font-size: 14px !important;
+}
+
+.react-datepicker__month-container {
+    font-family: "PF Isotext Pro", sans-serif !important;
+}
+
+.home-menu-card {
+    background: rgba(255, 255, 255, 0.4);
+    transition: 0.3s ease;
+}
+
+.home-menu-card:hover {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid #3b71ca !important;
+    transform: scale(1.05);
+}
+
+.table-small td {
+    padding: 2px 10px;
+}
+
+th {
+    font-weight: bold !important;
+}
+
+.info-table th,
+.info-table td {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Apply flexbox to the container */
+.ck-editor {
+    display: flex;
+    flex-direction: row-reverse;
+}
+.ck-toolbar {
+    width: auto;
+    border-left: none !important;
+    border-top-right-radius: 0.25rem !important;
+    border-bottom-right-radius: 0.25rem !important;
+    border-top-left-radius: 0 !important;
+    border-bottom: 1px solid #ccced1 !important;
+    height: 113px !important;
+    border-color: #00b0f0 !important;
+}
+.ck-editor__editable {
+    min-height: 113px;
+    max-height: 113px !important;
+    border-top-left-radius: 0.25rem !important;
+    border-bottom-left-radius: 0.25rem !important;
+    border-bottom-right-radius: 0 !important;
+    border-color: #00b0f0 !important;
+    line-height: 0.5;
+}
+.ck-editor__main {
+    flex: 1; /* This makes it take up the remaining space */
+}
+.ck .ck-toolbar__items {
+    display: flex;
+    flex-direction: column !important;
+}
+.ck .ck-toolbar__items button {
+    font-size: 9px;
+}
+
+/* styles.css */
+.print-section,
+.print-section * {
+    visibility: hidden;
+}
+
+@media print {
+    body {
+        background: #fff;
+    }
+    body * {
+        visibility: hidden;
+    }
+    .print-section,
+    .print-section * {
+        visibility: visible;
+    }
+    .print-section {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+
+    /* Header styles */
+    @page {
+        margin-top: 0.7in;
+        margin-right: 0;
+        margin-left: 0;
+        margin-bottom: 0.5in;
+    }
+    @page :first {
+        margin-top: 0;
+    }
+}
+
+td p {
+    margin-bottom: 5px !important;
+}
