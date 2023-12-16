@@ -149,7 +149,7 @@ export default function AddStudent() {
       sortable: true,
     },
     {
-      name: 'Action',
+      name: 'Edit',
       button: true,
       cell: row => <button className="btn btn-secondary btn-sm px-2" onClick={() => { handleEditClick(csvData.indexOf(row) - 1); setShowEditStudentModal(true) }}>
         <i className="fas fa-edit"></i></button>
@@ -159,9 +159,8 @@ export default function AddStudent() {
   useEffect(() => {
     if (sessionStorage.getItem('selectedId')) {
       setAcInfo(JSON.parse(sessionStorage.getItem('selectedId')))
-      if (acInfo.batch_id !== 0) {
+      if (acInfo.dept_id !== 0)
         getBatchs(acInfo.dept_id)
-      }
     }
     getDepartments()
   }, [acInfo.batch_id, acInfo.dept_id, getBatchs])
@@ -258,36 +257,36 @@ export default function AddStudent() {
               <i className="fas fa-trash-alt"></i></button>}
           />
 
-
-          {/* Edit data modal */}
-          <ModalDialog
-            title={`Edit: ${editRowData.name}`}
-            content={
-              <form onSubmit={handleSaveClick}>
-                <TextField label="Student ID" fullWidth value={editRowData.studentId}
-                  onChange={(e) => setEditRowData({ ...editRowData, studentId: e.target.value, })} margin='normal' size='small' />
-
-                <TextField label="Name" fullWidth value={editRowData.name}
-                  onChange={(e) => setEditRowData({ ...editRowData, name: e.target.value, })} margin='normal' size='small' />
-
-                <TextField label="Email" fullWidth value={editRowData.email}
-                  onChange={(e) => setEditRowData({ ...editRowData, email: e.target.value, })} margin='normal' size='small' />
-
-                <TextField label="Phone" fullWidth value={editRowData.phone}
-                  onChange={(e) => setEditRowData({ ...editRowData, phone: e.target.value, })} margin='normal' size='small' />
-              </form>
-            }
-            onOpen={showEditStudentModal}
-            onClose={() => setShowEditStudentModal(false)}
-            onConfirm={handleSaveClick}
-            confirmText={'Update Input'}
-          />
-
-          {/* Utilities */}
-          <CustomSnackbar message={error} status={'error'} />
-          <CustomSnackbar message={success} status={'success'} />
         </div>
       </div>
+
+      {/* Edit data modal */}
+      <ModalDialog
+        title={`Edit: ${editRowData.name}`}
+        content={
+          <form onSubmit={handleSaveClick}>
+            <TextField label="Student ID" fullWidth value={editRowData.studentId}
+              onChange={(e) => setEditRowData({ ...editRowData, studentId: e.target.value, })} margin='normal' size='small' />
+
+            <TextField label="Name" fullWidth value={editRowData.name}
+              onChange={(e) => setEditRowData({ ...editRowData, name: e.target.value, })} margin='normal' size='small' />
+
+            <TextField label="Email" fullWidth value={editRowData.email}
+              onChange={(e) => setEditRowData({ ...editRowData, email: e.target.value, })} margin='normal' size='small' />
+
+            <TextField label="Phone" fullWidth value={editRowData.phone}
+              onChange={(e) => setEditRowData({ ...editRowData, phone: e.target.value, })} margin='normal' size='small' />
+          </form>
+        }
+        onOpen={showEditStudentModal}
+        onClose={() => setShowEditStudentModal(false)}
+        onConfirm={handleSaveClick}
+        confirmText={'Update Input'}
+      />
+
+      {/* Utilities */}
+      <CustomSnackbar message={error} status={'error'} />
+      <CustomSnackbar message={success} status={'success'} />
     </div>
   );
 }

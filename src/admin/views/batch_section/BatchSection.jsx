@@ -27,7 +27,7 @@ export default function BatchSection() {
   const [showEditBatchModal, setShowEditBatchModal] = useState(false)
   const [showAddBatchModal, setShowAddBatchModal] = useState(false)
 
-
+  console.log(selectedDepartment)
   // add & remove input field
   const handleAddField = () => {
     setInputSections([...inputSections, []])
@@ -45,11 +45,14 @@ export default function BatchSection() {
 
 
   // get departments
-  const getDepartments = useCallback(() => {
+  const getDepartments = useCallback((getBatch) => {
     axios.get('/api/admin/departments').then(res => {
       if (res.status === 200) {
         setDepartments(res.data.departments)
-        getBatchs(res.data.departments[0].id)
+        if (getBatch === 1) {
+          getBatchs(res.data.departments[0].id)
+          setSelectedDepartment(res.data.departments[0].id)
+        }
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -193,7 +196,13 @@ export default function BatchSection() {
 
 
   useEffect(() => {
-    getDepartments()
+    if (sessionStorage.getItem('selectedId')) {
+      setSelectedDepartment(JSON.parse(sessionStorage.getItem('selectedId')).dept_id)
+      getBatchs(JSON.parse(sessionStorage.getItem('selectedId')).dept_id)
+      getDepartments()
+    } else {
+      getDepartments(1)
+    }
   }, [getDepartments])
 
   useEffect(() => {
@@ -217,14 +226,16 @@ export default function BatchSection() {
             title={
               <div className="row">
                 <div className='col-3'>
-                  <select className="form-select" onChange={(e) => {
-                    setSelectedDepartment(e.target.value);
-                    getBatchs(e.target.value)
-                  }}>
+                  <TextField select fullWidth margin='small' size='small' value={selectedDepartment}
+                    onChange={(e) => {
+                      setSelectedDepartment(e.target.value);
+                      getBatchs(e.target.value)
+                      sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
+                    }}>
                     {departments.map((department) => (
-                      <option value={department.id}>{department.name}</option>
+                      <MenuItem value={department.id}>{department.name}</MenuItem>
                     ))}
-                  </select>
+                  </TextField>
                 </div>
                 <div className='col-4'>
                   <div className="input-group">

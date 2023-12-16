@@ -4,7 +4,10 @@ import DataTable from 'react-data-table-component'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import { Link } from 'react-router-dom'
-import { MenuItem, TextField } from '@mui/material'
+import { Grid, Menu, MenuItem, TextField } from '@mui/material'
+import ModalDialog from '../../../utilities/ModalDialog'
+import CustomSnackbar from '../../../utilities/SnackBar'
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 export default function Students() {
 
@@ -16,17 +19,20 @@ export default function Students() {
   const [batchs, setBatchs] = useState([])
   const [sections, setSections] = useState([])
 
-  // const [selectedDepartment, setSelectedDepartment] = useState(0)
-  // const [selectedBatch, setSelectedBatch] = useState(0)
-
   const [filterVals, setFilterVals] = useState({ dept_id: 0, batch_id: 0, section_id: 0 })
 
   const [students, setStudents] = useState([])
   const [searchStudents, setSearchStudents] = useState('')
   const [filteredStudents, setFilteredStudents] = useState([])
 
+  const [inputStudent, setInputStudent] = useState({ student_id: '', name: '', email: '', phone: '' })
   const [editableStudent, setEditableStudent] = useState({})
   const [selectedStudents, setSelectedStudents] = useState([])
+
+  // open menu and modals
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false)
 
   // console.log(batchs)
   // get departments
@@ -70,6 +76,30 @@ export default function Students() {
         setStudents(res.data.students)
         setFilteredStudents(res.data.students)
         setLoading(false)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+        setLoading(false)
+      }
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+      setLoading(false)
+    });
+  }
+
+  // create student
+  const addStudent = (e) => {
+    e.preventDefault()
+    setLoading(true)
+    let data = { ...inputStudent, ...filterVals }
+    axios.post('/api/admin/students', data).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        getStudents(filterVals.batch_id, filterVals.section_id)
+        setInputStudent({ student_id: '', name: '', email: '', phone: '' })
+        setLoading(false)
+        setTimeout(() => { setSuccess('') }, 5000)
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -161,7 +191,7 @@ export default function Students() {
     },
     {
       name: 'Phone',
-      selector: row => <a href={'tel:' + row.email} target='blank'>{row.phone}</a>,
+      selector: row => <a href={'tel:' + row.phone} target='blank'>{row.phone}</a>,
       sortable: true,
       wrap: true,
     },
@@ -177,10 +207,10 @@ export default function Students() {
   useEffect(() => {
     if (sessionStorage.getItem('selectedId')) {
       setFilterVals(JSON.parse(sessionStorage.getItem('selectedId')))
-      if (filterVals.batch_id !== 0) {
+      if (filterVals.dept_id !== 0)
         getBatchs(filterVals.dept_id)
+      if (filterVals.batch_id !== 0)
         getStudents(filterVals.batch_id, filterVals.section_id)
-      }
     }
     getDepartments()
   }, [filterVals.batch_id, filterVals.dept_id, filterVals.section_id, getBatchs])
@@ -201,7 +231,23 @@ export default function Students() {
       <div className='card my-2'>
         <div className='card-header d-flex justify-content-between align-items-center'>
           <h5 className='mt-3'>All Student</h5>
-          <Link to={'/admin/students/add'} className="btn btn-primary">Add Student</Link>
+
+          {/* add student dropdown button and menu */}
+          <button className="btn btn-primary" id="basic-button" aria-controls={open ? 'basic-menu' : undefined} aria-haspopup="true"
+            aria-expanded={open ? 'true' : undefined} onClick={(event) => setAnchorEl(event.currentTarget)}>
+            Add Student
+          </button>
+          <Menu id="basic-menu" anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}
+            MenuListProps={{ 'aria-labelledby': 'basic-button' }}>
+            <MenuItem>
+              <Link to={'/admin/students/add'} className='text-dark'>
+                <i className="fas fa-file-csv text-grey me-3"></i>Import from .csv
+              </Link>
+            </MenuItem>
+            <MenuItem onClick={() => { setShowAddStudentModal(true); setAnchorEl(null) }}>
+              <i className="fas fa-user-plus text-grey fa-sm me-3"></i>Add manually
+            </MenuItem>
+          </Menu>
         </div>
 
 
@@ -286,56 +332,66 @@ export default function Students() {
             clearSelectedRows={loading}
           />
         </div>
-
-
-        {/* Edit student modal */}
-        <div className="modal" id="editStudentModal" data-mdb-backdrop="static" tabIndex="-1" aria-labelledby="pleModalLabel" aria-hidden="true">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h1 className="modal-title fs-5" id="pleModalLabel">{editableStudent.name}</h1>
-                <button type="button" className="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <form onSubmit={updateStudent}>
-                <div className="modal-body">
-                  <div className="mb-3">
-                    <label htmlFor="name" className="form-label">Name</label>
-                    <input type="text" className="form-control" id="name" value={editableStudent.name}
-                      onChange={(e) => setEditableStudent({ ...editableStudent, name: e.target.value })} maxLength="255" />
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email</label>
-                    <input type="email" className="form-control" id="email" value={editableStudent.email}
-                      onChange={(e) => setEditableStudent({ ...editableStudent, email: e.target.value })} maxLength="255" />
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="department" className="form-label">Department</label>
-                    <select className="form-select" id='department' value={editableStudent.dept_id}
-                      onChange={(e) => { setEditableStudent({ ...editableStudent, dept_id: e.target.value }) }}>
-                      <option selected disabled>Select Department</option>
-                      {departments.map((department) => (
-                        <option value={department.id}>{department.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {error ? setTimeout(() => { setError(""); }, 3000) && <div className="alert alert-danger mt-3 mb-0">{error}</div> : ''}
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-                  <button type="submit" className="btn btn-primary">
-                    {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> :
-                      success ? setTimeout(() => { setSuccess(""); }, 3000) && success : 'Update changes'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div >
-
       </div>
+
+
+      {/* add student modal */}
+      <ModalDialog
+        title={'Add Student'}
+        content={
+          <div>
+            {/* dept, batch, section disabled fields */}
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField select fullWidth value={filterVals.dept_id} margin='normal' size='small' disabled >
+                  {departments.map((department) => (
+                    <MenuItem value={department.id}>{department.name}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <TextField select fullWidth value={filterVals.batch_id} margin='normal' size='small' disabled >
+                  {batchs.map((batch) => (
+                    <MenuItem value={batch.id}>{batch.batch_name}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <TextField select fullWidth value={filterVals.section_id} margin='normal' size='small' disabled >
+                  {sections && sections.map((section) => (
+                    <MenuItem value={section.id}>{section.section_name}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            </Grid>
+
+            {/* sid, name, email, phone input fields */}
+            <TextField label="Student ID" fullWidth value={inputStudent.student_id}
+              onChange={(e) => setInputStudent({ ...inputStudent, student_id: e.target.value })} margin='normal' size='small' />
+
+            <TextField label="Name" fullWidth value={inputStudent.name}
+              onChange={(e) => setInputStudent({ ...inputStudent, name: e.target.value })} margin='normal' size='small' />
+
+            <TextField label="Email" fullWidth value={inputStudent.email}
+              onChange={(e) => setInputStudent({ ...inputStudent, email: e.target.value })} margin='normal' size='small' />
+
+            <TextField label="Phone" fullWidth value={inputStudent.phone}
+              onChange={(e) => setInputStudent({ ...inputStudent, phone: e.target.value })} margin='normal' size='small' />
+          </div>
+        }
+        onOpen={showAddStudentModal}
+        onClose={() => setShowAddStudentModal(false)}
+        onConfirm={addStudent}
+        confirmText={filterVals.section_id !== 0 && 'Add'}
+        loading={loading}
+      />
+
+      {/* Edit student modal */}
+
+
+      {/* Utilities */}
+      <CustomSnackbar message={error} status={'error'} />
+      <CustomSnackbar message={success} status={'success'} />
     </div>
   )
 }

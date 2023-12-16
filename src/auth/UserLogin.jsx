@@ -72,7 +72,7 @@ export default function UserLogin() {
         </div>
 
 
-        <div className="row d-md-flex align-items-center">
+        <div className="row d-md-flex align-items-center mt-4">
           {/* left image */}
           <div className="col-md-5 col-lg-6 p-3 p-lg-5">
             <img className="img-fluid mb-3" src={vectorArt} alt='Welcome' style={{ width: '90%' }} />
@@ -88,16 +88,18 @@ export default function UserLogin() {
               <div className="card-body">
                 <form onSubmit={loginSubmit}>
                   <div className="mb-3">
-                    <label htmlFor="email">Email</label>
-                    <input type="email" name="email" id="email" className='form-control' value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <label className='form-label' htmlFor="email">Email</label>
+                    <input type="email" name="email" id="email" className='form-control form-control-lg'
+                      value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="password">Password</label>
-                    <input type="password" name="password" id="password" className='form-control' value={password} onChange={(e) => setPassword(e.target.value)} />
+                    <label className='form-label' htmlFor="password">Password</label>
+                    <input type="password" name="password" id="password" className='form-control form-control-lg'
+                      value={password} onChange={(e) => setPassword(e.target.value)} />
                   </div>
 
-                  <label htmlFor="remember" className='mb-3'>
+                  <label htmlFor="remember" className='form-label mb-3'>
                     <input type="checkbox" name="remember" id="remember" checked={remember}
                       onChange={(e) => setRemember(e.target.checked)} /> Remember Me
                   </label>

@@ -60,16 +60,18 @@ export default function AdminLogin() {
         <div className='card card-body shadow-lg rounded-7'>
           <form onSubmit={loginSubmit}>
             <div className="mb-3">
-              <label htmlFor="email">Email</label>
-              <input type="email" name="email" id="email" className='form-control' value={email} onChange={(e) => setEmail(e.target.value)} />
+              <label htmlFor="email" className='form-label'>Email</label>
+              <input type="email" name="email" id="email" className='form-control form-control-lg'
+                value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
 
             <div className="mb-3">
-              <label htmlFor="password">Password</label>
-              <input type="password" name="password" id="password" className='form-control' value={password} onChange={(e) => setPassword(e.target.value)} />
+              <label htmlFor="password" className='form-label'>Password</label>
+              <input type="password" name="password" id="password" className='form-control form-control-lg'
+                value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
 
-            <label htmlFor="remember" className='mb-3'>
+            <label htmlFor="remember" className='form-label mb-3'>
               <input type="checkbox" name="remember" id="remember" checked={remember}
                 onChange={(e) => setRemember(e.target.checked)} /> Remember Me
             </label>

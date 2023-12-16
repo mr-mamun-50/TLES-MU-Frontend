@@ -21,6 +21,6 @@ module.exports = {
     // key props
     'react/jsx-key': 'off',
     // propos validation
-    'react/prop-types': 'off'
+    'react/prop-types': 'off',
   },
 }

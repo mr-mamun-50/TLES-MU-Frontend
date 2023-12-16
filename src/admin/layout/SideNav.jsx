@@ -36,12 +36,12 @@ export default function AdminSideNav({ onClose }) {
 
             <NavLink to="/admin" end>
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-chart-area fa-fw me-3"></i> <span>Dashboard</span>
+                <i className="fas fa-chart-area fa-fw me-3"></i> <span> Dashboard</span>
               </span>
             </NavLink>
             <NavLink to="/">
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-clipboard-list fa-fw me-3"></i> <span>Notices</span>
+                <i className="fas fa-clipboard-list fa-fw me-3"></i> <span> Notices</span>
               </span>
             </NavLink>
 
@@ -50,37 +50,58 @@ export default function AdminSideNav({ onClose }) {
 
             <NavLink to="/admin/students">
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-people-group fa-fw me-3"></i><span>Students</span>
+                <i className="fas fa-people-roof fa-fw me-3"></i><span> Students</span>
               </span>
             </NavLink>
 
             <NavLink to="/admin/teachers">
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-user-tie fa-fw me-3"></i><span>Teachers</span>
+                <i className="fas fa-user-tie fa-fw me-3"></i><span> Teachers</span>
               </span>
             </NavLink>
 
+            <NavLink to="/admin/assign-course">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="fas fa-book fa-fw me-3"></i><span> Assign Course</span>
+              </span>
+            </NavLink>
+
+            <NavLink to="/admin/semester">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="fas fa-diagram-next fa-fw me-3"></i><span> Semesters</span>
+              </span>
+            </NavLink>
+
+            <NavLink to="/admin/batch-section">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="fas fa-users-rectangle fa-fw me-3"></i><span> Batches</span>
+              </span>
+            </NavLink>
+
+            <NavLink to="/admin/departments-courses">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="fas fa-layer-group fa-fw me-3"></i><span> Dept. & Courses</span>
+              </span>
+            </NavLink>
 
             <span className="list-group-item list-group-item-action py-2" onClick={() => setShowClinicalSubMenu(!showClinicalSubMenu)} >
               <i className="fas fa-university fa-fw me-3"></i>{" "}
-              <span>Academic</span>
+              <span>Others</span>
               <i className={`fas ${showClinicalSubMenu ? "fa-angle-down" : "fa-angle-right"} float-end mt-1`}></i>
             </span>
             <div className={`${showClinicalSubMenu ? "show" : "collapse"} glassy`}>
-
-              <NavLink to="/admin/batch-section" className="list-group-item">
-                <span>
-                  <i className="fas fa-ils fa-fw me-3"></i>
-                  <span>Batches</span>
-                </span>
-              </NavLink>
-              <NavLink to="/admin/departments-courses" className="list-group-item">
+              <NavLink to="/" className="list-group-item">
                 <span>
                   <i className="fas fa-layer-group fa-fw me-3"></i>
-                  <span>Dept. & Courses</span>
+                  <span>Demo 1</span>
                 </span>
               </NavLink>
-
+              <NavLink to="/" className="list-group-item">
+                <span>
+                  <i className="fas fa-layer-group fa-fw me-3"></i>
+                  <span>Demo 2</span>
+                </span>
+              </NavLink>
             </div>
           </div>
         </div>

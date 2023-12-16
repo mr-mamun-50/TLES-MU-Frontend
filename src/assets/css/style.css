@@ -303,7 +303,7 @@ th {
     visibility: hidden;
 }
 
-@media print {
+/* @media print {
     body {
         background: #fff;
     }
@@ -320,7 +320,6 @@ th {
         top: 0;
     }
 
-    /* Header styles */
     @page {
         margin-top: 0.7in;
         margin-right: 0;
@@ -330,7 +329,7 @@ th {
     @page :first {
         margin-top: 0;
     }
-}
+} */
 
 td p {
     margin-bottom: 5px !important;

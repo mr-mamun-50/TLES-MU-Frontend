@@ -175,7 +175,12 @@ export default function Teachers() {
 
 
   useEffect(() => {
-    getTeachers(0)
+    if (sessionStorage.getItem('selectedId')) {
+      setSelectedDepartment(JSON.parse(sessionStorage.getItem('selectedId')).dept_id)
+      getTeachers(JSON.parse(sessionStorage.getItem('selectedId')).dept_id)
+    } else {
+      getTeachers(0)
+    }
     getDepartments()
   }, [])
 
@@ -201,15 +206,17 @@ export default function Teachers() {
             title={
               <div className="row">
                 <div className='col-3'>
-                  <select className="form-select" onChange={(e) => {
-                    setSelectedDepartment(e.target.value);
-                    getTeachers(e.target.value)
-                  }}>
-                    <option selected value={0}>All Teachers</option>
+                  <TextField select fullWidth margin='small' size='small' value={selectedDepartment}
+                    onChange={(e) => {
+                      setSelectedDepartment(e.target.value);
+                      getTeachers(e.target.value)
+                      sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
+                    }}>
+                    <MenuItem value={0}>All Teachers</MenuItem>
                     {departments.map((department) => (
-                      <option value={department.id}>{department.name}</option>
+                      <MenuItem value={department.id}>{department.name}</MenuItem>
                     ))}
-                  </select>
+                  </TextField>
                 </div>
                 <div className='col-4'>
                   <div className="input-group">
@@ -224,7 +231,8 @@ export default function Teachers() {
             pagination
             responsive
             highlightOnHover
-            noDataComponent={loading ? <span className="spinner-border" role="status" aria-hidden="true"></span> : 'No data found'}
+            noDataComponent={loading ? <span className="spinner-border my-4" role="status" aria-hidden="true"></span>
+              : <div className="text-center my-4">No teachers found</div>}
             selectableRows
             selectableRowsHighlight
             onSelectedRowsChange={data => setSelectedTeachers(data.selectedRows)}

@@ -13,6 +13,8 @@ import Teachers from './admin/views/teacher/Teachers';
 import BatchSection from './admin/views/batch_section/BatchSection';
 import Students from './admin/views/student/Students';
 import AddStudent from './admin/views/student/AddStudent';
+import AssignCourse from "./admin/views/semester/AssignCourse";
+import Semesters from "./admin/views/semester/Semesters";
 
 export default function AllRoutes() {
   return (
@@ -50,6 +52,10 @@ export default function AllRoutes() {
         {/* Student Routes */}
         <Route path="students" element={<Students />} />
         <Route path="students/add" element={<AddStudent />} />
+
+        {/* Semester & Assign Course */}
+        <Route path="semester" element={<Semesters />} />
+        <Route path="assign-course" element={<AssignCourse />} />
       </Route>
 
 
@@ -58,6 +64,7 @@ export default function AllRoutes() {
 
       {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
       <Route path="/" element={<Navigate to={'/login'} />} />
+      <Route path="*" element={<Navigate to={'/'} />} />
     </Routes>
   )
 }
