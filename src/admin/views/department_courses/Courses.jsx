@@ -235,7 +235,7 @@ export default function Courses() {
                 <input type="text" className="form-control bb-input" placeholder="Search course" value={searchCourse} onChange={(e) => setSearchCourse(e.target.value)} />
               </div>
 
-              <button onClick={() => setShowAddCourseModal(true)} className="btn btn-primary">Add Course</button>
+              <button onClick={() => setShowAddCourseModal(true)} className="btn btn-secondary">Add Course</button>
             </div>
           }
           columns={columns}

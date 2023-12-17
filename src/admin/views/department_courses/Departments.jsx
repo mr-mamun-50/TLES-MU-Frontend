@@ -180,6 +180,7 @@ export default function Departments() {
       <div className='card-header'>
         <h5 className='mt-3'>Departments</h5>
       </div>
+
       <div className='card-body pt-2'>
         <DataTable
           title={
@@ -189,7 +190,7 @@ export default function Departments() {
                   <div className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></div>
                   <input type="text" className="form-control bb-input" placeholder="Search department" value={searchDepartment} onChange={(e) => setSearchDepartment(e.target.value)} />
                 </div>
-                <button onClick={() => setShowAddDeptModal(true)} className="btn btn-primary">Add Department</button>
+                <button onClick={() => setShowAddDeptModal(true)} className="btn btn-secondary">Add Department</button>
               </div>
             </div>
           }

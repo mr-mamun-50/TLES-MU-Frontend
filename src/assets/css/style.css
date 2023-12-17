@@ -64,6 +64,9 @@ body {
 .bg-white {
     background-color: #fff !important;
 }
+.border-grey {
+    border: 1px solid #bdbdbd !important;
+}
 
 .sidebar {
     position: fixed;

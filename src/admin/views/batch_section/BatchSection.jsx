@@ -218,7 +218,7 @@ export default function BatchSection() {
       <div className='card my-2'>
         <div className='card-header d-flex justify-content-between align-items-center'>
           <h5 className='mt-3'>All Batch</h5>
-          <button onClick={() => setShowAddBatchModal(true)} className="btn btn-primary">Add Batch</button>
+          <button onClick={() => setShowAddBatchModal(true)} className="btn btn-secondary">Add Batch</button>
         </div>
 
         <div className='card-body pt-2'>

@@ -55,7 +55,6 @@ export default function AllRoutes() {
 
         {/* Semester & Assign Course */}
         <Route path="semester" element={<Semesters />} />
-        <Route path="assign-course" element={<AssignCourse />} />
       </Route>
 
 
@@ -63,7 +62,6 @@ export default function AllRoutes() {
       <Route path="/admin/login" element={<PublicRoute><AdminLogin /></PublicRoute>} />
 
       {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
-      <Route path="/" element={<Navigate to={'/login'} />} />
       <Route path="*" element={<Navigate to={'/'} />} />
     </Routes>
   )

@@ -60,12 +60,6 @@ export default function AdminSideNav({ onClose }) {
               </span>
             </NavLink>
 
-            <NavLink to="/admin/assign-course">
-              <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-book fa-fw me-3"></i><span> Assign Course</span>
-              </span>
-            </NavLink>
-
             <NavLink to="/admin/semester">
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-diagram-next fa-fw me-3"></i><span> Semesters</span>

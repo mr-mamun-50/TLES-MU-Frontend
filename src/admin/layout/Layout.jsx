@@ -34,17 +34,10 @@ export default function AdminLayout(props) {
 
   const container = window !== undefined ? () => window().document.body : undefined;
 
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
 
   // Logout function
   const handleLogOut = () => {
-    handleClose()
+    setAnchorEl(null)
 
     Swal.fire({
       title: 'Are you sure?',
@@ -111,6 +104,11 @@ export default function AdminLayout(props) {
             <MenuIcon />
           </IconButton>
 
+          <div className="input-group d-none d-md-flex" style={{ width: '250px' }}>
+            <input className="form-control ps-3" placeholder="Search" style={{ borderRadius: "10px 0 0 10px" }} required />
+            <button className="btn bg-light border-grey px-3" style={{ borderRadius: "0 10px 10px 0" }}><i className="fas fa-search me-1"></i></button>
+          </div>
+
           {/* user info */}
           {/* <Box className="border px-2 px-md-3 py-1 me-2 rounded-7 wrap50p">
             <h6 className='m-0 p-0'>{userDetails.name}</h6>
@@ -121,7 +119,7 @@ export default function AdminLayout(props) {
           <Box className='ms-auto'>
             <div className="bg-light rounded-7 ps-1">
               <Button size="large" aria-label="account" aria-controls="menu-appbar" aria-haspopup="true"
-                onClick={handleMenu} color="inherit" style={{ textTransform: 'none' }}>
+                onClick={(event) => setAnchorEl(event.currentTarget)} color="inherit" style={{ textTransform: 'none' }}>
 
                 <Typography mr={1}>{userDetails.name}</Typography>
                 <Avatar src={`${config.s3BaseUrl}${userDetails.photo}`} sx={{ width: 32, height: 32 }} />
@@ -131,9 +129,9 @@ export default function AdminLayout(props) {
             <Menu id="menu-appbar" anchorEl={anchorEl} sx={{ mt: '40px' }}
               anchorOrigin={{ vertical: 'top', horizontal: 'right', }} keepMounted
               transformOrigin={{ vertical: 'top', horizontal: 'right', }}
-              open={Boolean(anchorEl)} onClose={handleClose}>
+              open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
 
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
+              <MenuItem>Profile</MenuItem>
               <MenuItem onClick={() => { setAnchorEl(null); setOpenChangePass(true) }}>Change Password</MenuItem>
               <Divider />
               <MenuItem onClick={handleLogOut}>Logout</MenuItem>

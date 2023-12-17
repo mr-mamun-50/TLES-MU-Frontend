@@ -198,7 +198,7 @@ export default function Teachers() {
       <div className='card my-2'>
         <div className='card-header d-flex justify-content-between align-items-center'>
           <h5 className='mt-3'>All Teacher</h5>
-          <button onClick={() => setShowAddTeacherModal(true)} className="btn btn-primary">Add Teacher</button>
+          <button onClick={() => setShowAddTeacherModal(true)} className="btn btn-secondary">Add Teacher</button>
         </div>
 
         <div className='card-body pt-2'>

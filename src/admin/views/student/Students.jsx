@@ -233,7 +233,7 @@ export default function Students() {
           <h5 className='mt-3'>All Student</h5>
 
           {/* add student dropdown button and menu */}
-          <button className="btn btn-primary" id="basic-button" aria-controls={open ? 'basic-menu' : undefined} aria-haspopup="true"
+          <button className="btn btn-secondary" id="basic-button" aria-controls={open ? 'basic-menu' : undefined} aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined} onClick={(event) => setAnchorEl(event.currentTarget)}>
             Add Student
           </button>
