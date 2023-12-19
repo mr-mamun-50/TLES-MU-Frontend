@@ -67,6 +67,9 @@ body {
 .border-grey {
     border: 1px solid #bdbdbd !important;
 }
+.border-light-grey {
+    border-color: #e3ebf7 !important;
+}
 
 .sidebar {
     position: fixed;

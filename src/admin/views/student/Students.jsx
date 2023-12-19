@@ -266,6 +266,7 @@ export default function Students() {
                     setFilterVals({ dept_id: e.target.value, batch_id: 0, section_id: 0 });
                     getBatchs(e.target.value);
                     sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
+                    setStudents([])
                   }}>
                   <MenuItem value={0} disabled>Select Department</MenuItem>
                   {departments.map((department) => (
@@ -280,7 +281,6 @@ export default function Students() {
                   onChange={(e) => {
                     setFilterVals({ ...filterVals, batch_id: e.target.value, section_id: 0 });
                     batchs.map((batch) => batch.id === e.target.value && setSections(batch.sections));
-                    getStudents(e.target.value, 0)
                     sessionStorage.setItem('selectedId', JSON.stringify({ ...filterVals, batch_id: e.target.value, section_id: 0 }))
                   }} disabled={filterVals.dept_id === 0}>
                   <MenuItem value={0} disabled>Select Batch</MenuItem>
@@ -295,7 +295,6 @@ export default function Students() {
                 <TextField select fullWidth margin='small' size='small' value={filterVals.section_id}
                   onChange={(e) => {
                     setFilterVals({ ...filterVals, section_id: e.target.value })
-                    getStudents(filterVals.batch_id, e.target.value)
                     sessionStorage.setItem('selectedId', JSON.stringify({ ...filterVals, section_id: e.target.value }))
                   }} disabled={filterVals.batch_id === 0}>
                   <MenuItem value={0} disabled>Select Section</MenuItem>

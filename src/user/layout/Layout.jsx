@@ -10,7 +10,6 @@ import { useEffect } from 'react';
 import { useCallback } from 'react';
 import CustomSnackbar from '../../utilities/SnackBar';
 import PasswordChangeDialog from '../../utilities/PasswordChangeDialog';
-import config from '../../config';
 import UserSideNav from './SideNav';
 
 const drawerWidth = 240;
@@ -124,7 +123,7 @@ export default function UserLayout(props) {
                 onClick={handleMenu} color="inherit" style={{ textTransform: 'none' }}>
 
                 <Typography mr={1}>{userDetails.name}</Typography>
-                <Avatar src={`${config.s3BaseUrl}${userDetails.photo}`} sx={{ width: 32, height: 32 }} />
+                <Avatar sx={{ width: 32, height: 32 }} />
               </Button>
             </div>
 

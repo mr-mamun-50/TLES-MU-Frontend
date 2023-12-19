@@ -273,7 +273,7 @@ export default function Courses() {
             <div className="form-label mb-0 mt-3">Courses</div>
             {/* courses input fields */}
             {inputValues.map((inputField, index) => (
-              <div className='card card-body mb-3 mt-2 p-3 pe-1 shadow-sm border' key={index}>
+              <div className='border-top border-light-grey py-3' key={index}>
                 <div className='d-flex justify-content-between'>
 
                   <Grid container spacing={2}>

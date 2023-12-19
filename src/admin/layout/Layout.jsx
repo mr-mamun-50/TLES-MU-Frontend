@@ -11,7 +11,6 @@ import { useCallback } from 'react';
 import CustomSnackbar from '../../utilities/SnackBar';
 import PasswordChangeDialog from '../../utilities/PasswordChangeDialog';
 import AdminSideNav from './SideNav';
-import config from '../../config';
 
 const drawerWidth = 240;
 
@@ -122,7 +121,7 @@ export default function AdminLayout(props) {
                 onClick={(event) => setAnchorEl(event.currentTarget)} color="inherit" style={{ textTransform: 'none' }}>
 
                 <Typography mr={1}>{userDetails.name}</Typography>
-                <Avatar src={`${config.s3BaseUrl}${userDetails.photo}`} sx={{ width: 32, height: 32 }} />
+                <Avatar sx={{ width: 32, height: 32 }} />
               </Button>
             </div>
 

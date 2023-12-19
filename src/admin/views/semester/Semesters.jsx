@@ -12,7 +12,7 @@ export default function Semesters() {
   const [error, setError] = useState('')
 
   const [semesters, setSemesters] = useState([])
-  const [selectedSemester, setSelectedSemester] = useState(0)
+  const [selectedSemester, setSelectedSemester] = useState({})
 
   const semesterOpt = { name: '', start_date: convertDate(new Date()), end_date: convertDate(new Date().setMonth(+16)) }
   const [inputSemester, setInputSemester] = useState(semesterOpt)
@@ -20,7 +20,7 @@ export default function Semesters() {
   // show hide modals
   const [showAddSemesterModal, setShowAddSemesterModal] = useState(false)
 
-  console.log(semesters)
+  // console.log(semesters)
 
   // get semesters
   const getSemesters = () => {
@@ -28,7 +28,7 @@ export default function Semesters() {
     axios.get(`/api/admin/semesters`).then(res => {
       if (res.status === 200) {
         setSemesters(res.data.semesters)
-        setSelectedSemester(res.data.semesters[0].id)
+        setSelectedSemester(res.data.semesters[0])
         setLoading(false)
       } else {
         setError(res.data.message)
@@ -75,7 +75,7 @@ export default function Semesters() {
     <div className="container">
       <div className="row">
         {/* select semester */}
-        <div className="col-12 col-md-6 col-lg-4">
+        <div className="col-12 col-md-6 col-lg-3">
           <div className='card my-2'>
             <div className='card-header d-flex justify-content-between align-items-center'>
               <h5 className='mt-2 mb-0'>Semesters</h5>
@@ -85,9 +85,9 @@ export default function Semesters() {
             <div className="card-body px-3">
               <div className="list-group list-group-light" style={{ height: "300px", overflowY: "scroll" }}>
                 {semesters.map((semester) => (
-                  <button onClick={() => setSelectedSemester(semester.id)}
-                    className={`list-group-item list-group-item-action px-3 py-2 ${selectedSemester === semester.id && 'active'}`}>
-                    <i className={`${selectedSemester === semester.id ? 'fas' : 'far'} fa-circle-check me-2`}></i>{semester.name}
+                  <button onClick={() => setSelectedSemester(semester)}
+                    className={`list-group-item list-group-item-action px-3 py-2 ${selectedSemester.id === semester.id && 'active'}`}>
+                    <i className={`${selectedSemester.id === semester.id ? 'fas' : 'far'} fa-circle-check me-2`}></i>{semester.name}
                   </button>
                 ))}
               </div>
@@ -96,8 +96,8 @@ export default function Semesters() {
         </div>
 
         {/* assign courses */}
-        <div className="col-12 col-md-6 col-lg-8">
-          <AssignCourse />
+        <div className="col-12 col-md-6 col-lg-9">
+          {selectedSemester.id && <AssignCourse selectedSemester={selectedSemester} />}
         </div>
       </div>
 
