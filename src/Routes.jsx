@@ -8,13 +8,14 @@ import UserPrivateRoute from './user/layout/PrivateRoute';
 import UserLayout from './user/layout/Layout';
 import AdminDashboard from './admin/views/Dashboard';
 import UserDashboard from './user/views/Dashboard';
-import DcIndex from './admin/views/department_courses/DcIndex';
 import Teachers from './admin/views/teacher/Teachers';
 import BatchSection from './admin/views/batch_section/BatchSection';
 import Students from './admin/views/student/Students';
 import AddStudent from './admin/views/student/AddStudent';
-import AssignCourse from "./admin/views/semester/AssignCourse";
 import Semesters from "./admin/views/semester/Semesters";
+import AssignedCourses from "./user/views/classes/AssignedCourses";
+import Departments from "./admin/views/department_courses/Departments";
+import ViewClass from "./user/views/classes/ViewClass";
 
 export default function AllRoutes() {
   return (
@@ -27,8 +28,9 @@ export default function AllRoutes() {
       <Route path="/" element={<UserPrivateRoute><UserLayout /></UserPrivateRoute>}>
         <Route index element={<UserDashboard />} />
 
-        {/* clinic routes */}
-        {/* <Route path="clinics" element={<Clinics />} /> */}
+        {/* Classes routes */}
+        <Route path="classes" element={<AssignedCourses />} />
+        <Route path="classes/:id" element={<ViewClass />} />
       </Route>
 
 
@@ -47,7 +49,7 @@ export default function AllRoutes() {
         <Route path="batch-section" element={<BatchSection />} />
 
         {/* Department Routes */}
-        <Route path="departments-courses" element={<DcIndex />} />
+        <Route path="departments-courses" element={<Departments />} />
 
         {/* Student Routes */}
         <Route path="students" element={<Students />} />

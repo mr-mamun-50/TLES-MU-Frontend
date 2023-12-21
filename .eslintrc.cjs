@@ -22,5 +22,7 @@ module.exports = {
     'react/jsx-key': 'off',
     // propos validation
     'react/prop-types': 'off',
+    // warning in unused imports eslint
+    "no-unused-vars": ["warn", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
   },
 }

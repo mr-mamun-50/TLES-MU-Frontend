@@ -6,13 +6,12 @@ import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
 import { Grid, MenuItem, TextField } from '@mui/material'
 
-export default function Courses() {
+export default function Courses({ departments }) {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const [departments, setDepartments] = useState([])
   const [selectedDepartment, setSelectedDepartment] = useState(0)
 
   const [courses, setCourses] = useState([])
@@ -151,21 +150,6 @@ export default function Courses() {
     });
   }
 
-  // get  departments
-  const getDepartments = () => {
-    axios.get('/api/admin/departments').then(res => {
-      if (res.status === 200) {
-        setDepartments(res.data.departments)
-      } else {
-        setError(res.data.message)
-        setTimeout(() => { setError('') }, 5000)
-      }
-    }).catch(err => {
-      setError(err.response.data.message)
-      setTimeout(() => { setError('') }, 5000)
-    });
-  }
-
   // datatable columns
   const columns = [
     {
@@ -182,6 +166,12 @@ export default function Courses() {
       wrap: true
     },
     {
+      name: 'Credit',
+      selector: row => row.credit_hours,
+      sortable: true,
+      width: '90px'
+    },
+    {
       name: 'Action',
       cell: (row) => <button className="btn btn-secondary btn-sm px-2"
         onClick={() => { setEditableCourse(row); setShowEditCourseModal(true) }}><i className="fas fa-edit"></i></button >,
@@ -189,10 +179,6 @@ export default function Courses() {
     }
   ]
 
-
-  useEffect(() => {
-    getDepartments()
-  }, [])
 
   useEffect(() => {
     const result = courses.filter((course) => {
@@ -209,20 +195,16 @@ export default function Courses() {
       <div className='card-header d-flex justify-content-between align-items-center'>
         <h5 className='mt-3'>Courses</h5>
 
-        <div className='d-flex justify-content-end'>
-          <button type="button" onClick={() => getDepartments()} className='btn btn-light btn-floating me-1'>
-            <i className="fas fa-refresh fa-lg text-muted"></i></button>
-
-          <select className="form-select w-50" onChange={(e) => {
-            setSelectedDepartment(e.target.value)
-            getCourses(e.target.value)
+        <TextField sx={{ width: '200px' }} select fullWidth margin='small' size='small' value={selectedDepartment}
+          onChange={(e) => {
+            setSelectedDepartment(e.target.value);
+            getCourses(e.target.value);
           }}>
-            <option selected disabled value={0}>Select Department</option>
-            {departments.map((department) => (
-              <option value={department.id} key={department.id}>{department.name}</option>
-            ))}
-          </select>
-        </div>
+          <MenuItem value={0} disabled>Select Department</MenuItem>
+          {departments.map((department) => (
+            <MenuItem value={department.id}>{department.name}</MenuItem>
+          ))}
+        </TextField>
       </div>
 
       {/* body */}
@@ -277,13 +259,17 @@ export default function Courses() {
                 <div className='d-flex justify-content-between'>
 
                   <Grid container spacing={2}>
-                    <Grid item xs={12} sm={4}>
+                    <Grid item xs={12} sm={3}>
                       <TextField fullWidth label="Course code" value={inputField.course_code}
                         onChange={(e) => handleInputChange({ course_code: e.target.value }, index)} size='small' />
                     </Grid>
-                    <Grid item xs={12} sm={8}>
+                    <Grid item xs={12} sm={6}>
                       <TextField fullWidth label="Course title" value={inputField.title}
                         onChange={(e) => handleInputChange({ title: e.target.value }, index)} size='small' />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <TextField type='number' fullWidth label="Credit hours" value={inputField.credit_hours}
+                        onChange={(e) => handleInputChange({ credit_hours: e.target.value }, index)} size='small' inputProps={{ step: '0.5' }} />
                     </Grid>
                   </Grid>
 
@@ -300,7 +286,7 @@ export default function Courses() {
         }
         onOpen={showAddCourseModal}
         onClose={() => setShowAddCourseModal(false)}
-        confirmText={selectedDepartment.length > 0 && 'Add Courses'}
+        confirmText={selectedDepartment !== 0 && 'Add Courses'}
         onConfirm={addCourses}
         loading={loading}
       />
@@ -309,14 +295,18 @@ export default function Courses() {
       <ModalDialog
         title={'Edit Course'}
         content={
-          <form onSubmit={updateCourses} style={{ minWidth: '350px' }}>
+          <form onSubmit={updateCourses} style={{ width: '350px' }}>
             <TextField label="Course code" value={editableCourse.course_code}
               onChange={(e) => setEditableCourse({ ...editableCourse, course_code: e.target.value })}
-              className="mb-3" fullWidth required margin='normal' />
+              className="mb-3" fullWidth required margin='normal' size='small' />
 
             <TextField label="Course title" value={editableCourse.title}
               onChange={(e) => setEditableCourse({ ...editableCourse, title: e.target.value })}
-              className="mb-3" fullWidth required margin='normal' />
+              className="mb-3" fullWidth required margin='normal' size='small' />
+
+            <TextField type='number' label="Credit hours" value={editableCourse.credit_hours}
+              onChange={(e) => setEditableCourse({ ...editableCourse, credit_hours: e.target.value })}
+              className="mb-3" fullWidth required margin='normal' size='small' inputProps={{ step: '0.5' }} />
           </form>
         }
         onOpen={showEditCourseModal}

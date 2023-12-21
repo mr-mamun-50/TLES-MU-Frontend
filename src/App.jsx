@@ -4,7 +4,8 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import AllRoutes from "./Routes";
 
 
-axios.defaults.baseURL = 'http://localhost/teaching_learning_evaluation_system_mu/backend/public';
+// axios.defaults.baseURL = 'http://localhost/teaching_learning_evaluation_system_mu/backend/public';
+axios.defaults.baseURL = 'http://127.0.0.1:8000';
 axios.defaults.headers.post['Accept'] = 'application/json';
 axios.defaults.withCredentials = true;
 

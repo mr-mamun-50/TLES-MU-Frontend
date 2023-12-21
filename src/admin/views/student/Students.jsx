@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import axios from 'axios'
 import Swal from 'sweetalert2'
@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom'
 import { Grid, Menu, MenuItem, TextField } from '@mui/material'
 import ModalDialog from '../../../utilities/ModalDialog'
 import CustomSnackbar from '../../../utilities/SnackBar'
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 export default function Students() {
 
@@ -30,7 +29,7 @@ export default function Students() {
   const [selectedStudents, setSelectedStudents] = useState([])
 
   // open menu and modals
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [showAddStudentModal, setShowAddStudentModal] = useState(false)
 

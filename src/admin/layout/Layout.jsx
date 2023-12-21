@@ -103,10 +103,10 @@ export default function AdminLayout(props) {
             <MenuIcon />
           </IconButton>
 
-          <div className="input-group d-none d-md-flex" style={{ width: '250px' }}>
+          <Box className="input-group d-none d-md-flex" style={{ width: '250px' }}>
             <input className="form-control ps-3" placeholder="Search" style={{ borderRadius: "10px 0 0 10px" }} required />
             <button className="btn bg-light border-grey px-3" style={{ borderRadius: "0 10px 10px 0" }}><i className="fas fa-search me-1"></i></button>
-          </div>
+          </Box>
 
           {/* user info */}
           {/* <Box className="border px-2 px-md-3 py-1 me-2 rounded-7 wrap50p">

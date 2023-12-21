@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
 import { TextField } from '@mui/material'
+import Courses from './Courses'
 
 export default function Departments() {
 
@@ -176,38 +177,50 @@ export default function Departments() {
 
 
   return (
-    <div className='card'>
-      <div className='card-header'>
-        <h5 className='mt-3'>Departments</h5>
-      </div>
+    <div className="container">
+      <div className='row my-2'>
 
-      <div className='card-body pt-2'>
-        <DataTable
-          title={
-            <div>
-              <div className="w-100 d-flex align-items-center justify-content-between my-2">
-                <div className="input-group w-50">
-                  <div className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></div>
-                  <input type="text" className="form-control bb-input" placeholder="Search department" value={searchDepartment} onChange={(e) => setSearchDepartment(e.target.value)} />
-                </div>
-                <button onClick={() => setShowAddDeptModal(true)} className="btn btn-secondary">Add Department</button>
-              </div>
+        {/* department section */}
+        <div className='col-lg-5'>
+          <div className='card'>
+            <div className='card-header'>
+              <h5 className='mt-3'>Departments</h5>
             </div>
-          }
-          columns={columns}
-          data={filteredDepartment}
-          pagination
-          responsive
-          highlightOnHover
-          noDataComponent={loading ? <span className="spinner-border" role="status" aria-hidden="true"></span> : 'No data found'}
-          selectableRows
-          selectableRowsHighlight
-          onSelectedRowsChange={data => setSelectedDepartments(data.selectedRows)}
-          contextActions={<button className="btn btn-danger me-2 px-3" onClick={() => deleteDepartments()}><i className="fas fa-trash-alt"></i></button>}
-          clearSelectedRows={loading}
-        />
-      </div>
 
+            <div className='card-body pt-2'>
+              <DataTable
+                title={
+                  <div>
+                    <div className="w-100 d-flex align-items-center justify-content-between my-2">
+                      <div className="input-group w-50">
+                        <div className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></div>
+                        <input type="text" className="form-control bb-input" placeholder="Search department" value={searchDepartment} onChange={(e) => setSearchDepartment(e.target.value)} />
+                      </div>
+                      <button onClick={() => setShowAddDeptModal(true)} className="btn btn-secondary">Add Department</button>
+                    </div>
+                  </div>
+                }
+                columns={columns}
+                data={filteredDepartment}
+                pagination
+                responsive
+                highlightOnHover
+                noDataComponent={loading ? <span className="spinner-border" role="status" aria-hidden="true"></span> : 'No data found'}
+                selectableRows
+                selectableRowsHighlight
+                onSelectedRowsChange={data => setSelectedDepartments(data.selectedRows)}
+                contextActions={<button className="btn btn-danger me-2 px-3" onClick={() => deleteDepartments()}><i className="fas fa-trash-alt"></i></button>}
+                clearSelectedRows={loading}
+              />
+            </div>
+          </div >
+        </div>
+
+        {/* courses section */}
+        <div className='col-lg-7'>
+          <Courses departments={departments} />
+        </div>
+      </div>
 
 
       {/* add dept. modal */}
@@ -256,6 +269,6 @@ export default function Departments() {
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
       <CustomSnackbar message={success} status={'success'} />
-    </div >
+    </div>
   )
 }

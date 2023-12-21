@@ -1,4 +1,3 @@
-/* eslint-disable eqeqeq */
 import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import axios from 'axios'
@@ -27,7 +26,7 @@ export default function BatchSection() {
   const [showEditBatchModal, setShowEditBatchModal] = useState(false)
   const [showAddBatchModal, setShowAddBatchModal] = useState(false)
 
-  console.log(selectedDepartment)
+  // console.log(batchs)
   // add & remove input field
   const handleAddField = () => {
     setInputSections([...inputSections, []])
@@ -173,7 +172,7 @@ export default function BatchSection() {
     },
     {
       name: 'Total Students',
-      selector: row => '200',
+      selector: row => row.students_count,
       sortable: true,
       wrap: true,
       width: '150px'

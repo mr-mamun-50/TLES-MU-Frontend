@@ -110,6 +110,11 @@ export default function UserLayout(props) {
             <MenuIcon />
           </IconButton>
 
+          <Box className="input-group d-none d-md-flex" style={{ width: '250px' }}>
+            <input className="form-control ps-3" placeholder="Search" style={{ borderRadius: "10px 0 0 10px" }} required />
+            <button className="btn bg-light border-grey px-3" style={{ borderRadius: "0 10px 10px 0" }}><i className="fas fa-search me-1"></i></button>
+          </Box>
+
           {/* user info */}
           {/* <Box className="border px-2 px-md-3 py-1 me-2 rounded-7 wrap50p">
             <h6 className='m-0 p-0'>{userDetails.name}</h6>
@@ -122,7 +127,8 @@ export default function UserLayout(props) {
               <Button size="large" aria-label="account" aria-controls="menu-appbar" aria-haspopup="true"
                 onClick={handleMenu} color="inherit" style={{ textTransform: 'none' }}>
 
-                <Typography mr={1}>{userDetails.name}</Typography>
+                <Typography className='text-hide-ellipsis' mr={1} style={{ width: '110px' }}>
+                  {userDetails.name}</Typography>
                 <Avatar sx={{ width: 32, height: 32 }} />
               </Button>
             </div>

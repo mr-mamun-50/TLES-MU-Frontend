@@ -34,40 +34,38 @@ export default function UserSideNav({ onClose }) {
             <small className='text-muted ms-4'>Core</small>
             <hr className='mb-1 mt-0 text-light' />
 
-            <NavLink to="/admin" end>
+            <NavLink to="/" end>
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-tachometer-alt fa-fw me-3"></i> <span>Dashboard</span>
+                <i className="fas fa-chart-area fa-fw me-3"></i> <span>Dashboard</span>
               </span>
             </NavLink>
-            <NavLink to="/admin/clinic-list">
+            <NavLink to="/classes">
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-hospital-user fa-fw me-3"></i> <span>Clinic List</span>
+                <i className="fas fa-graduation-cap fa-fw me-3"></i> <span>Classes</span>
               </span>
             </NavLink>
 
-            <small className='text-muted mt-2 ms-4'>Administrative</small>
+            <small className='text-muted mt-2 ms-4'>Analytics</small>
             <hr className='mb-1 mt-0 text-light' />
 
             <span className="list-group-item list-group-item-action py-2" onClick={() => setShowClinicalSubMenu(!showClinicalSubMenu)} >
-              <i className="fas fa-hospital fa-fw me-3"></i>{" "}
-              <span>Clinical</span>
+              <i className="fas fa-university fa-fw me-3"></i>{" "}
+              <span>Others</span>
               <i className={`fas ${showClinicalSubMenu ? "fa-angle-down" : "fa-angle-right"} float-end mt-1`}></i>
             </span>
             <div className={`${showClinicalSubMenu ? "show" : "collapse"} glassy`}>
-
-              <NavLink to="/admin/medical-tests" className="list-group-item">
+              <NavLink to="/*" className="list-group-item">
                 <span>
-                  <i className="fas fa-microscope fa-fw me-3"></i>
-                  <span>MedicalTests</span>
+                  <i className="fas fa-layer-group fa-fw me-3"></i>
+                  <span>Demo 1</span>
                 </span>
               </NavLink>
-              <NavLink to="/admin/clinics" className="list-group-item">
+              <NavLink to="/*" className="list-group-item">
                 <span>
-                  <i className="fas fa-hospital fa-fw me-3"></i>
-                  <span>Clinics</span>
+                  <i className="fas fa-layer-group fa-fw me-3"></i>
+                  <span>Demo 2</span>
                 </span>
               </NavLink>
-
             </div>
           </div>
         </div>
