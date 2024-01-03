@@ -32,6 +32,7 @@ export default function Students() {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [showAddStudentModal, setShowAddStudentModal] = useState(false)
+  const [showEditStudentModal, setShowEditStudentModal] = useState(false)
 
   // console.log(batchs)
   // get departments
@@ -119,6 +120,7 @@ export default function Students() {
       if (res.status === 200) {
         setSuccess(res.data.message)
         getStudents(filterVals.batch_id, filterVals.section_id)
+        setShowEditStudentModal(false)
         setLoading(false)
         setTimeout(() => { setSuccess('') }, 5000)
       } else {
@@ -197,7 +199,7 @@ export default function Students() {
     {
       name: 'Action',
       button: true,
-      cell: row => <button className="btn btn-secondary btn-sm px-2" onClick={() => { setEditableStudent(row) }}>
+      cell: row => <button className="btn btn-secondary btn-sm px-2" onClick={() => { setEditableStudent(row); setShowEditStudentModal(true) }}>
         <i className="fas fa-edit" ></i></button >,
     }
   ]
@@ -385,6 +387,29 @@ export default function Students() {
       />
 
       {/* Edit student modal */}
+      <ModalDialog
+        title={'Edit Student'}
+        content={
+          <div>
+            <TextField label="Student ID" fullWidth value={editableStudent.student_id}
+              onChange={(e) => setEditableStudent({ ...editableStudent, student_id: e.target.value })} margin='normal' size='small' />
+
+            <TextField label="Name" fullWidth value={editableStudent.name}
+              onChange={(e) => setEditableStudent({ ...editableStudent, name: e.target.value })} margin='normal' size='small' />
+
+            <TextField label="Email" fullWidth value={editableStudent.email}
+              onChange={(e) => setEditableStudent({ ...editableStudent, email: e.target.value })} margin='normal' size='small' />
+
+            <TextField label="Phone" fullWidth value={editableStudent.phone}
+              onChange={(e) => setEditableStudent({ ...editableStudent, phone: e.target.value })} margin='normal' size='small' />
+          </div>
+        }
+        onOpen={showEditStudentModal}
+        onClose={() => setShowEditStudentModal(false)}
+        onConfirm={updateStudent}
+        confirmText={'Update'}
+        loading={loading}
+      />
 
 
       {/* Utilities */}

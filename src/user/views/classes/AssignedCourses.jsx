@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import { Menu, MenuItem, TextField } from '@mui/material'
 import { Link } from 'react-router-dom'
@@ -33,9 +33,9 @@ export default function AssignedCourses() {
   // console.log(classes)
 
   // get classes
-  const getClasses = (category) => {
+  const getClasses = useCallback(() => {
     setLoading(true);
-    axios.get(`/api/user/assigned-courses/${category}`).then(res => {
+    axios.get(`/api/user/assigned-courses/${classStatus}`).then(res => {
       if (res.status === 200) {
         const fetchImagePromises = res.data.courses.map(course => {
           return fetch(`https://api.pexels.com/v1/search?query=${course.course.title}&per_page=1`, {
@@ -68,29 +68,32 @@ export default function AssignedCourses() {
       setTimeout(() => { setError('') }, 5000);
       setLoading(false);
     });
-  };
+  }, [classStatus]);
 
   // move to archive
   const moveToArchive = (id) => {
     setLoading(true)
     axios.put(`/api/user/assigned-courses/move-to-archive/${id}`).then(res => {
       if (res.status === 200) {
+        getClasses()
         setSuccess(res.data.message)
-        getClasses(1)
+        setTimeout(() => { setSuccess('') }, 5000)
       } else {
         setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
       }
       setLoading(false)
     }).catch(err => {
       setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     })
   }
 
 
   useEffect(() => {
-    getClasses(1)
-  }, [])
+    getClasses()
+  }, [getClasses])
 
 
   return (
@@ -101,7 +104,7 @@ export default function AssignedCourses() {
 
         <div className="col-6 col-md-3 col-xl-2">
           <TextField select fullWidth margin='small' size='small' value={classStatus}
-            onChange={(e) => { setClassStatus(e.target.value); getClasses(e.target.value) }}>
+            onChange={(e) => { setClassStatus(e.target.value); }}>
             <MenuItem value={1}>Current classes</MenuItem>
             <MenuItem value={0}>Archived Classes</MenuItem>
           </TextField>
@@ -115,9 +118,10 @@ export default function AssignedCourses() {
           : classes.length > 0 ?
             classes.map((course, index) => (
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 mb-4">
-                <div className='card border border-light-grey h-100' key={index}>
+                <div className='card border border-light-grey h-100 class-card' key={index}>
 
-                  <Link to={`/classes/${course.id}`}>
+                  {/* linked card contents */}
+                  <Link to={`/classes/${course.id}`} state={{ course: course }}>
                     <div className="card-header bg-dark d-flex align-items-end" style={{
                       height: '110px',
                       background: `linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)), url("${course.image}") no-repeat center/cover`
@@ -129,14 +133,15 @@ export default function AssignedCourses() {
                         <p className='card-text text-light' style={{ textShadow: '0 0 10px black' }}>Credit hours: {course.course.credit_hours}</p>
                       </div>
                     </div>
+
+
+                    <div className='card-body p-3 small text-dark bg-white'>
+                      <p className='mb-1 text-hide-ellipsis'>{course.section.batch.department.name}</p>
+                      <p className='mb-1 fw-bold'>{course.section.batch.batch_name} ({course.section.section_name})</p>
+                      <p className='mb-2'>{course.semester?.name}</p>
+                      {/* <p className=''>Number of Students: {course.section.students.length}</p> */}
+                    </div>
                   </Link>
-
-
-                  <div className='card-body p-3 small'>
-                    <p className='mb-1 text-hide-ellipsis'>{course.section.batch.department.name}</p>
-                    <p className='mb-1 fw-bold'>{course.section.batch.batch_name} ({course.section.section_name})</p>
-                    <p className=''>Number of Students: {course.section.students.length}</p>
-                  </div>
 
 
                   {/* more button */}
@@ -152,7 +157,7 @@ export default function AssignedCourses() {
                     onClose={handleMenuClose} MenuListProps={{ 'aria-labelledby': `basic-button-${index}` }}
                   >
                     <MenuItem onClick={() => { moveToArchive(course.id); handleMenuClose() }}>
-                      <i className="fas fa-inbox text-grey me-3"></i>Move to Archive
+                      <i className="fas fa-inbox text-grey me-3"></i>Move to {classStatus === 1 ? 'Archive' : "Current"}
                     </MenuItem>
                   </Menu>
                 </div>

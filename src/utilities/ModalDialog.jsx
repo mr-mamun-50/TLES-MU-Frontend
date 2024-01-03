@@ -1,5 +1,4 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
-import React from 'react'
 
 export default function ModalDialog({ title, content, confirmText, onConfirm, loading, onOpen, onClose, isFullScreen, actionColor, disabledAction }) {
 

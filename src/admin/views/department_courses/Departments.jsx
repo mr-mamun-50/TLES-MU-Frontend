@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import axios from 'axios'
-import Swal from 'sweetalert2'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
 import { TextField } from '@mui/material'
@@ -19,10 +18,12 @@ export default function Departments() {
 
   const [inputDepartments, setInputDepartments] = useState([[]])
   const [selectedDepartments, setSelectedDepartments] = useState([])
+  const [deleteDeptInput, setDeleteDeptInput] = useState('')
 
   const [editableDepartment, setEditableDepartment] = useState([])
   const [showEditDeptModal, setShowEditDeptModal] = useState(false)
   const [showAddDeptModal, setShowAddDeptModal] = useState(false)
+  const [showDeptDelete, setShowDeptDelete] = useState(false)
 
   // add & remove input field
   const handleAddField = () => {
@@ -69,37 +70,26 @@ export default function Departments() {
   // delete exam departments
   const deleteDepartments = () => {
     let deletableId = { deletableId: selectedDepartments.map((department) => department.id) }
-
-    Swal.fire({
-      title: 'Are you sure to delete?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#1976D2',
-      cancelButtonColor: '#707070',
-      confirmButtonText: 'Yes, delete!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setLoading(true)
-        axios.post('/api/admin/departments/delete', deletableId).then(res => {
-          if (res.status === 200) {
-            getDepartments()
-            setSelectedDepartments([])
-            setSuccess(res.data.message)
-            setLoading(false)
-            setTimeout(() => { setSuccess('') }, 5000)
-          } else {
-            setError(res.data.message)
-            setLoading(false)
-            setTimeout(() => { setError('') }, 5000)
-          }
-        }).catch(err => {
-          setError(err.response.data.message)
-          setLoading(false)
-          setTimeout(() => { setError('') }, 5000)
-        });
+    setLoading(true)
+    axios.post('/api/admin/departments/delete', deletableId).then(res => {
+      if (res.status === 200) {
+        getDepartments()
+        setSelectedDepartments([])
+        setShowDeptDelete(false)
+        setDeleteDeptInput('')
+        setSuccess(res.data.message)
+        setLoading(false)
+        setTimeout(() => { setSuccess('') }, 5000)
+      } else {
+        setError(res.data.message)
+        setLoading(false)
+        setTimeout(() => { setError('') }, 5000)
       }
-    })
+    }).catch(err => {
+      setError(err.response.data.message)
+      setLoading(false)
+      setTimeout(() => { setError('') }, 5000)
+    });
   }
 
   // update exam departments
@@ -209,7 +199,7 @@ export default function Departments() {
                 selectableRows
                 selectableRowsHighlight
                 onSelectedRowsChange={data => setSelectedDepartments(data.selectedRows)}
-                contextActions={<button className="btn btn-danger me-2 px-3" onClick={() => deleteDepartments()}><i className="fas fa-trash-alt"></i></button>}
+                contextActions={<button className="btn btn-danger me-2 px-3" onClick={() => setShowDeptDelete(true)}><i className="fas fa-trash-alt"></i></button>}
                 clearSelectedRows={loading}
               />
             </div>
@@ -263,6 +253,29 @@ export default function Departments() {
         onClose={() => setShowEditDeptModal(false)}
         confirmText={'Save changes'}
         onConfirm={updateDepartments}
+        loading={loading}
+      />
+
+      {/* delete account modal */}
+      <ModalDialog
+        title={`Detete selected department?`}
+        content={
+          <div className='mt-2'>
+            <p className='fw-bold mb-0'>Are you sure you want to remove this?</p>
+            <p className='mb-4'>This action cannot be undone.</p>
+
+            {/* type the username to delete account */}
+            <p className='mb-2'>To confirm deletion, type <b>delete</b> in the text input field.</p>
+            <TextField placeholder='delete' type="text" value={deleteDeptInput}
+              onChange={(e) => setDeleteDeptInput(e.target.value)} fullWidth size='small' />
+          </div>
+        }
+        onOpen={showDeptDelete}
+        onClose={() => setShowDeptDelete(false)}
+        confirmText={'Delete Account'}
+        actionColor={'error'}
+        disabledAction={deleteDeptInput !== 'delete'}
+        onConfirm={deleteDepartments}
         loading={loading}
       />
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import logo from '../assets/images/logo/tles_logo_dark.png'
 import vectorArt from '../assets/images/static/6101072.svg'
@@ -22,7 +22,7 @@ export default function UserLogin() {
     let data = { email, password }
     setLoading(true)
     setError('')
-    axios.get('/sanctum/csrf-cookie').then(response => {
+    axios.get('/sanctum/csrf-cookie').then(_response => {
       axios.post('/api/user/login', data).then(res => {
         if (res.status === 200) {
           if (remember) {

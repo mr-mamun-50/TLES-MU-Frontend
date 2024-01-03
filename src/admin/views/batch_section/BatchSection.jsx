@@ -231,6 +231,7 @@ export default function BatchSection() {
                       getBatchs(e.target.value)
                       sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
                     }}>
+                    <MenuItem value={0} disabled>Select Department</MenuItem>
                     {departments.map((department) => (
                       <MenuItem value={department.id}>{department.name}</MenuItem>
                     ))}

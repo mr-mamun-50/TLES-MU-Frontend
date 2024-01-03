@@ -243,15 +243,20 @@ body {
     font-family: "PF Isotext Pro", sans-serif !important;
 }
 
-.home-menu-card {
+.class-card {
     background: rgba(255, 255, 255, 0.4);
     transition: 0.3s ease;
 }
 
-.home-menu-card:hover {
+.class-card:hover {
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid #3b71ca !important;
-    transform: scale(1.05);
+    transform: scale(1.01);
+}
+
+.exam-card:hover {
+    box-shadow: 0 3px 10px #ccc !important;
+    border: 1px solid #3b71ca !important;
 }
 
 .table-small td {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CSVReader from 'react-csv-reader';
 import DataTable from 'react-data-table-component'
 import ModalDialog from '../../../utilities/ModalDialog';
@@ -60,7 +60,7 @@ export default function AddStudent() {
   const handleDeleteClick = () => {
     if (selectedStudents.length > 0) {
       // Filter out the selected rows from 'csvData'
-      const filteredData = csvData.filter((row, rowIndex) => {
+      const filteredData = csvData.filter((row, _rowIndex) => {
         return !selectedStudents.some((selectedRow) =>
           JSON.stringify(selectedRow) === JSON.stringify(row)
         );

@@ -1,5 +1,4 @@
 import { Box, Button, IconButton } from '@mui/material'
-import React from 'react'
 import styled from '@emotion/styled';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Close';
