@@ -16,8 +16,10 @@ import Semesters from "./admin/views/semester/Semesters";
 import AssignedCourses from "./user/views/classes/AssignedCourses";
 import Departments from "./admin/views/department_courses/Departments";
 import ViewClass from "./user/views/classes/ViewClass";
-import CreateQuestion from "./user/views/classes/view_class/CreateQuestion";
-import ViewQuestion from "./user/views/classes/view_class/ViewQuestion";
+import CreateQuestion from "./user/views/classes/view_class/Questions/CreateQuestion";
+import ViewQuestion from "./user/views/classes/view_class/Questions/ViewQuestion";
+import ManualMarksEntry from "./user/views/classes/view_class/Marks/ManualMarksEntry";
+import ImportMarks from "./user/views/classes/view_class/Marks/ImportMarks";
 
 export default function AllRoutes() {
   return (
@@ -33,8 +35,14 @@ export default function AllRoutes() {
         {/* Classes routes */}
         <Route path="classes" element={<AssignedCourses />} />
         <Route path="classes/:id" element={<ViewClass />} />
+
+        {/* Question routes */}
         <Route path="classes/create-question/:id" element={<CreateQuestion />} />
         <Route path="classes/question/:id" element={<ViewQuestion />} />
+
+        {/* Marks entry routes */}
+        <Route path="classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
+        <Route path="classes/import-marks/:id" element={<ImportMarks />} />
       </Route>
 
 

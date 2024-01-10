@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Box, Grid, MenuItem, TextField } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import CustomSnackbar from "../../../../utilities/SnackBar";
-import ModalDialog from "../../../../utilities/ModalDialog";
+import CustomSnackbar from "../../../../../utilities/SnackBar";
+import ModalDialog from "../../../../../utilities/ModalDialog";
 import Swal from "sweetalert2";
 
 export default function ViewQuestion() {
@@ -77,7 +77,7 @@ export default function ViewQuestion() {
     setEditableQuestion({ ...editableQuestion, questions: updatedQuestions });
   }
 
-  console.log(editableQuestion);
+  // console.log(editableQuestion);
 
   // get question
   const getQuestion = useCallback(() => {
@@ -196,7 +196,7 @@ export default function ViewQuestion() {
               <small className='text-muted my-1'>{`${course.course?.course_code} :: ${course.course?.title}`}</small>
             </Box>
           </Box>
-          <p className="ms-auto text-muted">Full marks: {exam.total_marks}</p>
+          <p className="text-muted">Full marks: {exam.total_marks}</p>
         </Box>
 
 
@@ -204,8 +204,9 @@ export default function ViewQuestion() {
           <Box className="card-body">
 
             {/* calculate total marks questions.questions.marks */}
-            <p className="text-muted text-end">Created questions for:
-              <b className={marksTaken >= exam.total_marks ? 'text-success' : 'text-danger'}> {marksTaken}</b> marks</p>
+            <p className="text-muted text-end">
+              <i className={`bi ${marksTaken >= exam.total_marks ? 'bi-check-circle text-success' : 'bi-exclamation-triangle text-warning'} me-2`}></i>
+              Created questions for: <b>{marksTaken}</b> marks</p>
 
             {/* view all questions */}
             {questionSets.length === 0 ? <div className="text-center my-5">No questions added yet</div> :

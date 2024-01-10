@@ -351,3 +351,37 @@ td p {
     overflow: hidden;
     white-space: nowrap;
 }
+
+/* marks input styles */
+.marks-input {
+    border: none;
+    border-radius: 0;
+    padding-top: 5.5px;
+    padding-bottom: 5px;
+}
+.input-active {
+    box-shadow: inset 0px 0px 0px 1px #00b0f0 !important;
+}
+.input-error {
+    box-shadow: inset 0px 0px 0px 1px #ff4546 !important;
+}
+
+/* Style for the sticky table */
+/* Style for the fixed column (1st column) */
+.sticky-column {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: #f2f2f2;
+    outline: 1px solid #bdbdbd;
+}
+
+/* Style for the fixed header (1st row) */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #f2f2f2;
+    box-shadow: 0px 2px 5px #ccc;
+    outline: 1px solid #bdbdbd;
+}

@@ -1,7 +1,7 @@
 import { Box, Grid, MenuItem, TextField } from "@mui/material";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import CustomSnackbar from "../../../../utilities/SnackBar";
+import CustomSnackbar from "../../../../../utilities/SnackBar";
 import axios from "axios";
 
 export default function CreateQuestion() {
@@ -94,7 +94,7 @@ export default function CreateQuestion() {
               <small className='text-muted my-1'>{`${course.course?.course_code} :: ${course.course?.title}`}</small>
             </Box>
           </Box>
-          <p className="ms-auto text-muted">Full marks: {exam.total_marks}</p>
+          <p className="text-muted">Full marks: {exam.total_marks}</p>
         </Box>
 
 

@@ -120,7 +120,7 @@ export default function UserLogin() {
       </div >
 
 
-      {/* foother section */}
+      {/* footer section */}
       <div className="py-3 mt-5">
         <div className="container">
           {/* <div className="d-flex justify-content-center">

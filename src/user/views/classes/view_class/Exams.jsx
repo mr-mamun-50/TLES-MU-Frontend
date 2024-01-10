@@ -141,7 +141,7 @@ export default function Exams({ course }) {
 
 
   return (
-    <Box className='px-3 pt-1'>
+    <Box className='px-2 pt-1'>
       <Box className="d-flex justify-content-between align-items-center mb-4">
         <p className="text-muted my-0">
           <i className={`fas fa-circle-check me-2 ${marksTaken === 90 ? 'text-success' : marksTaken > 90 ? 'text-danger' : ''}`}></i>
@@ -168,7 +168,10 @@ export default function Exams({ course }) {
                 {/* informations and actions */}
                 <Box className="">
                   <h5 className="card-title mb-1">{exam.exam_type}</h5>
-                  <small className="text-muted">{` ${exam.total_marks} Marks`}</small>
+                  <small className="text-muted">
+                    Total: <b>{exam.total_marks}</b> marks
+                    {(exam.exam_type === 'Final' || exam.exam_type === 'Midterm') && <> • Created questions for: <b>{exam.added_marks}</b> marks</>}
+                  </small>
 
                   {/* Action buttons */}
                   <Box className="d-flex align-items-center mt-2">
@@ -176,8 +179,8 @@ export default function Exams({ course }) {
                       <Link to={`/classes/question/${exam.id}`} state={{ course: course, exam: exam }} className="btn btn-secondary btn-sm me-2">
                         <i className="fas fa-file-pen me-2"></i> View / Edit</Link>}
 
-                    <Link to={`/classes/edit-exam/${exam.id}`} className="btn btn-secondary btn-sm">
-                      <i className="fas fa-edit me-2"></i> Enter Marks</Link>
+                    <Link to={`/classes/manual-marks-entry/${exam.id}`} state={{ course: course, exam: exam, question_sets: exam.exam_question_sets }}
+                      className="btn btn-secondary btn-sm"><i className="fas fa-edit me-2"></i> Enter Marks</Link>
                   </Box>
                 </Box>
               </Box>
