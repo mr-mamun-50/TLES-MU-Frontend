@@ -187,7 +187,7 @@ export default function Exams({ course }) {
                 </Box>
               </Box>
 
-              {/* Status and date */}
+              {/* Status and date, edit-delete */}
               <Box className="">
                 <small className="text-muted">
                   {new Date(exam.exam_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', })}
@@ -196,14 +196,16 @@ export default function Exams({ course }) {
                 <Box className="d-flex justify-content-end mt-4">
                   <button className="btn btn-outline-secondary btn-sm btn-floating me-2"
                     onClick={() => {
-                      if (exam.total_marks !== 20 && exam.total_marks !== 30 && exam.total_marks !== 40) {
-                        let newExam = { ...exam }
-                        newExam.other_marks = exam.total_marks
-                        newExam.total_marks = 'other'
-                        setEditableExam(newExam)
-                      } else {
-                        setEditableExam(exam);
+                      const selectedExam = { ...exam }
+                      if (exam.exam_type !== 'Final' && exam.exam_type !== 'Midterm' && exam.exam_type !== 'Class Test' && exam.exam_type !== 'Presentation' && exam.exam_type !== 'Viva') {
+                        selectedExam.exam_type = 'other'
+                        selectedExam.other_exam_type = exam.exam_type
                       }
+                      if (exam.total_marks !== 20 && exam.total_marks !== 30 && exam.total_marks !== 40) {
+                        selectedExam.total_marks = 'other'
+                        selectedExam.other_marks = exam.total_marks
+                      }
+                      setEditableExam(selectedExam)
                       setOpenEditExamModal(true)
                     }}><i className="fas fa-edit"></i></button>
 
@@ -291,23 +293,35 @@ export default function Exams({ course }) {
         title={'Edit Exam'}
         content={
           <Box sx={{ width: '350px' }}>
-            <TextField label='Exam Type' select fullWidth value={editableExam.exam_type}
-              onChange={(e) => {
-                if (e.target.value === 'Final')
-                  setEditableExam({ ...editableExam, exam_type: e.target.value, total_marks: 40 });
-                else if (e.target.value === 'Midterm')
-                  setEditableExam({ ...editableExam, exam_type: e.target.value, total_marks: 20 });
-                else if (e.target.value === 'Class Test' || e.target.value === 'Viva' || e.target.value === 'Presentation')
-                  setEditableExam({ ...editableExam, exam_type: e.target.value, total_marks: 'other' });
-                else
-                  setEditableExam({ ...editableExam, exam_type: e.target.value });
-              }} margin='normal' size='small'>
-              <MenuItem value={'Midterm'}>Midterm</MenuItem>
-              <MenuItem value={'Final'}>Final</MenuItem>
-              <MenuItem value={'Class Test'}>Class Test</MenuItem>
-              <MenuItem value={'Viva'}>Viva</MenuItem>
-              <MenuItem value={'Presentation'}>Presentation</MenuItem>
-            </TextField>
+            <Grid container spacing={2}>
+              <Grid item xs={editableExam.exam_type === 'other' ? 6 : 12}>
+                <TextField label='Exam Type' select fullWidth value={editableExam.exam_type}
+                  onChange={(e) => {
+                    if (e.target.value === 'Final')
+                      setEditableExam({ ...editableExam, exam_type: e.target.value, total_marks: 40 });
+                    else if (e.target.value === 'Midterm')
+                      setEditableExam({ ...editableExam, exam_type: e.target.value, total_marks: 20 });
+                    else if (e.target.value === 'Class Test' || e.target.value === 'Viva' || e.target.value === 'Presentation')
+                      setEditableExam({ ...editableExam, exam_type: e.target.value, total_marks: 'other' });
+                    else
+                      setEditableExam({ ...editableExam, exam_type: e.target.value });
+                  }} margin='normal' size='small'>
+                  <MenuItem value={'Midterm'}>Midterm</MenuItem>
+                  <MenuItem value={'Final'}>Final</MenuItem>
+                  <MenuItem value={'Class Test'}>Class Test</MenuItem>
+                  <MenuItem value={'Viva'}>Viva</MenuItem>
+                  <MenuItem value={'Presentation'}>Presentation</MenuItem>
+                  <MenuItem value={'other'}>Other</MenuItem>
+                </TextField>
+              </Grid>
+
+              {editableExam.exam_type === 'other' &&
+                <Grid item xs={6}>
+                  <TextField label='Other Exam Type' fullWidth value={editableExam.other_exam_type}
+                    onChange={(e) => setEditableExam({ ...editableExam, other_exam_type: e.target.value })} margin='normal' size='small' />
+                </Grid>
+              }
+            </Grid>
 
             <Grid container spacing={2}>
               <Grid item xs={editableExam.total_marks === 'other' ? 6 : 12}>

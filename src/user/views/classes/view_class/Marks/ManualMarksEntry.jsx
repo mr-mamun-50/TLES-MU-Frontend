@@ -1,8 +1,9 @@
-import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
+import { Box, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material'
 import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import CustomSnackbar from '../../../../../utilities/SnackBar';
+import ModalDialog from '../../../../../utilities/ModalDialog';
 
 export default function ManualMarksEntry() {
 
@@ -17,10 +18,12 @@ export default function ManualMarksEntry() {
   const question_sets = location.state?.question_sets;
 
   const [students, setStudents] = useState([])
-
   const [inputMarksData, setInputMarksData] = useState([]);
 
-  // console.log(students)
+  const [editableMarks, setEditableMarks] = useState({})
+  const [showEditMarksModal, setShowEditMarksModal] = useState(false);
+
+  // console.log(editableMarks)
 
   // handle input exam marks changes
   const handleExamMarksChange = (studentId, questionId, marks) => {
@@ -112,7 +115,7 @@ export default function ManualMarksEntry() {
   // submit exam marks
   const submitExamMarks = () => {
     setSubmitLoading(true)
-    axios.post(`/api/user/obtained-marks/${exam.id}`, inputMarksData).then(res => {
+    axios.post(`/api/user/obtained-exam-marks/${exam.id}`, inputMarksData).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         setTimeout(() => { setSuccess('') }, 5000)
@@ -133,7 +136,7 @@ export default function ManualMarksEntry() {
   // submit class activities marks
   const submitCaMarks = () => {
     setSubmitLoading(true)
-    axios.post(`/api/user/class-activities-marks/${exam.id}`, inputMarksData).then(res => {
+    axios.post(`/api/user/obtained-ca-marks/${exam.id}`, inputMarksData).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         setTimeout(() => { setSuccess('') }, 5000)
@@ -148,6 +151,48 @@ export default function ManualMarksEntry() {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
       setSubmitLoading(false)
+    })
+  }
+
+  // edit / delete exam marks
+  const updateOrDeleteExamMarks = () => {
+    setLoading(true)
+    axios.put(`/api/user/obtained-exam-marks/${editableMarks.id}`, editableMarks).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        setTimeout(() => { setSuccess('') }, 5000)
+        getStudents()
+        setShowEditMarksModal(false)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+      setLoading(false)
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+      setLoading(false)
+    })
+  }
+
+  // edit / delete class activities marks
+  const updateOrDeleteCaMarks = () => {
+    setLoading(true)
+    axios.put(`/api/user/obtained-ca-marks/${editableMarks.id}`, editableMarks).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        setTimeout(() => { setSuccess('') }, 5000)
+        getStudents()
+        setShowEditMarksModal(false)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+      setLoading(false)
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+      setLoading(false)
     })
   }
 
@@ -219,16 +264,25 @@ export default function ManualMarksEntry() {
                         {/* all questions input fields */}
                         {question_sets.map((question_set) => (
                           question_set.questions.map((question, question_index) => {
-                            const obtainedMarks = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id)?.marks;
+                            const obtainedMark = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id);
                             const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id && entry.question_id === question.id)?.marks ?? '';
 
                             return (
                               <TableCell key={question_index} style={{ minWidth: '80px', padding: '0' }}>
 
                                 {/* marks input field and edit button */}
-                                {obtainedMarks > -1 ?
-                                  <button className='btn btn-block py-1' style={{ fontSize: '14px' }}>
-                                    {obtainedMarks}</button>
+                                {obtainedMark?.marks > -1 ?
+                                  <button className='btn btn-block py-1' style={{ fontSize: '14px' }}
+                                    onClick={() => {
+                                      setEditableMarks({
+                                        ...obtainedMark,
+                                        qstn_no: `${question_set.sl}.${question_set.questions.length > 1 ? String.fromCharCode(question_index + 97) : ''}`,
+                                        qstn_marks: question.marks,
+                                        student_id: student.student_id
+                                      });
+                                      setShowEditMarksModal(true)
+                                    }}>
+                                    {obtainedMark.marks}</button>
                                   :
                                   <input type="number"
                                     className={`form-control marks-input ${inputMarksValue > question.marks && 'input-error'} ${inputMarksValue && 'input-active'}`}
@@ -256,7 +310,7 @@ export default function ManualMarksEntry() {
 
                   <TableBody>
                     {students.map((student, student_index) => {
-                      const obtainedMarks = student.obtained_ca_marks.find(obtained_marks => obtained_marks.exam_id === exam.id)?.marks;
+                      const obtainedMark = student.obtained_ca_marks.find(obtained_marks => obtained_marks.exam_id === exam.id);
                       const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id)?.marks ?? '';
 
                       return (
@@ -265,9 +319,10 @@ export default function ManualMarksEntry() {
                           <TableCell style={{ minWidth: '80px', padding: '0' }}>
 
                             {/* marks input field and edit button */}
-                            {obtainedMarks > -1 ?
-                              <button className='btn btn-block py-1 text-start' style={{ fontSize: '14px' }}>
-                                {obtainedMarks}</button>
+                            {obtainedMark?.marks > -1 ?
+                              <button className='btn btn-block py-1 text-start' style={{ fontSize: '14px' }}
+                                onClick={() => { setEditableMarks({ ...obtainedMark, student_id: student.student_id }); setShowEditMarksModal(true) }}>
+                                {obtainedMark.marks}</button>
                               :
                               <input type="number"
                                 className={`form-control marks-input ${inputMarksValue > exam.total_marks && 'input-error'} ${inputMarksValue && 'input-active'}`}
@@ -292,6 +347,36 @@ export default function ManualMarksEntry() {
           </Box>
         }
       </Box>
+
+
+      {/* edit marks modal */}
+      <ModalDialog
+        title={(exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ? `${editableMarks.student_id} (${editableMarks.qstn_no})` : `${editableMarks.student_id}`}
+        content={
+          <Box>
+            {(exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ?
+              <Box className="d-flex align-items-center">
+                <TextField label={'Marks'} type='number' value={editableMarks.marks} error={editableMarks.marks > editableMarks.qstn_marks}
+                  onChange={(e) => setEditableMarks({ ...editableMarks, marks: e.target.value })} margin='normal' size='small' />
+                <h5 className='text-muted ms-2 mt-3'> / {editableMarks.qstn_marks}</h5>
+              </Box>
+              :
+              <Box className="d-flex align-items-center">
+                <TextField label={'Marks'} type='number' value={editableMarks.marks} error={editableMarks.marks > exam.total_marks}
+                  onChange={(e) => setEditableMarks({ ...editableMarks, marks: e.target.value })} margin='normal' size='small' />
+                <h5 className='text-muted ms-2 mt-3'> / {exam.total_marks}</h5>
+              </Box>
+            }
+            <small className='text-muted'><i>* save empty data to delete</i></small>
+          </Box>
+        }
+        onOpen={showEditMarksModal}
+        onClose={() => setShowEditMarksModal(false)}
+        onConfirm={(exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ? updateOrDeleteExamMarks : updateOrDeleteCaMarks}
+        confirmText={editableMarks.marks !== '' ? 'Save' : 'Delete'}
+        actionColor={editableMarks.marks !== '' ? 'primary' : 'error'}
+        loading={loading}
+      />
 
 
       {/* Utilities */}

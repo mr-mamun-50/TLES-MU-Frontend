@@ -198,7 +198,7 @@ export default function ImportMarks() {
   // submit exam marks
   const submitExamMarks = () => {
     setSubmitLoading(true)
-    axios.post(`/api/user/obtained-marks/${exam.id}`, inputMarksData).then(res => {
+    axios.post(`/api/user/obtained-exam-marks/${exam.id}`, inputMarksData).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         setTimeout(() => { setSuccess('') }, 5000)
@@ -218,7 +218,7 @@ export default function ImportMarks() {
   // submit class activities marks
   const submitCaMarks = () => {
     setSubmitLoading(true)
-    axios.post(`/api/user/class-activities-marks/${exam.id}`, inputMarksData).then(res => {
+    axios.post(`/api/user/obtained-ca-marks/${exam.id}`, inputMarksData).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         setTimeout(() => { setSuccess('') }, 5000)
