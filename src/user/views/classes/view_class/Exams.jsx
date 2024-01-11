@@ -15,7 +15,7 @@ export default function Exams({ course }) {
 
   const [exams, setExams] = useState([])
   const marksTaken = exams.reduce((acc, exam) => acc + exam.total_marks, 0)
-  const [inputExam, setInputExam] = useState({ class_id: classId, exam_type: 'Midterm', total_marks: 20, other_marks: 10, exam_date: convertDate(new Date()) })
+  const [inputExam, setInputExam] = useState({ class_id: classId, exam_type: 'Midterm', other_exam_type: 'Lab Assessment', total_marks: 20, other_marks: 10, exam_date: convertDate(new Date()) })
   const [editableExam, setEditableExam] = useState({})
 
   const [openAddExamModal, setOpenAddExamModal] = useState(false)
@@ -136,6 +136,8 @@ export default function Exams({ course }) {
       return 'fas fa-person-chalkboard'
     } else if (examType === 'Viva') {
       return 'fas fa-people-arrows'
+    } else {
+      return 'far fa-paste'
     }
   }
 
@@ -222,24 +224,37 @@ export default function Exams({ course }) {
         title={'Create Exam'}
         content={
           <Box sx={{ width: '350px' }}>
-            <TextField label='Exam Type' select fullWidth value={inputExam.exam_type}
-              onChange={(e) => {
-                if (e.target.value === 'Final')
-                  setInputExam({ ...inputExam, exam_type: e.target.value, total_marks: 40 });
-                else if (e.target.value === 'Midterm')
-                  setInputExam({ ...inputExam, exam_type: e.target.value, total_marks: 20 });
-                else if (e.target.value === 'Class Test' || e.target.value === 'Viva' || e.target.value === 'Presentation')
-                  setInputExam({ ...inputExam, exam_type: e.target.value, total_marks: 'other' });
-                else
-                  setInputExam({ ...inputExam, exam_type: e.target.value });
-              }} margin='normal' size='small'>
 
-              <MenuItem value={'Midterm'}>Midterm</MenuItem>
-              <MenuItem value={'Final'}>Final</MenuItem>
-              <MenuItem value={'Class Test'}>Class Test</MenuItem>
-              <MenuItem value={'Viva'}>Viva</MenuItem>
-              <MenuItem value={'Presentation'}>Presentation</MenuItem>
-            </TextField>
+            <Grid container spacing={2}>
+              <Grid item xs={inputExam.exam_type === 'other' ? 6 : 12}>
+                <TextField label='Exam Type' select fullWidth value={inputExam.exam_type}
+                  onChange={(e) => {
+                    if (e.target.value === 'Final')
+                      setInputExam({ ...inputExam, exam_type: e.target.value, total_marks: 40 });
+                    else if (e.target.value === 'Midterm')
+                      setInputExam({ ...inputExam, exam_type: e.target.value, total_marks: 20 });
+                    else if (e.target.value === 'Class Test' || e.target.value === 'Viva' || e.target.value === 'Presentation')
+                      setInputExam({ ...inputExam, exam_type: e.target.value, total_marks: 'other' });
+                    else
+                      setInputExam({ ...inputExam, exam_type: e.target.value });
+                  }} margin='normal' size='small'>
+
+                  <MenuItem value={'Midterm'}>Midterm</MenuItem>
+                  <MenuItem value={'Final'}>Final</MenuItem>
+                  <MenuItem value={'Class Test'}>Class Test</MenuItem>
+                  <MenuItem value={'Viva'}>Viva</MenuItem>
+                  <MenuItem value={'Presentation'}>Presentation</MenuItem>
+                  <MenuItem value={'other'}>Other</MenuItem>
+                </TextField>
+              </Grid>
+
+              {inputExam.exam_type === 'other' &&
+                <Grid item xs={6}>
+                  <TextField label='Other Exam Type' fullWidth value={inputExam.other_exam_type}
+                    onChange={(e) => setInputExam({ ...inputExam, other_exam_type: e.target.value })} margin='normal' size='small' />
+                </Grid>
+              }
+            </Grid>
 
             <Grid container spacing={2}>
               <Grid item xs={inputExam.total_marks === 'other' ? 6 : 12}>

@@ -53,18 +53,27 @@ export default function ImportMarks() {
         const jsonResult = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
 
-        // bring out all questions from question_sets in one array
-        const allQuestions = question_sets.
-          map((question_set) => question_set.questions).
-          flat();
-
         setInputMarksData([])
 
-        for (let i = 0; i < students.length; i++) {
-          for (let j = 0; j < allQuestions.length; j++) {
-            let data = jsonResult[i + 1][j + 1]
+        if (exam.exam_type === 'Midterm' || exam.exam_type === 'Final') {
+          // bring out all questions from question_sets in one array
+          const allQuestions = question_sets.
+            map((question_set) => question_set.questions).
+            flat();
+
+          for (let i = 0; i < students.length; i++) {
+            for (let j = 0; j < allQuestions.length; j++) {
+              let data = jsonResult[i + 1][j + 1]
+              if (data != null) {
+                setInputMarksData(prev => [...prev, { student_id: students[i].id, question_id: allQuestions[j].id, marks: data }])
+              }
+            }
+          }
+        } else {
+          for (let i = 0; i < students.length; i++) {
+            let data = jsonResult[i + 1][1]
             if (data != null) {
-              setInputMarksData(prev => [...prev, { student_id: students[i].id, question_id: allQuestions[j].id, marks: data }])
+              setInputMarksData(prev => [...prev, { student_id: students[i].id, marks: data }])
             }
           }
         }
@@ -80,12 +89,15 @@ export default function ImportMarks() {
     const worksheet = workbook.addWorksheet('Sheet1');
 
     // Define columns
-    const columns = [
+    const columns = (exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ? [
       { header: 'Student ID', key: 'student_id', width: 12 },
       ...question_sets.flatMap(set =>
         set.questions.map((question, i) => (
           { header: `${set.sl}.${String.fromCharCode(i + 97)} (${question.marks})`, key: `${set.sl}.${String.fromCharCode(i + 97)}`, width: 8 }
         )))
+    ] : [
+      { header: 'Student ID', key: 'student_id', width: 12 },
+      { header: 'Marks', key: 'marks', width: 12 },
     ];
     // Set columns in the worksheet
     worksheet.columns = columns;
@@ -95,12 +107,14 @@ export default function ImportMarks() {
       const row = {
         student_id: student.student_id,
       };
-      question_sets.forEach((question_set) => {
-        question_set.questions.forEach((question, question_index) => {
-          const obtainedMarks = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id)?.marks;
-          row[`${question_set.sl}.${String.fromCharCode(question_index + 97)}`] = obtainedMarks > -1 ? obtainedMarks : null;
-        });
-      });
+      (exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ?
+        question_sets.forEach((question_set) => {
+          question_set.questions.forEach((question, question_index) => {
+            const obtainedMarks = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id)?.marks;
+            row[`${question_set.sl}.${String.fromCharCode(question_index + 97)}`] = obtainedMarks > -1 ? obtainedMarks : null;
+          });
+        })
+        : row.marks = student.obtained_ca_marks.find(obtained_marks => obtained_marks.exam_id === exam.id)?.marks;
       worksheet.addRow(row);
     });
 
@@ -181,8 +195,8 @@ export default function ImportMarks() {
   };
 
 
-  // submit marks
-  const submitMarks = () => {
+  // submit exam marks
+  const submitExamMarks = () => {
     setSubmitLoading(true)
     axios.post(`/api/user/obtained-marks/${exam.id}`, inputMarksData).then(res => {
       if (res.status === 200) {
@@ -201,6 +215,25 @@ export default function ImportMarks() {
     })
   }
 
+  // submit class activities marks
+  const submitCaMarks = () => {
+    setSubmitLoading(true)
+    axios.post(`/api/user/class-activities-marks/${exam.id}`, inputMarksData).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        setTimeout(() => { setSuccess('') }, 5000)
+        window.history.back()
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+      setSubmitLoading(false)
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+      setSubmitLoading(false)
+    })
+  }
 
 
   return (
@@ -240,54 +273,85 @@ export default function ImportMarks() {
             <Box>
               <Box className="table-responsive" ref={tableContainerRef} onScroll={handleScroll} style={{ height: '70vh' }}>
 
-                <Table className='table-bordered table-sm border-grey'>
-                  <TableHead className='sticky-header'>
-                    <TableRow>
-                      <TableCell rowSpan={2} className="sticky-column">Student ID</TableCell>
-                      {/* question set numbers */}
-                      {question_sets.map((question_set, set_index) => (
-                        <TableCell colSpan={question_set.questions.length} key={set_index} className='text-center'>{question_set.sl}</TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      {/* all question numbers */}
-                      {question_sets.map((question_set) => (
-                        question_set.questions.map((question, question_index) => (
-                          <TableCell key={question_index} className='text-center fw-bold'>
-                            {question_set.questions.length > 1 && `${String.fromCharCode(question_index + 97)} `}
-                            <small className='fw-normal'>{`(${question.marks})`}</small>
-                          </TableCell>
-                        ))
-                      ))}
-                    </TableRow>
-                  </TableHead>
+                {(exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ?
 
-                  <TableBody>
-                    {students.map((student, student_index) => (
-                      <TableRow key={student_index}>
-                        <TableCell style={{ minWidth: '120px' }} className="sticky-column">{student.student_id}</TableCell>
-
-                        {/* all questions marks */}
-                        {question_sets.map((question_set) => (
-                          question_set.questions.map((question, question_index) => {
-                            const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id && entry.question_id === question.id)?.marks ?? '';
-                            return (
-                              <TableCell key={question_index} style={{ minWidth: '60px', textAlign: 'center' }}>
-                                {inputMarksValue}
-                              </TableCell>
-                            )
-                          })
+                  // exam marks table
+                  <Table className='table-bordered table-sm border-grey'>
+                    <TableHead className='sticky-header'>
+                      <TableRow>
+                        <TableCell rowSpan={2} className="sticky-column">Student ID</TableCell>
+                        {/* question set numbers */}
+                        {question_sets.map((question_set, set_index) => (
+                          <TableCell colSpan={question_set.questions.length} key={set_index} className='text-center'>{question_set.sl}</TableCell>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                      <TableRow>
+                        {/* all question numbers */}
+                        {question_sets.map((question_set) => (
+                          question_set.questions.map((question, question_index) => (
+                            <TableCell key={question_index} className='text-center fw-bold'>
+                              {question_set.questions.length > 1 && `${String.fromCharCode(question_index + 97)} `}
+                              <small className='fw-normal'>{`(${question.marks})`}</small>
+                            </TableCell>
+                          ))
+                        ))}
+                      </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                      {students.map((student, student_index) => (
+                        <TableRow key={student_index}>
+                          <TableCell style={{ minWidth: '120px' }} className="sticky-column">{student.student_id}</TableCell>
+
+                          {/* all questions marks */}
+                          {question_sets.map((question_set) => (
+                            question_set.questions.map((question, question_index) => {
+                              const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id && entry.question_id === question.id)?.marks ?? '';
+                              return (
+                                <TableCell key={question_index} style={{ minWidth: '60px', textAlign: 'center' }}>
+                                  {inputMarksValue}
+                                </TableCell>
+                              )
+                            })
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+
+                  :
+                  // class activity marks table
+                  <Table className='table-bordered table-sm border-grey'>
+                    <TableHead className='sticky-header'>
+                      <TableRow>
+                        <TableCell className="sticky-column">Student ID</TableCell>
+                        <TableCell className="sticky-column">Marks</TableCell>
+                      </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                      {students.map((student, student_index) => {
+                        const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id)?.marks ?? '';
+
+                        return (
+                          <TableRow key={student_index}>
+                            <TableCell style={{ minWidth: '120px' }} className="sticky-column">{student.student_id}</TableCell>
+                            <TableCell style={{ minWidth: '60px', textAlign: 'center' }}>
+                              {inputMarksValue}
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                }
               </Box>
 
 
               {/* save button */}
               <Box className="text-end mt-3">
-                <button className="btn btn-primary" onClick={submitMarks} disabled={inputMarksData.length === 0}>
+                <button className="btn btn-primary" onClick={(exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ? submitExamMarks : submitCaMarks}
+                  disabled={inputMarksData.length === 0}>
                   {submitLoading ? <span className='spinner-border spinner-border-sm'></span> : 'Save Changes'}</button>
               </Box>
             </Box>

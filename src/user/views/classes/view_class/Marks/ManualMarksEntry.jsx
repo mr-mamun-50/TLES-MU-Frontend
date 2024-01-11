@@ -186,7 +186,7 @@ export default function ManualMarksEntry() {
           <Box className="card-body">
             <Box className="table-responsive" ref={tableContainerRef} onScroll={handleScroll} style={{ height: '70vh' }}>
 
-              {(exam.type === 'Midterm' || exam.type === 'Final') ?
+              {(exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ?
 
                 // exam marks table
                 <Table className='table-bordered table-sm border-grey'>
@@ -285,7 +285,7 @@ export default function ManualMarksEntry() {
 
             {/* save button */}
             <Box className="text-end mt-3">
-              <button className="btn btn-primary" onClick={(exam.type === 'Midterm' || exam.type === 'Final') ? submitExamMarks : submitCaMarks}
+              <button className="btn btn-primary" onClick={(exam.exam_type === 'Midterm' || exam.exam_type === 'Final') ? submitExamMarks : submitCaMarks}
                 disabled={inputMarksData.length === 0}>
                 {submitLoading ? <span className='spinner-border spinner-border-sm'></span> : 'Save Changes'}</button>
             </Box>
