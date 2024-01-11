@@ -180,7 +180,7 @@ export default function Exams({ course }) {
                         <i className="fas fa-file-pen me-2"></i> View / Edit</Link>}
 
                     <Link to={`/classes/manual-marks-entry/${exam.id}`} state={{ course: course, exam: exam, question_sets: exam.exam_question_sets }}
-                      className="btn btn-secondary btn-sm"><i className="fas fa-edit me-2"></i> Enter Marks</Link>
+                      className="btn btn-secondary btn-sm"><i className="fas fa-edit me-2"></i> Enter / Edit Marks</Link>
                   </Box>
                 </Box>
               </Box>
@@ -213,7 +213,8 @@ export default function Exams({ course }) {
           </Box>
         </Box>
       )) : loading ? <div className="text-center"><span className='spinner-border my-4'></span></div>
-        : <div className="text-center my-5">No Exams Found</div>}
+        : <div className="text-center my-5">No Exams Found</div>
+      }
 
 
       {/* add exam modal */}
@@ -327,7 +328,7 @@ export default function Exams({ course }) {
       {/* Utilities */}
       < CustomSnackbar message={error} status={'error'} />
       <CustomSnackbar message={success} status={'success'} />
-    </Box>
+    </Box >
   )
 
 

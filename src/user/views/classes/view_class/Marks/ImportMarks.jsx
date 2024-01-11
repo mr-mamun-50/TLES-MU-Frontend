@@ -62,7 +62,7 @@ export default function ImportMarks() {
 
         for (let i = 0; i < students.length; i++) {
           for (let j = 0; j < allQuestions.length; j++) {
-            let data = jsonResult[i + 1][j + 2]
+            let data = jsonResult[i + 1][j + 1]
             if (data != null) {
               setInputMarksData(prev => [...prev, { student_id: students[i].id, question_id: allQuestions[j].id, marks: data }])
             }
@@ -81,7 +81,6 @@ export default function ImportMarks() {
 
     // Define columns
     const columns = [
-      { header: 'ID', key: 'id', width: 8 },
       { header: 'Student ID', key: 'student_id', width: 12 },
       ...question_sets.flatMap(set =>
         set.questions.map((question, i) => (
@@ -91,18 +90,23 @@ export default function ImportMarks() {
     // Set columns in the worksheet
     worksheet.columns = columns;
 
-    // add students to the worksheet
-    worksheet.addRows(students.map((student) => ({
-      id: student.id,
-      student_id: student.student_id
-    })));
+    // add student id amd obtained marks to the worksheet
+    students.forEach((student) => {
+      const row = {
+        student_id: student.student_id,
+      };
+      question_sets.forEach((question_set) => {
+        question_set.questions.forEach((question, question_index) => {
+          const obtainedMarks = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id)?.marks;
+          row[`${question_set.sl}.${String.fromCharCode(question_index + 97)}`] = obtainedMarks > -1 ? obtainedMarks : null;
+        });
+      });
+      worksheet.addRow(row);
+    });
 
 
-    // set number format for 1st column Text
-    worksheet.getColumn(1).numFmt = '@';
-
-    // Set colors on the second column
-    worksheet.getColumn(2).eachCell({ includeEmpty: false }, (cell, _rowNumber) => {
+    // Set colors on the 1st column
+    worksheet.getColumn(1).eachCell({ includeEmpty: false }, (cell, _rowNumber) => {
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
@@ -135,24 +139,15 @@ export default function ImportMarks() {
     worksheet.views = [
       {
         state: 'frozen',
-        xSplit: 2, // Number of columns to freeze
+        xSplit: 1, // Number of columns to freeze
         ySplit: 1, // Number of rows to freeze
         topLeftCell: 'C2', // Cell reference for the top-left cell of the bottom-right pane
       }
     ];
 
-    // Make the first row and 1st two column read-only
+    // Make the first row and 1st column read-only
     for (let row = 1; row <= worksheet.rowCount; row++) {
       worksheet.getCell(`A${row}`).dataValidation = {
-        type: 'whole',
-        operator: 'equal',
-        formula1: '""', // empty string means any value is allowed
-        formulae: ['"Read-only"'], // array of formulae to check
-        showErrorMessage: true,
-        errorTitle: 'Read-only',
-        error: 'Editing not allowed in this cell.',
-      };
-      worksheet.getCell(`B${row}`).dataValidation = {
         type: 'whole',
         operator: 'equal',
         formula1: '""', // empty string means any value is allowed
@@ -229,11 +224,14 @@ export default function ImportMarks() {
         {/* Body section */}
         <Box className='card-body'>
           <Box className="d-flex justify-content-between mb-4">
-            <button onClick={downloadExcel} className='btn btn-outline-dark border-grey me-2'><i className="fas fa-download me-2"></i> Download Excel</button>
+            {/* download .xlsx file button */}
+            <button onClick={downloadExcel} className='btn btn-outline-dark border-grey me-2' style={{ textTransform: 'none', fontSize: '14px' }}>
+              <i className="fas fa-download me-2"></i> Download .xlsx file</button>
 
+            {/* file input */}
             <Box className="col-6 col-lg-4">
               <FileInput label={'Upload .xlsx file'} onUpload={(e) => { handleFileChange(e); setUploadedFile(e.target.files[0]) }}
-                state={uploadedFile} onDelete={() => { setUploadedFile('') }} formats={'.xlsx, .xls'} />
+                state={uploadedFile} onDelete={() => { setUploadedFile(''); setInputMarksData([]) }} formats={'.xlsx, .xls'} />
             </Box>
           </Box>
 
@@ -269,12 +267,12 @@ export default function ImportMarks() {
                       <TableRow key={student_index}>
                         <TableCell style={{ minWidth: '120px' }} className="sticky-column">{student.student_id}</TableCell>
 
-                        {/* all questions input fields */}
+                        {/* all questions marks */}
                         {question_sets.map((question_set) => (
                           question_set.questions.map((question, question_index) => {
                             const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id && entry.question_id === question.id)?.marks ?? '';
                             return (
-                              <TableCell key={question_index} style={{ minWidth: '70px', textAlign: 'center' }}>
+                              <TableCell key={question_index} style={{ minWidth: '60px', textAlign: 'center' }}>
                                 {inputMarksValue}
                               </TableCell>
                             )

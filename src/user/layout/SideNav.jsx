@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Toolbar } from "@mui/material";
 import logo from '../../assets/images/logo/tles_logo_light.png';
 import { NavLink } from 'react-router-dom';
@@ -42,6 +42,16 @@ export default function UserSideNav({ onClose }) {
             <NavLink to="/classes">
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-graduation-cap fa-fw me-3"></i> <span>Classes</span>
+              </span>
+            </NavLink>
+            <NavLink to="/retake-classes">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="fas fa-retweet fa-fw me-3"></i> <span>Retake Classes</span>
+              </span>
+            </NavLink>
+            <NavLink to="/supplementary-exams">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="far fa-handshake fa-fw me-3"></i> <span>Supplementary Exams</span>
               </span>
             </NavLink>
 

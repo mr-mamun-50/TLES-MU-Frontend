@@ -20,8 +20,10 @@ export default function ManualMarksEntry() {
 
   const [inputMarksData, setInputMarksData] = useState([]);
 
-  // handle input marks changes
-  const handleMarksChange = (studentId, questionId, marks) => {
+  // console.log(students)
+
+  // handle input exam marks changes
+  const handleExamMarksChange = (studentId, questionId, marks) => {
     // Find if the entry already exists
     const existingEntryIndex = inputMarksData.findIndex(
       entry => entry.student_id === studentId && entry.question_id === questionId
@@ -47,6 +49,34 @@ export default function ManualMarksEntry() {
     }
   };
 
+  // handle input class activities marks changes
+  const handleCaMarksChange = (studentId, marks) => {
+    // Find if the entry already exists
+    const existingEntryIndex = inputMarksData.findIndex(
+      entry => entry.student_id === studentId
+    );
+
+    // If the entry exists, update the marks; otherwise, create a new entry
+    if (existingEntryIndex !== -1) {
+      // if marks === '' then remove the object else update the data
+      if (marks === '') {
+        setInputMarksData(prevMarksData => prevMarksData.filter(entry => entry.student_id !== studentId));
+      } else {
+        setInputMarksData(prevMarksData => {
+          const updatedEntries = [...prevMarksData];
+          updatedEntries[existingEntryIndex].marks = marks;
+          return updatedEntries;
+        });
+      }
+    } else {
+      setInputMarksData(prevMarksData => [
+        ...prevMarksData,
+        { student_id: studentId, marks: marks }
+      ]);
+    }
+  }
+
+
   // sticky table classes manage
   const tableContainerRef = useRef(null);
   const handleScroll = () => {
@@ -60,7 +90,6 @@ export default function ManualMarksEntry() {
     }
   };
 
-  // console.log(inputMarksData)
 
   // get students
   const getStudents = useCallback(() => {
@@ -80,10 +109,31 @@ export default function ManualMarksEntry() {
     })
   }, [course.section.id, exam.id])
 
-  // submit marks
-  const submitMarks = () => {
+  // submit exam marks
+  const submitExamMarks = () => {
     setSubmitLoading(true)
     axios.post(`/api/user/obtained-marks/${exam.id}`, inputMarksData).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        setTimeout(() => { setSuccess('') }, 5000)
+        getStudents()
+        setInputMarksData([])
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+      setSubmitLoading(false)
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+      setSubmitLoading(false)
+    })
+  }
+
+  // submit class activities marks
+  const submitCaMarks = () => {
+    setSubmitLoading(true)
+    axios.post(`/api/user/class-activities-marks/${exam.id}`, inputMarksData).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         setTimeout(() => { setSuccess('') }, 5000)
@@ -123,9 +173,10 @@ export default function ManualMarksEntry() {
               <small className='text-muted my-1'>{`${course.course?.course_code} :: ${course.course?.title}`}</small>
             </Box>
           </Box>
+          {/* import button and full marks */}
           <div className="text-end">
             <Link to={`/classes/import-marks/${exam.id}`} state={{ course: course, exam: exam, question_sets: exam.exam_question_sets, students: students }}
-              className='btn btn-dark btn-sm mb-2'>Import</Link>
+              className='btn btn-dark btn-sm mb-2'>Import / Export</Link>
             <p className="text-muted mt-1">Full marks: {exam.total_marks}</p>
           </div>
         </Box>
@@ -135,65 +186,107 @@ export default function ManualMarksEntry() {
           <Box className="card-body">
             <Box className="table-responsive" ref={tableContainerRef} onScroll={handleScroll} style={{ height: '70vh' }}>
 
-              <Table className='table-bordered table-sm border-grey'>
-                <TableHead className='sticky-header'>
-                  <TableRow>
-                    <TableCell rowSpan={2} className="sticky-column">Student ID</TableCell>
-                    {/* question set numbers */}
-                    {question_sets.map((question_set, set_index) => (
-                      <TableCell colSpan={question_set.questions.length} key={set_index} className='text-center'>{question_set.sl}</TableCell>
-                    ))}
-                  </TableRow>
-                  <TableRow>
-                    {/* all question numbers */}
-                    {question_sets.map((question_set) => (
-                      question_set.questions.map((question, question_index) => (
-                        <TableCell key={question_index} className='text-center fw-bold'>
-                          {question_set.questions.length > 1 && `${String.fromCharCode(question_index + 97)} `}
-                          <small className='fw-normal'>{`(${question.marks})`}</small>
-                        </TableCell>
-                      ))
-                    ))}
-                  </TableRow>
-                </TableHead>
+              {(exam.type === 'Midterm' || exam.type === 'Final') ?
 
-                <TableBody>
-                  {students.map((student, student_index) => (
-                    <TableRow key={student_index}>
-                      <TableCell style={{ minWidth: '120px' }} className="sticky-column">{student.student_id}</TableCell>
-
-                      {/* all questions input fields */}
-                      {question_sets.map((question_set) => (
-                        question_set.questions.map((question, question_index) => {
-                          const obtainedMarks = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id)?.marks;
-                          const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id && entry.question_id === question.id)?.marks ?? '';
-
-                          return (
-                            <TableCell key={question_index} style={{ minWidth: '90px', padding: '0' }}>
-
-                              {/* marks input field and edit button */}
-                              {obtainedMarks > -1 ?
-                                <button className='btn btn-block py-1' style={{ fontSize: '14px' }}>
-                                  {obtainedMarks}</button>
-                                :
-                                <input type="number"
-                                  className={`form-control marks-input ${inputMarksValue > question.marks && 'input-error'} ${inputMarksValue && 'input-active'}`}
-                                  value={inputMarksValue}
-                                  onChange={(e) => handleMarksChange(student.id, question.id, e.target.value)} />
-                              }
-                            </TableCell>
-                          )
-                        })
+                // exam marks table
+                <Table className='table-bordered table-sm border-grey'>
+                  <TableHead className='sticky-header'>
+                    <TableRow>
+                      <TableCell rowSpan={2} className="sticky-column">Student ID</TableCell>
+                      {/* question set numbers */}
+                      {question_sets.map((question_set, set_index) => (
+                        <TableCell colSpan={question_set.questions.length} key={set_index} className='text-center'>{question_set.sl}</TableCell>
                       ))}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                    <TableRow>
+                      {/* all question numbers */}
+                      {question_sets.map((question_set) => (
+                        question_set.questions.map((question, question_index) => (
+                          <TableCell key={question_index} className='text-center fw-bold'>
+                            {question_set.questions.length > 1 && `${String.fromCharCode(question_index + 97)} `}
+                            <small className='fw-normal'>{`(${question.marks})`}</small>
+                          </TableCell>
+                        ))
+                      ))}
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {students.map((student, student_index) => (
+                      <TableRow key={student_index}>
+                        <TableCell style={{ minWidth: '120px' }} className="sticky-column">{student.student_id}</TableCell>
+
+                        {/* all questions input fields */}
+                        {question_sets.map((question_set) => (
+                          question_set.questions.map((question, question_index) => {
+                            const obtainedMarks = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id)?.marks;
+                            const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id && entry.question_id === question.id)?.marks ?? '';
+
+                            return (
+                              <TableCell key={question_index} style={{ minWidth: '80px', padding: '0' }}>
+
+                                {/* marks input field and edit button */}
+                                {obtainedMarks > -1 ?
+                                  <button className='btn btn-block py-1' style={{ fontSize: '14px' }}>
+                                    {obtainedMarks}</button>
+                                  :
+                                  <input type="number"
+                                    className={`form-control marks-input ${inputMarksValue > question.marks && 'input-error'} ${inputMarksValue && 'input-active'}`}
+                                    value={inputMarksValue}
+                                    onChange={(e) => handleExamMarksChange(student.id, question.id, e.target.value)} />
+                                }
+                              </TableCell>
+                            )
+                          })
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+
+                :
+                // class activity marks table
+                <Table className='table-bordered table-sm border-grey'>
+                  <TableHead className='sticky-header'>
+                    <TableRow>
+                      <TableCell className="sticky-column">Student ID</TableCell>
+                      <TableCell className="sticky-column">Marks</TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {students.map((student, student_index) => {
+                      const obtainedMarks = student.obtained_ca_marks.find(obtained_marks => obtained_marks.exam_id === exam.id)?.marks;
+                      const inputMarksValue = inputMarksData.find(entry => entry.student_id === student.id)?.marks ?? '';
+
+                      return (
+                        <TableRow key={student_index}>
+                          <TableCell style={{ minWidth: '120px' }} className="sticky-column">{student.student_id}</TableCell>
+                          <TableCell style={{ minWidth: '80px', padding: '0' }}>
+
+                            {/* marks input field and edit button */}
+                            {obtainedMarks > -1 ?
+                              <button className='btn btn-block py-1 text-start' style={{ fontSize: '14px' }}>
+                                {obtainedMarks}</button>
+                              :
+                              <input type="number"
+                                className={`form-control marks-input ${inputMarksValue > exam.total_marks && 'input-error'} ${inputMarksValue && 'input-active'}`}
+                                value={inputMarksValue}
+                                onChange={(e) => handleCaMarksChange(student.id, e.target.value)} />
+                            }
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              }
             </Box>
 
             {/* save button */}
             <Box className="text-end mt-3">
-              <button className="btn btn-primary" onClick={submitMarks} disabled={inputMarksData.length === 0}>
+              <button className="btn btn-primary" onClick={(exam.type === 'Midterm' || exam.type === 'Final') ? submitExamMarks : submitCaMarks}
+                disabled={inputMarksData.length === 0}>
                 {submitLoading ? <span className='spinner-border spinner-border-sm'></span> : 'Save Changes'}</button>
             </Box>
           </Box>
