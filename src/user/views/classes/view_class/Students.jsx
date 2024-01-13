@@ -2,15 +2,15 @@ import { Box } from "@mui/material"
 import axios from "axios"
 import { useCallback, useEffect, useState } from "react"
 import DataTable from "react-data-table-component"
-import { Link, useParams } from "react-router-dom"
+import { Link } from "react-router-dom"
 import CustomSnackbar from "../../../../utilities/SnackBar"
 
-export default function EnrolledStudents() {
+export default function EnrolledStudents({ assigned_class }) {
 
   // const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const classId = useParams().id
+  // const classId = useParams().id
 
   const [students, setStudents] = useState([])
 
@@ -23,9 +23,9 @@ export default function EnrolledStudents() {
   // get students
   const getStudents = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/user/enrolled-students/${classId}`).then(res => {
+    axios.get(`/api/user/students/${assigned_class.section.id}`).then(res => {
       if (res.status === 200) {
-        setStudents(res.data.course.section.students)
+        setStudents(res.data.students)
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -36,7 +36,7 @@ export default function EnrolledStudents() {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     })
-  }, [classId])
+  }, [assigned_class.section.id])
 
   // datatable columns
   const columns = [
@@ -65,10 +65,10 @@ export default function EnrolledStudents() {
       wrap: true,
     },
     {
-      name: 'Action',
+      name: 'Details',
       button: true,
-      cell: row => <Link to={`/classes/student/${row.id}`} className="btn btn-secondary btn-sm px-2">
-        <i className="fas fa-eye" ></i></Link >,
+      cell: row => <Link to={`/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
+        className="btn btn-secondary btn-sm px-2"><i className="fas fa-eye" ></i></Link >,
     }
   ]
 
@@ -76,8 +76,6 @@ export default function EnrolledStudents() {
   useEffect(() => {
     getStudents()
   }, [getStudents])
-
-
 
   useEffect(() => {
     const filteredData = students.filter(student => {

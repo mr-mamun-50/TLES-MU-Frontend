@@ -12,7 +12,7 @@ export default function CreateQuestion() {
 
   let navigate = useNavigate();
   const location = useLocation();
-  const course = location.state?.course;
+  const assigned_class = location.state?.assigned_class;
   const exam = location.state?.exam;
 
   const setOptions = { sl: 1, question_type: 'With subquestions', questions: [{ blooms_level: 'Remember', marks: '' }] }
@@ -64,7 +64,7 @@ export default function CreateQuestion() {
       if (res.status === 200) {
         setSuccess(res.data.message)
         setTimeout(() => { setSuccess('') }, 5000)
-        navigate(`/classes/question/${exam.id}`, { state: { course: course, exam: exam } })
+        navigate(`/classes/question/${exam.id}`, { state: { assigned_class: assigned_class, exam: exam } })
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -89,9 +89,9 @@ export default function CreateQuestion() {
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
               <i className='fas fa-arrow-left fa-lg'></i></button>
             <Box className='my-2'>
-              <h5 className='card-title mb-1'>{`${course.semester?.name} ${exam.exam_type} Exam`}</h5>
-              <small className='text-muted'>{` ${course.section?.batch.department.name} - ${course.section?.batch.batch_name} (${course.section?.section_name})`}</small> <br />
-              <small className='text-muted my-1'>{`${course.course?.course_code} :: ${course.course?.title}`}</small>
+              <h5 className='card-title mb-1'>{`${assigned_class.semester?.name} ${exam.exam_type} Exam`}</h5>
+              <small className='text-muted'>{` ${assigned_class.section?.batch.department.name} - ${assigned_class.section?.batch.batch_name} (${assigned_class.section?.section_name})`}</small> <br />
+              <small className='text-muted my-1'>{`${assigned_class.course?.course_code} :: ${assigned_class.course?.title}`}</small>
             </Box>
           </Box>
           <p className="text-muted">Full marks: {exam.total_marks}</p>

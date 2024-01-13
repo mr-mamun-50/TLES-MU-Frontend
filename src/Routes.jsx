@@ -20,6 +20,7 @@ import CreateQuestion from "./user/views/classes/view_class/Questions/CreateQues
 import ViewQuestion from "./user/views/classes/view_class/Questions/ViewQuestion";
 import ManualMarksEntry from "./user/views/classes/view_class/Marks/ManualMarksEntry";
 import ImportMarks from "./user/views/classes/view_class/Marks/ImportMarks";
+import StudentDashboard from "./user/views/classes/view_class/Students/StudentDashboard";
 
 export default function AllRoutes() {
   return (
@@ -43,6 +44,9 @@ export default function AllRoutes() {
         {/* Marks entry routes */}
         <Route path="classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
         <Route path="classes/import-marks/:id" element={<ImportMarks />} />
+
+        {/* Students routes */}
+        <Route path="classes/student-dashboard/:id" element={<StudentDashboard />} />
       </Route>
 
 

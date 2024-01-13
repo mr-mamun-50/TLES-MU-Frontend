@@ -6,7 +6,7 @@ import axios from "axios";
 import CustomSnackbar from "../../../../utilities/SnackBar";
 import Swal from "sweetalert2";
 
-export default function Exams({ course }) {
+export default function Exams({ assigned_class }) {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
@@ -33,7 +33,7 @@ export default function Exams({ course }) {
         setTimeout(() => { setSuccess('') }, 5000)
         const exam = res.data.exam
         if (exam.exam_type === 'Final' || exam.exam_type === 'Midterm') {
-          navigate(`/classes/create-question/${exam.id}`, { state: { course: course, exam: exam } })
+          navigate(`/classes/create-question/${exam.id}`, { state: { assigned_class: assigned_class, exam: exam } })
         } else {
           getExams()
           setOpenAddExamModal(false)
@@ -178,10 +178,10 @@ export default function Exams({ course }) {
                   {/* Action buttons */}
                   <Box className="d-flex align-items-center mt-2">
                     {(exam.exam_type === 'Final' || exam.exam_type === 'Midterm') &&
-                      <Link to={`/classes/question/${exam.id}`} state={{ course: course, exam: exam }} className="btn btn-secondary btn-sm me-2">
+                      <Link to={`/classes/question/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam }} className="btn btn-secondary btn-sm me-2">
                         <i className="fas fa-file-pen me-2"></i> View / Edit</Link>}
 
-                    <Link to={`/classes/manual-marks-entry/${exam.id}`} state={{ course: course, exam: exam, question_sets: exam.exam_question_sets }}
+                    <Link to={`/classes/manual-marks-entry/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam, question_sets: exam.exam_question_sets }}
                       className="btn btn-secondary btn-sm"><i className="fas fa-edit me-2"></i> Enter / Edit Marks</Link>
                   </Box>
                 </Box>

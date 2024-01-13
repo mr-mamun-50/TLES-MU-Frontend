@@ -13,7 +13,7 @@ export default function ManualMarksEntry() {
   const [success, setSuccess] = useState('')
 
   const location = useLocation();
-  const course = location.state?.course;
+  const assigned_class = location.state?.assigned_class;
   const exam = location.state?.exam;
   const question_sets = location.state?.question_sets;
 
@@ -97,7 +97,7 @@ export default function ManualMarksEntry() {
   // get students
   const getStudents = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/user/students-with-marks/${course.section.id}/${exam.id}`).then(res => {
+    axios.get(`/api/user/students-with-marks/${assigned_class.section.id}/${exam.id}`).then(res => {
       if (res.status === 200) {
         setStudents(res.data.students)
       } else {
@@ -110,7 +110,7 @@ export default function ManualMarksEntry() {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     })
-  }, [course.section.id, exam.id])
+  }, [assigned_class.section.id, exam.id])
 
   // submit exam marks
   const submitExamMarks = () => {
@@ -213,14 +213,14 @@ export default function ManualMarksEntry() {
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
               <i className='fas fa-arrow-left fa-lg'></i></button>
             <Box className='my-2'>
-              <h5 className='card-title mb-1'>{`${course.semester?.name} ${exam.exam_type} Exam`}</h5>
-              <small className='text-muted'>{` ${course.section?.batch.department.name} - ${course.section?.batch.batch_name} (${course.section?.section_name})`}</small> <br />
-              <small className='text-muted my-1'>{`${course.course?.course_code} :: ${course.course?.title}`}</small>
+              <h5 className='card-title mb-1'>{`${assigned_class.semester?.name} ${exam.exam_type} Exam`}</h5>
+              <small className='text-muted'>{` ${assigned_class.section?.batch.department.name} - ${assigned_class.section?.batch.batch_name} (${assigned_class.section?.section_name})`}</small> <br />
+              <small className='text-muted my-1'>{`${assigned_class.course?.course_code} :: ${assigned_class.course?.title}`}</small>
             </Box>
           </Box>
           {/* import button and full marks */}
           <div className="text-end">
-            <Link to={`/classes/import-marks/${exam.id}`} state={{ course: course, exam: exam, question_sets: exam.exam_question_sets, students: students }}
+            <Link to={`/classes/import-marks/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam, question_sets: exam.exam_question_sets, students: students }}
               className='btn btn-dark btn-sm mb-2'>Import / Export</Link>
             <p className="text-muted mt-1">Full marks: {exam.total_marks}</p>
           </div>
@@ -276,7 +276,7 @@ export default function ManualMarksEntry() {
                                     onClick={() => {
                                       setEditableMarks({
                                         ...obtainedMark,
-                                        qstn_no: `${question_set.sl}.${question_set.questions.length > 1 ? String.fromCharCode(question_index + 97) : ''}`,
+                                        qstn_no: `${question_set.sl}${question_set.questions.length > 1 ? `.${String.fromCharCode(question_index + 97)}` : ''}`,
                                         qstn_marks: question.marks,
                                         student_id: student.student_id
                                       });

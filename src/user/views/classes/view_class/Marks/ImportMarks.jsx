@@ -14,7 +14,7 @@ export default function ImportMarks() {
   const [success, setSuccess] = useState('')
 
   const location = useLocation();
-  const course = location.state?.course;
+  const assigned_class = location.state?.assigned_class;
   const exam = location.state?.exam;
   const question_sets = location.state?.question_sets;
   const students = location.state?.students;
@@ -190,7 +190,7 @@ export default function ImportMarks() {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `${course.semester?.name} ${exam.exam_type} ${course.course?.course_code}-${course.course?.title} ${course.section?.batch.batch_name} (${course.section?.section_name})-${course.section?.batch.department.name}`
+    link.download = `${assigned_class.semester?.name} ${exam.exam_type} ${assigned_class.course?.course_code}-${assigned_class.course?.title} ${assigned_class.section?.batch.batch_name} (${assigned_class.section?.section_name})-${assigned_class.section?.batch.department.name}`
     link.click();
   };
 
@@ -246,9 +246,9 @@ export default function ImportMarks() {
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
               <i className='fas fa-arrow-left fa-lg'></i></button>
             <Box className='my-2'>
-              <h5 className='card-title mb-1'>{`${course.semester?.name} ${exam.exam_type} Exam`}</h5>
-              <small className='text-muted'>{` ${course.section?.batch.department.name} - ${course.section?.batch.batch_name} (${course.section?.section_name})`}</small> <br />
-              <small className='text-muted my-1'>{`${course.course?.course_code} :: ${course.course?.title}`}</small>
+              <h5 className='card-title mb-1'>{`${assigned_class.semester?.name} ${exam.exam_type} Exam`}</h5>
+              <small className='text-muted'>{` ${assigned_class.section?.batch.department.name} - ${assigned_class.section?.batch.batch_name} (${assigned_class.section?.section_name})`}</small> <br />
+              <small className='text-muted my-1'>{`${assigned_class.course?.course_code} :: ${assigned_class.course?.title}`}</small>
             </Box>
           </Box>
           <p className="text-muted mt-1">Full marks: {exam.total_marks}</p>

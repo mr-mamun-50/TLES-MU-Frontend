@@ -13,7 +13,7 @@ export default function ViewQuestion() {
   const [error, setError] = useState('')
 
   const location = useLocation();
-  const course = location.state?.course;
+  const assigned_class = location.state?.assigned_class;
   const exam = location.state?.exam;
 
   const [questionSets, setQuestionSets] = useState('')
@@ -191,9 +191,9 @@ export default function ViewQuestion() {
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
               <i className='fas fa-arrow-left fa-lg'></i></button>
             <Box className='my-2'>
-              <h5 className='card-title mb-1'>{`${course.semester?.name} ${exam.exam_type} Exam`}</h5>
-              <small className='text-muted'>{` ${course.section?.batch.department.name} - ${course.section?.batch.batch_name} (${course.section?.section_name})`}</small> <br />
-              <small className='text-muted my-1'>{`${course.course?.course_code} :: ${course.course?.title}`}</small>
+              <h5 className='card-title mb-1'>{`${assigned_class.semester?.name} ${exam.exam_type} Exam`}</h5>
+              <small className='text-muted'>{` ${assigned_class.section?.batch.department.name} - ${assigned_class.section?.batch.batch_name} (${assigned_class.section?.section_name})`}</small> <br />
+              <small className='text-muted my-1'>{`${assigned_class.course?.course_code} :: ${assigned_class.course?.title}`}</small>
             </Box>
           </Box>
           <p className="text-muted">Full marks: {exam.total_marks}</p>

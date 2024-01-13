@@ -116,29 +116,29 @@ export default function AssignedCourses() {
       <div className="row">
         {loading ? <div className="text-center"><span className='spinner-border my-4'></span></div>
           : classes.length > 0 ?
-            classes.map((course, index) => (
+            classes.map((assigned_class, index) => (
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 mb-4">
                 <div className='card border border-light-grey h-100 class-card' key={index}>
 
                   {/* linked card contents */}
-                  <Link to={`/classes/${course.id}`} state={{ course: course }}>
+                  <Link to={`/classes/${assigned_class.id}`} state={{ assigned_class: assigned_class }}>
                     <div className="card-header bg-dark d-flex align-items-end" style={{
                       height: '110px',
-                      background: `linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)), url("${course.image}") no-repeat center/cover`
+                      background: `linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)), url("${assigned_class.image}") no-repeat center/cover`
                     }}>
                       <div className="w-100 text-shadow">
-                        <h5 className='text-white text-hide-ellipsis' title={`${course.course.course_code} :: ${course.course.title}`}
+                        <h5 className='text-white text-hide-ellipsis' title={`${assigned_class.course.course_code} :: ${assigned_class.course.title}`}
                           style={{ textShadow: '0 0 10px black' }}>
-                          {course.course.course_code} :: {course.course.title}</h5>
-                        <p className='card-text text-light' style={{ textShadow: '0 0 10px black' }}>Credit hours: {course.course.credit_hours}</p>
+                          {assigned_class.course.course_code} :: {assigned_class.course.title}</h5>
+                        <p className='card-text text-light' style={{ textShadow: '0 0 10px black' }}>Credit hours: {assigned_class.course.credit_hours}</p>
                       </div>
                     </div>
 
 
                     <div className='card-body p-3 small text-dark bg-white'>
-                      <p className='mb-1 text-hide-ellipsis'>{course.section.batch.department.name}</p>
-                      <p className='mb-1 fw-bold'>{course.section.batch.batch_name} ({course.section.section_name})</p>
-                      <p className='mb-2'>{course.semester?.name}</p>
+                      <p className='mb-1 text-hide-ellipsis'>{assigned_class.section.batch.department.name}</p>
+                      <p className='mb-1 fw-bold'>{assigned_class.section.batch.batch_name} ({assigned_class.section.section_name})</p>
+                      <p className='mb-2'>{assigned_class.semester?.name}</p>
                       {/* <p className=''>Number of Students: {course.section.students.length}</p> */}
                     </div>
                   </Link>
@@ -156,7 +156,7 @@ export default function AssignedCourses() {
                   <Menu id={`basic-menu-${index}`} anchorEl={anchorEl} open={openMenus[index]}
                     onClose={handleMenuClose} MenuListProps={{ 'aria-labelledby': `basic-button-${index}` }}
                   >
-                    <MenuItem onClick={() => { moveToArchive(course.id); handleMenuClose() }}>
+                    <MenuItem onClick={() => { moveToArchive(assigned_class.id); handleMenuClose() }}>
                       <i className="fas fa-inbox text-grey me-3"></i>Move to {classStatus === 1 ? 'Archive' : "Current"}
                     </MenuItem>
                   </Menu>
