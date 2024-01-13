@@ -3,6 +3,9 @@ import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import CustomSnackbar from '../../../../../utilities/SnackBar'
+import { BarChart } from '@mui/x-charts/BarChart';
+import TabContext from '@mui/lab/TabContext'
+import TabPanel from '@mui/lab/TabPanel'
 
 export default function StudentDashboard() {
 
@@ -24,6 +27,10 @@ export default function StudentDashboard() {
     const obtainedCaMarks = exam.obtained_ca_marks ? exam.obtained_ca_marks.marks : 0;
     return obtainedExamMarks + obtainedCaMarks;
   }).reduce((sum, obtainedMarks) => sum + obtainedMarks, 0);
+
+
+  // tab index
+  const [tabIndex, setTabIndex] = useState({ Midterm: '1', Final: '1' });
 
   // console.log(totalObtainedMarks)
 
@@ -71,7 +78,7 @@ export default function StudentDashboard() {
         {/* body section */}
         <Box className="card-body">
           {/* student info and all marks */}
-          <Box className="bg-light rounded px-4 py-3 d-flex justify-content-between align-items-center">
+          <Box className="bg-light rounded-3 px-4 py-3 d-flex justify-content-between align-items-center">
             <Box>
               <h6 className="card-title" style={{ fontSize: '18px' }}>{student.name}</h6>
               <p className="card-title mb-0">ID: {student.student_id}</p>
@@ -107,7 +114,6 @@ export default function StudentDashboard() {
                           obtainedMarks: 0,
                         };
                       }
-
                       bloomsLevelMarks[bloomsLevel].totalMarks += obtainedMark.question.marks;
                       bloomsLevelMarks[bloomsLevel].obtainedMarks += obtainedMark.marks;
                     });
@@ -125,7 +131,6 @@ export default function StudentDashboard() {
                           percentage,
                         };
                       } else {
-                        // If blooms level is not present in obtained marks
                         return {
                           bloomsLevel,
                           percentage: 'N/A',
@@ -135,23 +140,59 @@ export default function StudentDashboard() {
 
                     return (
                       <Box className="col-12 col-md-6 mb-4" key={index}>
-                        <Box className="card border border-light-grey">
-                          <Box className="card-header d-flex justify-content-between align-items-center bg-light">
+                        <Box className="card h-100" sx={{ border: 1, borderColor: 'divider' }}>
+                          <Box className="card-header d-flex justify-content-between align-items-center" sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <h6 className='mb-0' style={{ fontSize: '18px' }}>{exam.exam_type}</h6>
-                            <p className="mb-0"><b>{obtainedMarks}</b>/{exam.total_marks}</p>
+
+                            <Box className="d-flex align-items-center">
+                              {/* tab indexes */}
+                              <Box className="btn-group shadow-0 align-items-center me-4">
+                                <button className={`btn btn${exam.exam_type === 'Midterm' ? tabIndex.Midterm === '2' ? '-outline' : '' : tabIndex.Final === '2' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
+                                  onClick={() => setTabIndex({ ...tabIndex, [exam.exam_type === 'Midterm' ? 'Midterm' : 'Final']: '1' })}>Graph</button>
+
+                                <button className={`btn btn${exam.exam_type === 'Midterm' ? tabIndex.Midterm === '1' ? '-outline' : '' : tabIndex.Final === '1' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
+                                  onClick={() => setTabIndex({ ...tabIndex, [exam.exam_type === 'Midterm' ? 'Midterm' : 'Final']: '2' })}>Details</button>
+                              </Box>
+
+                              {/* marks */}
+                              <p className="mb-0" style={{ fontSize: '18px' }}><b>{obtainedMarks}</b>/{exam.total_marks}</p>
+                            </Box>
                           </Box>
 
                           <Box className="card-body pt-3">
-                            <Table className='table-sm'>
-                              <TableBody>
-                                {bloomsLevelPercentages.map(({ bloomsLevel, percentage }) => (
-                                  <TableRow key={bloomsLevel}>
-                                    <TableCell>{bloomsLevel}</TableCell>
-                                    <TableCell className='text-end fw-semibold'>{percentage !== 'N/A' ? `${percentage.toFixed(2)} %` : percentage}</TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
+                            <TabContext value={exam.exam_type === 'Midterm' ? tabIndex.Midterm : tabIndex.Final}>
+
+                              {/* table of bloomsLevelPercentages*/}
+                              <TabPanel value='2' className='p-0'>
+                                <Table className='table-sm'>
+                                  <TableBody>
+                                    {bloomsLevelPercentages.map(({ bloomsLevel, percentage }) => (
+                                      <TableRow key={bloomsLevel}>
+                                        <TableCell>{bloomsLevel}</TableCell>
+                                        <TableCell className='text-end fw-semibold'>{percentage !== 'N/A' ? `${percentage.toFixed(2)} %` : percentage}</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TabPanel>
+
+                              {/* bar chart of bloomsLevelPercentages */}
+                              <TabPanel value='1' className='p-0'>
+                                <BarChart
+                                  xAxis={[{
+                                    id: 'barCategories',
+                                    data: bloomsLevelPercentages.map(({ bloomsLevel }) => bloomsLevel),
+                                    scaleType: 'band',
+                                  }]}
+                                  series={[{
+                                    data: bloomsLevelPercentages.map(({ percentage }) => percentage !== 'N/A' ? percentage : 0),
+                                    color: '#007bff',
+                                  }]}
+                                  height={220}
+                                  margin={{ top: 15, right: 15, bottom: 20, left: 30 }}
+                                />
+                              </TabPanel>
+                            </TabContext>
                           </Box>
                         </Box>
                       </Box>
