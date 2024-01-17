@@ -4,6 +4,27 @@ body {
     zoom: 95%;
 }
 
+/* small scrollbar style */
+.scroll::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* all scrollbar style */
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+*::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+*::-webkit-scrollbar-thumb {
+    background: #d2d2d2;
+    border-radius: 10px;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: #ccc;
+}
+
 .text-primary {
     color: #3b71ca !important;
 }

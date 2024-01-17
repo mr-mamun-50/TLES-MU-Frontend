@@ -85,7 +85,7 @@ export default function StudentDashboard() {
             </Box>
             {/* total marks obtained from obtained exam marks and obtained ca marks */}
             <Box className="d-flex">
-              <h5 className='mb-0'>{totalObtainedMarks}</h5>
+              <h5 className={`mb-0 ${((totalObtainedMarks * 100) / totalExamMarks) < 40 && 'text-danger'}`}>{totalObtainedMarks}</h5>
               <h5 className="mb-0 fw-normal">/{totalExamMarks}</h5>
             </Box>
           </Box>
@@ -140,7 +140,7 @@ export default function StudentDashboard() {
 
                     return (
                       <Box className="col-12 col-md-6 mb-4" key={index}>
-                        <Box className="card h-100" sx={{ border: 1, borderColor: 'divider' }}>
+                        <Box className="card border border-light-grey h-100">
                           <Box className="card-header d-flex justify-content-between align-items-center" sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <h6 className='mb-0' style={{ fontSize: '18px' }}>{exam.exam_type}</h6>
 
@@ -148,14 +148,19 @@ export default function StudentDashboard() {
                               {/* tab indexes */}
                               <Box className="btn-group shadow-0 align-items-center me-4">
                                 <button className={`btn btn${exam.exam_type === 'Midterm' ? tabIndex.Midterm === '2' ? '-outline' : '' : tabIndex.Final === '2' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
-                                  onClick={() => setTabIndex({ ...tabIndex, [exam.exam_type === 'Midterm' ? 'Midterm' : 'Final']: '1' })}>Graph</button>
+                                  onClick={() => setTabIndex({ ...tabIndex, [exam.exam_type === 'Midterm' ? 'Midterm' : 'Final']: '1' })}
+                                  title='Graph'><i className="fas fa-chart-column"></i></button>
 
                                 <button className={`btn btn${exam.exam_type === 'Midterm' ? tabIndex.Midterm === '1' ? '-outline' : '' : tabIndex.Final === '1' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
-                                  onClick={() => setTabIndex({ ...tabIndex, [exam.exam_type === 'Midterm' ? 'Midterm' : 'Final']: '2' })}>Details</button>
+                                  onClick={() => setTabIndex({ ...tabIndex, [exam.exam_type === 'Midterm' ? 'Midterm' : 'Final']: '2' })}
+                                  title='Details'><i className="fas fa-list"></i></button>
                               </Box>
 
                               {/* marks */}
-                              <p className="mb-0" style={{ fontSize: '18px' }}><b>{obtainedMarks}</b>/{exam.total_marks}</p>
+                              <p className="mb-0" style={{ fontSize: '18px' }}>
+                                <b className={`${exam.exam_type === 'Final' && ((obtainedMarks * 100) / exam.total_marks) < 40 && 'text-danger'}`}>{obtainedMarks}</b>
+                                /{exam.total_marks}
+                              </p>
                             </Box>
                           </Box>
 

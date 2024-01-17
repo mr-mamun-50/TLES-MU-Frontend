@@ -157,8 +157,8 @@ export default function Exams({ assigned_class }) {
 
       {/* exams list */}
       {exams.length > 0 ? exams.map(exam => (
-        <Box className="mb-4">
-          <Box key={exam.id} className="card shadow-sm exam-card" sx={{ border: 1, borderColor: 'divider' }}>
+        <Box className="mb-4" key={exam.id}>
+          <Box className="card shadow-sm exam-card" sx={{ border: 1, borderColor: 'divider' }}>
             <Box className="card-body d-flex justify-content-between">
               {/* Basic info and actions */}
               <Box className="d-flex">
