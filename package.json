@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.1",
+    "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.18",
     "@mui/lab": "^5.0.0-alpha.157",
@@ -24,6 +24,7 @@
     "exceljs": "^4.4.0",
     "mdb-ui-kit": "^7.0.0",
     "react": "^18.2.0",
+    "react-circular-progressbar": "^2.1.0",
     "react-csv-reader": "^4.0.0",
     "react-data-table-component": "^7.5.4",
     "react-dom": "^18.2.0",

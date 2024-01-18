@@ -62,7 +62,7 @@ export default function ViewClass() {
 
           <TabPanel value='3' className='p-0'>
             <Box className="card-body">
-              <CourseStatistics />
+              <CourseStatistics assigned_class={assigned_class} />
             </Box>
           </TabPanel>
 

@@ -106,10 +106,10 @@ export default function EnrolledStudents({ assigned_class }) {
         highlightOnHover
         noDataComponent={loading ? <div className="text-center"><span className='spinner-border my-4'></span></div>
           : <div className="text-center my-5">No students found</div>}
-        selectableRows
-        selectableRowsHighlight
-        // onSelectedRowsChange={data => setSelectedStudents(data.selectedRows)}
-        contextActions={<button className="btn btn-primary me-2 px-3" onClick={() => { }}><i className="fas fa-copy"></i></button>}
+      // selectableRows
+      // selectableRowsHighlight
+      // onSelectedRowsChange={data => setSelectedStudents(data.selectedRows)}
+      // contextActions={<button className="btn btn-primary me-2 px-3" onClick={() => { }}><i className="fas fa-copy"></i></button>}
       />
 
 

@@ -24,15 +24,15 @@ export default function StudentDashboard() {
 
   const totalObtainedMarks = examMarksOfClass.length > 0 && examMarksOfClass.map((exam) => {
     const obtainedExamMarks = exam.obtained_exam_marks.reduce((sum, obtainedMark) => sum + obtainedMark.marks, 0);
-    const obtainedCaMarks = exam.obtained_ca_marks ? exam.obtained_ca_marks.marks : 0;
+    const obtainedCaMarks = exam.obtained_ca_marks.length > 0 ? exam.obtained_ca_marks[0].marks : 0;
     return obtainedExamMarks + obtainedCaMarks;
   }).reduce((sum, obtainedMarks) => sum + obtainedMarks, 0);
 
 
-  // tab index
+  // tab index for graph and details
   const [tabIndex, setTabIndex] = useState({ Midterm: '1', Final: '1' });
 
-  // console.log(totalObtainedMarks)
+  // console.log(examMarksOfClass)
 
 
   // get all exam marks
@@ -219,7 +219,7 @@ export default function StudentDashboard() {
                         <Box className="card border border-light-grey">
                           <Box className="card-body d-flex justify-content-between align-items-center">
                             <h6 className='mb-0' style={{ fontSize: '18px' }}>{exam.exam_type}</h6>
-                            <p className="mb-0"><b>{exam.obtained_ca_marks?.marks ?? 0}</b>/{exam.total_marks}</p>
+                            <p className="mb-0"><b>{exam.obtained_ca_marks[0]?.marks ?? 0}</b>/{exam.total_marks}</p>
                           </Box>
                         </Box>
                       </Box>
