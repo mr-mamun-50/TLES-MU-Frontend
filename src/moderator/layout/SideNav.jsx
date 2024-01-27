@@ -4,7 +4,7 @@ import logo from '../../assets/images/logo/tles_logo_light.png';
 import { NavLink } from 'react-router-dom';
 
 
-export default function AdminSideNav({ onClose }) {
+export default function ModeratorSideNav({ onClose }) {
 
   const [showClinicalSubMenu, setShowClinicalSubMenu] = useState(false);
 
@@ -34,7 +34,7 @@ export default function AdminSideNav({ onClose }) {
             <small className='text-muted ms-4'>Core</small>
             <hr className='mb-1 mt-0 text-light' />
 
-            <NavLink to="/admin" end>
+            <NavLink to="/moderator" end>
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-chart-area fa-fw me-3"></i> <span> Dashboard</span>
               </span>
@@ -48,39 +48,33 @@ export default function AdminSideNav({ onClose }) {
             <small className='text-muted mt-2 ms-4'>Administrative</small>
             <hr className='mb-1 mt-0 text-light' />
 
-            <NavLink to="/admin/students">
+            <NavLink to="/moderator/students">
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-people-roof fa-fw me-3"></i><span> Students</span>
               </span>
             </NavLink>
 
-            <NavLink to="/admin/teachers">
+            <NavLink to="/moderator/teachers">
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-user-tie fa-fw me-3"></i><span> Teachers</span>
               </span>
             </NavLink>
 
-            <NavLink to="/admin/semester">
+            <NavLink to="/moderator/semester">
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-diagram-next fa-fw me-3"></i><span> Semesters</span>
               </span>
             </NavLink>
 
-            <NavLink to="/admin/batch-section">
+            <NavLink to="/moderator/batch-section">
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-users-rectangle fa-fw me-3"></i><span> Batches</span>
               </span>
             </NavLink>
 
-            <NavLink to="/admin/moderators">
+            <NavLink to="/moderator/departments-courses">
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-user-gear fa-fw me-3"></i><span> Head of Departments</span>
-              </span>
-            </NavLink>
-
-            <NavLink to="/admin/departments-courses">
-              <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-layer-group fa-fw me-3"></i><span> Dept. & Courses</span>
+                <i className="fas fa-layer-group fa-fw me-3"></i><span> All Courses</span>
               </span>
             </NavLink>
 

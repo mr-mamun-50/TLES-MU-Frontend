@@ -11,6 +11,7 @@ export default function Exams({ assigned_class }) {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
   const classId = useParams().id
 
   const [exams, setExams] = useState([])
@@ -22,7 +23,7 @@ export default function Exams({ assigned_class }) {
   const [openEditExamModal, setOpenEditExamModal] = useState(false)
   const navigate = useNavigate();
 
-  // console.log(exams)
+  // console.log(role)
 
   // crete exam
   const createExam = () => {
@@ -74,7 +75,7 @@ export default function Exams({ assigned_class }) {
   // get exams
   const getExams = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/user/exams/${classId}`).then(res => {
+    axios.get(`/api/${role}/exams/${classId}`).then(res => {
       if (res.status === 200) {
         setExams(res.data.exams)
       } else {
@@ -87,7 +88,7 @@ export default function Exams({ assigned_class }) {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     })
-  }, [classId])
+  }, [classId, role])
 
   // delete assigned course
   const deleteExam = (id) => {
@@ -120,8 +121,12 @@ export default function Exams({ assigned_class }) {
 
 
   useEffect(() => {
-    getExams()
-  }, [getExams])
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'))
+
+    role && getExams()
+  }, [getExams, role])
 
 
   // icon selector function
@@ -144,14 +149,16 @@ export default function Exams({ assigned_class }) {
 
   return (
     <Box className='px-2 pt-1'>
+      {/* total marks and new exam button */}
       <Box className="d-flex justify-content-between align-items-center mb-4">
         <p className="text-muted my-0">
-          <i className={`fas fa-circle-check me-2 ${marksTaken === 90 ? 'text-success' : marksTaken > 90 ? 'text-danger' : ''}`}></i>
+          <i className={`fas fa-circle-check me-2 ${marksTaken === 100 ? 'text-success' : marksTaken > 100 ? 'text-danger' : ''}`}></i>
           Exams taken: <b>{marksTaken}</b> marks
         </p>
 
-        <button onClick={() => setOpenAddExamModal(true)} className="btn btn-primary">
-          <i className="fas fa-plus me-2"></i> New Exam</button>
+        {role === 'user' &&
+          <button onClick={() => setOpenAddExamModal(true)} className="btn btn-primary">
+            <i className="fas fa-plus me-2"></i> New Exam</button>}
       </Box>
 
 
@@ -178,11 +185,15 @@ export default function Exams({ assigned_class }) {
                   {/* Action buttons */}
                   <Box className="d-flex align-items-center mt-2">
                     {(exam.exam_type === 'Final' || exam.exam_type === 'Midterm') &&
-                      <Link to={`/classes/question/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam }} className="btn btn-secondary btn-sm me-2">
-                        <i className="fas fa-file-pen me-2"></i> View / Edit</Link>}
+                      <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/question/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam }}
+                        className="btn btn-secondary btn-sm me-2">
+                        <i className="fas fa-file-pen me-2"></i> Question
+                      </Link>}
 
-                    <Link to={`/classes/manual-marks-entry/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam, question_sets: exam.exam_question_sets }}
-                      className="btn btn-secondary btn-sm"><i className="fas fa-edit me-2"></i> Enter / Edit Marks</Link>
+                    <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/manual-marks-entry/${exam.id}`}
+                      state={{ assigned_class: assigned_class, exam: exam, question_sets: exam.exam_question_sets }}
+                      className="btn btn-secondary btn-sm">
+                      <i className="fas fa-edit me-2"></i> Marks</Link>
                   </Box>
                 </Box>
               </Box>
@@ -193,25 +204,27 @@ export default function Exams({ assigned_class }) {
                   {new Date(exam.exam_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', })}
                 </small>
 
-                <Box className="d-flex justify-content-end mt-4">
-                  <button className="btn btn-outline-secondary btn-sm btn-floating me-2"
-                    onClick={() => {
-                      const selectedExam = { ...exam }
-                      if (exam.exam_type !== 'Final' && exam.exam_type !== 'Midterm' && exam.exam_type !== 'Class Test' && exam.exam_type !== 'Presentation' && exam.exam_type !== 'Viva') {
-                        selectedExam.exam_type = 'other'
-                        selectedExam.other_exam_type = exam.exam_type
-                      }
-                      if (exam.total_marks !== 20 && exam.total_marks !== 30 && exam.total_marks !== 40) {
-                        selectedExam.total_marks = 'other'
-                        selectedExam.other_marks = exam.total_marks
-                      }
-                      setEditableExam(selectedExam)
-                      setOpenEditExamModal(true)
-                    }}><i className="fas fa-edit"></i></button>
+                {role === 'user' &&
+                  <Box className="d-flex justify-content-end mt-4">
+                    <button className="btn btn-outline-secondary btn-sm btn-floating me-2"
+                      onClick={() => {
+                        const selectedExam = { ...exam }
+                        if (exam.exam_type !== 'Final' && exam.exam_type !== 'Midterm' && exam.exam_type !== 'Class Test' && exam.exam_type !== 'Presentation' && exam.exam_type !== 'Viva') {
+                          selectedExam.exam_type = 'other'
+                          selectedExam.other_exam_type = exam.exam_type
+                        }
+                        if (exam.total_marks !== 20 && exam.total_marks !== 30 && exam.total_marks !== 40) {
+                          selectedExam.total_marks = 'other'
+                          selectedExam.other_marks = exam.total_marks
+                        }
+                        setEditableExam(selectedExam)
+                        setOpenEditExamModal(true)
+                      }}><i className="fas fa-edit"></i></button>
 
-                  <button className="btn btn-outline-secondary btn-sm btn-floating"
-                    onClick={() => deleteExam(exam.id)}><i className="fas fa-trash-alt"></i></button>
-                </Box>
+                    <button className="btn btn-outline-secondary btn-sm btn-floating"
+                      onClick={() => deleteExam(exam.id)}><i className="fas fa-trash-alt"></i></button>
+                  </Box>
+                }
               </Box>
             </Box>
           </Box>

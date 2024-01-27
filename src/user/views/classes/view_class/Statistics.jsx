@@ -16,6 +16,7 @@ export default function CourseStatistics({ assigned_class }) {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
 
   const [examMarksOfClass, setExamMarksOfClass] = useState([])
 
@@ -56,7 +57,7 @@ export default function CourseStatistics({ assigned_class }) {
   // get all exam marks
   const getAllExamMarks = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/user/class_exam_marks/${assigned_class.id}`).then(res => {
+    axios.get(`/api/${role}/class_exam_marks/${assigned_class.id}`).then(res => {
       if (res.status === 200) {
         setExamMarksOfClass(res.data.examMarks)
       } else {
@@ -69,12 +70,16 @@ export default function CourseStatistics({ assigned_class }) {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     })
-  }, [assigned_class.id])
+  }, [assigned_class.id, role])
 
 
   useEffect(() => {
-    getAllExamMarks()
-  }, [getAllExamMarks])
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'))
+
+    role && getAllExamMarks()
+  }, [getAllExamMarks, role])
 
 
   return (

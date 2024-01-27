@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import axios from 'axios'
-import { Grid, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material'
+import { Box, Grid, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material'
 import ModalDialog from '../../../utilities/ModalDialog'
-import Swal from 'sweetalert2'
+import { useNavigate } from 'react-router-dom'
 
-export default function AssignCourse({ selectedSemester }) {
+export default function AssignCourse({ selectedSemester, role }) {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  let navigate = useNavigate();
 
   const [filterVals, setFilterVals] = useState({ dept_id: 0, batch_id: 0, section_id: 0 })
   const [departments, setDepartments] = useState([])
@@ -21,9 +22,12 @@ export default function AssignCourse({ selectedSemester }) {
 
   const [inputValues, setInputValues] = useState([]);
   const [editableCourse, setEditableCourse] = useState([])
+  const [deletableId, setDeletableId] = useState(null)
+  const [deleteCourseInput, setDeleteCourseInput] = useState('')
 
   // modal show hide
   const [showEditCourseModal, setShowEditCourseModal] = useState(false)
+  const [showCourseDelete, setShowCourseDelete] = useState(false)
 
   // console.log(assignedCourses)
 
@@ -62,7 +66,7 @@ export default function AssignCourse({ selectedSemester }) {
 
   // get all batchs
   const getBatchs = useCallback((dept_id) => {
-    axios.get(`/api/admin/batch_section/${dept_id}`).then(res => {
+    axios.get(`/api/${role}/batch_section/${dept_id}`).then(res => {
       if (res.status === 200) {
         setBatchs(res.data.batches)
         if (filterVals.batch_id !== 0) {
@@ -76,11 +80,11 @@ export default function AssignCourse({ selectedSemester }) {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
     });
-  }, [filterVals.batch_id])
+  }, [filterVals.batch_id, role])
 
   // get dept courses
   const getDeptCourses = useCallback((dept_id) => {
-    axios.get(`/api/admin/courses/${dept_id}`).then(res => {
+    axios.get(`/api/${role}/courses/${dept_id}`).then(res => {
       if (res.status === 200) {
         setCourses(res.data.courses)
       } else {
@@ -91,11 +95,11 @@ export default function AssignCourse({ selectedSemester }) {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
     });
-  }, [])
+  }, [role])
 
   // get teachers
-  const getTeachers = () => {
-    axios.get('/api/admin/teachers/0').then(res => {
+  const getTeachers = useCallback(() => {
+    axios.get(`/api/${role}/teachers/0`).then(res => {
       if (res.status === 200) {
         setTeachers(res.data.users)
       } else {
@@ -106,12 +110,12 @@ export default function AssignCourse({ selectedSemester }) {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
     });
-  }
+  }, [role])
 
   // get assigned courses
   const getAssignedCourses = useCallback((semester_id, section_id) => {
     setLoading(true)
-    axios.get(`/api/admin/assign-course/${semester_id}/${section_id}`).then(res => {
+    axios.get(`/api/${role}/assign-course/${semester_id}/${section_id}`).then(res => {
       if (res.status === 200) {
         setAssignedCourses(res.data.courses)
       } else {
@@ -124,14 +128,14 @@ export default function AssignCourse({ selectedSemester }) {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     });
-  }, [])
+  }, [role])
 
   // add assign course
   const addAssignCourse = (e) => {
     e.preventDefault()
     setLoading(true)
     let data = { ...filterVals, semester_id: selectedSemester.id, courses: inputValues }
-    axios.post('/api/admin/assign-course', data).then(res => {
+    axios.post(`/api/${role}/assign-course`, data).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         getAssignedCourses(selectedSemester.id, filterVals.section_id)
@@ -152,7 +156,7 @@ export default function AssignCourse({ selectedSemester }) {
   const editAssignedCourse = (e) => {
     e.preventDefault()
     setLoading(true)
-    axios.put(`/api/admin/assign-course/${editableCourse.id}`, editableCourse).then(res => {
+    axios.put(`/api/${role}/assign-course/${editableCourse.id}`, editableCourse).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         getAssignedCourses(selectedSemester.id, filterVals.section_id)
@@ -170,82 +174,89 @@ export default function AssignCourse({ selectedSemester }) {
   }
 
   // delete assigned course
-  const deleteAssignedCourse = (id) => {
-    Swal.fire({
-      title: 'Are you sure to delete?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#1976D2',
-      cancelButtonColor: '#707070',
-      confirmButtonText: 'Yes, delete!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios.delete(`/api/admin/assign-course/${id}`).then(res => {
-          if (res.status === 200) {
-            setSuccess(res.data.message)
-            getAssignedCourses(selectedSemester.id, filterVals.section_id)
-            setTimeout(() => { setSuccess('') }, 5000)
-          } else {
-            setError(res.data.message)
-            setTimeout(() => { setError('') }, 5000)
-          }
-        }).catch(err => {
-          setError(err.response.data.message)
-          setTimeout(() => { setError('') }, 5000)
-        });
+  const deleteAssignedCourse = () => {
+    axios.delete(`/api/${role}/assign-course/${deletableId}`).then(res => {
+      if (res.status === 200) {
+        getAssignedCourses(selectedSemester.id, filterVals.section_id)
+        setSuccess(res.data.message)
+        setShowCourseDelete(false)
+        setDeleteCourseInput('')
+        setDeletableId(null)
+        setTimeout(() => { setSuccess('') }, 5000)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
       }
-    })
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+    });
   }
 
 
 
   useEffect(() => {
+    if (role === 'moderator') {
+      const modDeptId = localStorage.getItem('user') ?
+        JSON.parse(localStorage.getItem('user')).dept_id
+        : JSON.parse(sessionStorage.getItem('user')).dept_id;
+
+      if (filterVals.dept_id === 0) {
+        setFilterVals({ dept_id: modDeptId, batch_id: 0, section_id: 0 })
+        getBatchs(modDeptId);
+      }
+    }
+
     if (sessionStorage.getItem('selectedId')) {
-      setFilterVals(JSON.parse(sessionStorage.getItem('selectedId')))
+      setFilterVals(JSON.parse(sessionStorage.getItem('selectedId')));
       if (filterVals.dept_id !== 0) {
-        getBatchs(filterVals.dept_id)
-        getDeptCourses(filterVals.dept_id)
+        getBatchs(filterVals.dept_id);
+        getDeptCourses(filterVals.dept_id);
       }
       if (filterVals.section_id !== 0)
-        getAssignedCourses(selectedSemester.id, filterVals.section_id)
+        getAssignedCourses(selectedSemester.id, filterVals.section_id);
     }
-  }, [filterVals.dept_id, filterVals.section_id, getAssignedCourses, getBatchs, getDeptCourses, selectedSemester.id])
+  }, [filterVals.dept_id, filterVals.section_id, getAssignedCourses, getBatchs, getDeptCourses, role, selectedSemester.id])
+
 
   useEffect(() => {
-    getDepartments()
-    getTeachers()
-  }, [])
+    if (role === 'admin') {
+      getDepartments();
+    }
+    getTeachers();
+  }, [getTeachers, role])
 
 
   return (
-    <div className="card my-2">
-      <div className='card-header d-flex justify-content-between align-items-center'>
+    <Box className="card my-2">
+      <Box className='card-header d-flex justify-content-between align-items-center'>
         <h5 className='mt-2 mb-0'>Assign Courses</h5>
-      </div>
+      </Box>
 
-      <div className="card-body">
+      <Box className="card-body">
         {/* Filter section */}
-        <div className="d-flex align-items-center mb-1">
+        <Box className="d-flex align-items-center mb-1">
           <Grid container spacing={2}>
             {/* select department */}
-            <Grid item xs={12} sm={5}>
-              <TextField select fullWidth margin='small' size='small' value={filterVals.dept_id}
-                onChange={(e) => {
-                  setFilterVals({ dept_id: e.target.value, batch_id: 0, section_id: 0 });
-                  getBatchs(e.target.value);
-                  sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
-                  setAssignedCourses([])
-                }}>
-                <MenuItem value={0} disabled>Select Department</MenuItem>
-                {departments.map((department) => (
-                  <MenuItem value={department.id}>{department.name}</MenuItem>
-                ))}
-              </TextField>
-            </Grid>
+            {role === 'admin' &&
+              <Grid item xs={12} sm={5}>
+                <TextField select fullWidth margin='small' size='small' value={filterVals.dept_id}
+                  onChange={(e) => {
+                    setFilterVals({ dept_id: e.target.value, batch_id: 0, section_id: 0 });
+                    getBatchs(e.target.value);
+                    sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
+                    setAssignedCourses([])
+                  }}>
+                  <MenuItem value={0} disabled>Select Department</MenuItem>
+                  {departments.map((department) => (
+                    <MenuItem value={department.id}>{department.name}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+            }
 
             {/* select batch */}
-            <Grid item xs={12} sm={2}>
+            <Grid item xs={12} sm={role === 'admin' ? 2 : 3}>
               <TextField select fullWidth margin='small' size='small' value={filterVals.batch_id}
                 onChange={(e) => {
                   setFilterVals({ ...filterVals, batch_id: e.target.value, section_id: 0 });
@@ -261,7 +272,7 @@ export default function AssignCourse({ selectedSemester }) {
             </Grid>
 
             {/* select section */}
-            <Grid item xs={12} sm={2}>
+            <Grid item xs={12} sm={role === 'admin' ? 2 : 3}>
               <TextField select fullWidth margin='small' size='small' value={filterVals.section_id}
                 onChange={(e) => {
                   setFilterVals({ ...filterVals, section_id: e.target.value })
@@ -274,7 +285,7 @@ export default function AssignCourse({ selectedSemester }) {
               </TextField>
             </Grid>
           </Grid>
-        </div>
+        </Box>
 
         {/* assigned courses table */}
         <Table>
@@ -295,21 +306,23 @@ export default function AssignCourse({ selectedSemester }) {
                 assignedCourses.map((course, index) => (
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{course.course && course.course.course_code}</TableCell>
-                    <TableCell>{course.course && course.course.title}</TableCell>
+                    <TableCell onClick={() => navigate(`/${role}/semester/classes/${course.id}`, { state: { assigned_class: course } })} style={{ cursor: 'pointer' }}>
+                      {course.course && course.course.course_code}</TableCell>
+                    <TableCell onClick={() => navigate(`/${role}/semester/classes/${course.id}`, { state: { assigned_class: course } })} style={{ cursor: 'pointer' }}>
+                      {course.course && course.course.title}</TableCell>
                     <TableCell>
                       <span>{course.teacher && course.teacher.name}</span><br />
                       <small className='text-muted'>({course.teacher.department && course.teacher.department.name})</small>
                     </TableCell>
                     <TableCell>{course.course && course.course.credit_hours}</TableCell>
                     <TableCell>
-                      <div className='d-flex'>
+                      <Box className='d-flex'>
                         <button className='btn btn-outline-secondary btn-sm btn-floating border-grey'
                           onClick={() => { setEditableCourse(course); setShowEditCourseModal(true) }}><i className="fas fa-edit"></i></button>
 
                         <button className='btn btn-outline-danger btn-sm btn-floating border-grey ms-1'
-                          onClick={() => deleteAssignedCourse(course.id)}><i className="fas fa-trash-alt"></i></button>
-                      </div>
+                          onClick={() => { setDeletableId(course.id); setShowCourseDelete(true) }}><i className="fas fa-trash-alt"></i></button>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))
@@ -321,8 +334,8 @@ export default function AssignCourse({ selectedSemester }) {
         {/* add course */}
         {/* dynamic input courses */}
         {inputValues.map((inputField, index) => (
-          <div className='border-bottom border-light-grey py-3' key={index}>
-            <div className='d-flex justify-content-between'>
+          <Box className='border-bottom border-light-grey py-3' key={index}>
+            <Box className='d-flex justify-content-between'>
 
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
@@ -352,8 +365,8 @@ export default function AssignCourse({ selectedSemester }) {
 
               <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-floating btn-sm ms-1 mt-1'>
                 <i className="fas fa-times"></i></button>
-            </div>
-          </div>
+            </Box>
+          </Box>
         ))}
 
         {/* Add mew field button */}
@@ -364,14 +377,14 @@ export default function AssignCourse({ selectedSemester }) {
         {inputValues.length > 0 &&
           <button type="button" onClick={addAssignCourse} className="btn btn-primary btn-sm ms-2 mt-3">
             <i className="fas fa-save me-1"></i> Save</button>}
-      </div>
+      </Box>
 
 
       {/* edit modal */}
       <ModalDialog
         title={'Edit'}
         content={
-          <div style={{ maxWidth: '350px' }}>
+          <Box style={{ maxWidth: '350px' }}>
             <TextField select fullWidth label="Course" value={editableCourse.course_id}
               onChange={(e) => setEditableCourse({ ...editableCourse, course_id: e.target.value })} size='small' margin='normal' >
               {courses.map((course) => (
@@ -390,7 +403,7 @@ export default function AssignCourse({ selectedSemester }) {
                 </MenuItem>
               ))}
             </TextField>
-          </div>
+          </Box>
         }
         onOpen={showEditCourseModal}
         onClose={() => setShowEditCourseModal(false)}
@@ -399,10 +412,33 @@ export default function AssignCourse({ selectedSemester }) {
         loading={loading}
       />
 
+      {/* delete course modal */}
+      <ModalDialog
+        title={`Detete selected course?`}
+        content={
+          <Box className='mt-2' sx={{ maxWidth: '350px' }}>
+            <p className='fw-bold mb-0'>Are you sure you want to remove this?</p>
+            <p className='mb-4'>This action cannot be undone.</p>
+
+            {/* type the username to delete account */}
+            <p className='mb-2'>To confirm deletion, type <b>delete</b> in the text input field.</p>
+            <TextField placeholder='delete' type="text" value={deleteCourseInput}
+              onChange={(e) => setDeleteCourseInput(e.target.value)} fullWidth size='small' />
+          </Box>
+        }
+        onOpen={showCourseDelete}
+        onClose={() => { setShowCourseDelete(false); setDeleteCourseInput('') }}
+        confirmText={'Delete'}
+        actionColor={'error'}
+        disabledAction={deleteCourseInput !== 'delete'}
+        onConfirm={deleteAssignedCourse}
+        loading={loading}
+      />
+
 
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
       <CustomSnackbar message={success} status={'success'} />
-    </div>
+    </Box>
   )
 }

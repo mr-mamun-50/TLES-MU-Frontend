@@ -3,7 +3,7 @@ import DataTable from 'react-data-table-component'
 import axios from 'axios'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
-import { TextField } from '@mui/material'
+import { Box, TextField } from '@mui/material'
 import Courses from './Courses'
 
 export default function Departments() {
@@ -167,28 +167,28 @@ export default function Departments() {
 
 
   return (
-    <div className="container">
-      <div className='row my-2'>
+    <Box className="container">
+      <Box className='row my-2'>
 
         {/* department section */}
-        <div className='col-lg-5'>
-          <div className='card'>
-            <div className='card-header'>
+        <Box className='col-lg-5'>
+          <Box className='card'>
+            <Box className='card-header'>
               <h5 className='mt-3'>Departments</h5>
-            </div>
+            </Box>
 
-            <div className='card-body pt-2'>
+            <Box className='card-body pt-2'>
               <DataTable
                 title={
-                  <div>
-                    <div className="w-100 d-flex align-items-center justify-content-between my-2">
-                      <div className="input-group w-50">
-                        <div className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></div>
+                  <Box>
+                    <Box className="w-100 d-flex align-items-center justify-content-between my-2">
+                      <Box className="input-group w-50">
+                        <Box className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></Box>
                         <input type="text" className="form-control bb-input" placeholder="Search department" value={searchDepartment} onChange={(e) => setSearchDepartment(e.target.value)} />
-                      </div>
+                      </Box>
                       <button onClick={() => setShowAddDeptModal(true)} className="btn btn-secondary">Add Department</button>
-                    </div>
-                  </div>
+                    </Box>
+                  </Box>
                 }
                 columns={columns}
                 data={filteredDepartment}
@@ -202,15 +202,15 @@ export default function Departments() {
                 contextActions={<button className="btn btn-danger me-2 px-3" onClick={() => setShowDeptDelete(true)}><i className="fas fa-trash-alt"></i></button>}
                 clearSelectedRows={loading}
               />
-            </div>
-          </div >
-        </div>
+            </Box>
+          </Box>
+        </Box>
 
         {/* courses section */}
-        <div className='col-lg-7'>
+        <Box className='col-lg-7'>
           <Courses departments={departments} />
-        </div>
-      </div>
+        </Box>
+      </Box>
 
 
       {/* add dept. modal */}
@@ -221,12 +221,12 @@ export default function Departments() {
 
             {inputDepartments.map((inputValue, index) => {
               return (
-                <div className='d-flex align-items-center' key={index}>
+                <Box className='d-flex align-items-center' key={index}>
                   <TextField label="Enter department name" variant="outlined" value={inputValue}
                     onChange={(e) => handleInputChange(e, index)} fullWidth margin='normal' size='small' />
                   <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-floating mt-2'>
                     <i className="fas fa-times"></i></button>
-                </div>
+                </Box>
               )
             })}
             <button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light"><i className="fas fa-plus me-1"></i> New</button>
@@ -256,23 +256,23 @@ export default function Departments() {
         loading={loading}
       />
 
-      {/* delete account modal */}
+      {/* delete dept. modal */}
       <ModalDialog
         title={`Detete selected department?`}
         content={
-          <div className='mt-2'>
+          <Box className='mt-2' sx={{ maxWidth: '350px' }}>
             <p className='fw-bold mb-0'>Are you sure you want to remove this?</p>
-            <p className='mb-4'>This action cannot be undone.</p>
+            <p className='mb-4'>{"This action cannot be undone and remove all the studets and data's of this department!"}</p>
 
             {/* type the username to delete account */}
             <p className='mb-2'>To confirm deletion, type <b>delete</b> in the text input field.</p>
             <TextField placeholder='delete' type="text" value={deleteDeptInput}
               onChange={(e) => setDeleteDeptInput(e.target.value)} fullWidth size='small' />
-          </div>
+          </Box>
         }
         onOpen={showDeptDelete}
-        onClose={() => setShowDeptDelete(false)}
-        confirmText={'Delete Account'}
+        onClose={() => { setShowDeptDelete(false); setDeleteDeptInput('') }}
+        confirmText={'Delete'}
         actionColor={'error'}
         disabledAction={deleteDeptInput !== 'delete'}
         onConfirm={deleteDepartments}
@@ -282,6 +282,6 @@ export default function Departments() {
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
       <CustomSnackbar message={success} status={'success'} />
-    </div>
+    </Box>
   )
 }

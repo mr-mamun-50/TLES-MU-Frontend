@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import axios from 'axios';
 import CustomSnackbar from './SnackBar';
+import { Box } from '@mui/material';
 
 export default function PasswordChangeDialog({ level, onOpen, onClose, mustChange }) {
   const [passwords, setPasswords] = useState({
@@ -77,18 +78,20 @@ export default function PasswordChangeDialog({ level, onOpen, onClose, mustChang
         <DialogContentText id="password-change-dialog-description" mb={3}>
           {mustChange ? 'Your account is protected by a default password. You must change your password to protect your account.' : ''}
         </DialogContentText>
-        <form onSubmit={handleSubmit}>
+        <Box style={{ maxWidth: '350px' }}>
+          <form onSubmit={handleSubmit}>
 
-          <TextField label="Old Password" type="password" name="oldPass" value={passwords.oldPass}
-            onChange={handleChange} fullWidth margin="normal" />
+            <TextField label="Old Password" type="password" name="oldPass" value={passwords.oldPass}
+              onChange={handleChange} fullWidth margin="normal" />
 
-          <TextField label="New Password" type="password" name="newPass" value={passwords.newPass}
-            onChange={handleChange} fullWidth margin="normal" />
+            <TextField label="New Password" type="password" name="newPass" value={passwords.newPass}
+              onChange={handleChange} fullWidth margin="normal" />
 
-          <TextField label="Re-enter New Password" type="password" name="reNewPass" value={passwords.reNewPass}
-            onChange={handleChange} fullWidth margin="normal" />
+            <TextField label="Re-enter New Password" type="password" name="reNewPass" value={passwords.reNewPass}
+              onChange={handleChange} fullWidth margin="normal" />
 
-        </form>
+          </form>
+        </Box>
       </DialogContent>
       <DialogActions className='pe-4 pb-3'>
         <Button onClick={handleClose} className='bg-light'>Close</Button>

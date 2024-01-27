@@ -21,6 +21,12 @@ import ViewQuestion from "./user/views/classes/view_class/Questions/ViewQuestion
 import ManualMarksEntry from "./user/views/classes/view_class/Marks/ManualMarksEntry";
 import ImportMarks from "./user/views/classes/view_class/Marks/ImportMarks";
 import StudentDashboard from "./user/views/classes/view_class/Students/StudentDashboard";
+import StudentProfile from "./user/views/classes/view_class/Students/StudentProfile";
+import ModeratorPrivateRoute from "./moderator/layout/PrivateRoute";
+import ModeratorLayout from "./moderator/layout/Layout";
+import ModeratorDashboard from "./moderator/views/Dashboard";
+import Moderators from "./admin/views/moderator/Moderators";
+import ModeratorCourses from "./moderator/views/Courses";
 
 export default function AllRoutes() {
   return (
@@ -47,6 +53,7 @@ export default function AllRoutes() {
 
         {/* Students routes */}
         <Route path="classes/student-dashboard/:id" element={<StudentDashboard />} />
+        <Route path="classes/student-profile/:id" element={<StudentProfile />} />
       </Route>
 
 
@@ -61,6 +68,9 @@ export default function AllRoutes() {
         {/* Teacher Routes */}
         <Route path="teachers" element={<Teachers />} />
 
+        {/* moderators */}
+        <Route path="moderators" element={<Moderators />} />
+
         {/* Batches Routes  */}
         <Route path="batch-section" element={<BatchSection />} />
 
@@ -73,6 +83,57 @@ export default function AllRoutes() {
 
         {/* Semester & Assign Course */}
         <Route path="semester" element={<Semesters />} />
+        <Route path="semester/classes/:id" element={<ViewClass />} />
+
+        {/* Question routes */}
+        <Route path="semester/classes/question/:id" element={<ViewQuestion />} />
+
+        {/* Marks entry routes */}
+        <Route path="semester/classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
+
+        {/* Students routes */}
+        <Route path="semester/classes/student-dashboard/:id" element={<StudentDashboard />} />
+        <Route path="semester/classes/student-profile/:id" element={<StudentProfile />} />
+      </Route>
+
+
+      {/**
+          |--------------------------------------------------------------------------
+          | Moderator routes
+          |--------------------------------------------------------------------------
+         */}
+      <Route path="/moderator" element={<ModeratorPrivateRoute><ModeratorLayout /></ModeratorPrivateRoute>}>
+        <Route index element={<ModeratorDashboard />} />
+
+        {/* Teacher Routes */}
+        <Route path="teachers" element={<Teachers />} />
+
+        {/* moderators */}
+        <Route path="moderators" element={<Moderators />} />
+
+        {/* Batches Routes  */}
+        <Route path="batch-section" element={<BatchSection />} />
+
+        {/* Department Routes */}
+        <Route path="departments-courses" element={<ModeratorCourses />} />
+
+        {/* Student Routes */}
+        <Route path="students" element={<Students />} />
+        <Route path="students/add" element={<AddStudent />} />
+
+        {/* Semester & Assign Course */}
+        <Route path="semester" element={<Semesters />} />
+        <Route path="semester/classes/:id" element={<ViewClass />} />
+
+        {/* Question routes */}
+        <Route path="semester/classes/question/:id" element={<ViewQuestion />} />
+
+        {/* Marks entry routes */}
+        <Route path="semester/classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
+
+        {/* Students routes */}
+        <Route path="semester/classes/student-dashboard/:id" element={<StudentDashboard />} />
+        <Route path="semester/classes/student-profile/:id" element={<StudentProfile />} />
       </Route>
 
 

@@ -1,7 +1,7 @@
 import { Box, Table, TableBody, TableCell, TableRow } from '@mui/material'
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import CustomSnackbar from '../../../../../utilities/SnackBar'
 import { BarChart } from '@mui/x-charts/BarChart';
 import TabContext from '@mui/lab/TabContext'
@@ -12,6 +12,7 @@ export default function StudentDashboard() {
   // const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
 
   const student_id = useParams().id
   const location = useLocation()
@@ -38,7 +39,7 @@ export default function StudentDashboard() {
   // get all exam marks
   const getAllExamMarks = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/user/students/class_exam_marks/${student_id}/${assigned_class.id}`).then(res => {
+    axios.get(`/api/${role}/class_students/class_exam_marks/${student_id}/${assigned_class.id}`).then(res => {
       if (res.status === 200) {
         setExamMarksOfClass(res.data.examMarks)
       } else {
@@ -51,20 +52,39 @@ export default function StudentDashboard() {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     })
-  }, [assigned_class.id, student_id])
+  }, [assigned_class.id, role, student_id])
 
 
   useEffect(() => {
-    getAllExamMarks()
-  }, [getAllExamMarks])
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'))
 
+    role && getAllExamMarks()
+  }, [getAllExamMarks, role])
+
+
+  // calculate gpa
+  const calculateGpa = (obtained, total) => {
+    let marks = obtained / total * 100;
+    if (marks >= 80) return 'A+ (4.00)';
+    if (marks >= 75) return 'A (3.75)';
+    if (marks >= 70) return 'A- (3.50)';
+    if (marks >= 65) return 'B+ (3.25)';
+    if (marks >= 60) return 'B (3.00)';
+    if (marks >= 55) return 'B- (2.75)';
+    if (marks >= 50) return 'C+ (2.50)';
+    if (marks >= 45) return 'C (2.25)';
+    if (marks >= 40) return 'D (2.00)';
+    return 'F (0.00)';
+  }
 
 
   return (
     <Box className="container">
       <Box className="card my-2">
         {/* seading section */}
-        <Box className='card-header pb-0 d-flex justify-content-between align-items-end' sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Box className='card-header pb-0 d-flex justify-content-between align-items-center' sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Box className='d-flex'>
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
               <i className='fas fa-arrow-left fa-lg'></i></button>
@@ -73,6 +93,12 @@ export default function StudentDashboard() {
               <small className='text-muted'>{` ${assigned_class.section?.batch.department.name} - ${assigned_class.section?.batch.batch_name} (${assigned_class.section?.section_name})`}</small>
             </Box>
           </Box>
+
+          {/* See student profile */}
+          <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/student-profile/${student_id}`} state={{ 'student': student }}
+            className='btn btn-outline-dark'>
+            <i className='fas fa-user-circle fa-lg me-1'></i> See Profile
+          </Link>
         </Box>
 
         {/* body section */}
@@ -83,11 +109,18 @@ export default function StudentDashboard() {
               <h6 className="card-title" style={{ fontSize: '18px' }}>{student.name}</h6>
               <p className="card-title mb-0">ID: {student.student_id}</p>
             </Box>
-            {/* total marks obtained from obtained exam marks and obtained ca marks */}
-            <Box className="d-flex">
-              <h5 className={`mb-0 ${((totalObtainedMarks * 100) / totalExamMarks) < 40 && 'text-danger'}`}>{totalObtainedMarks}</h5>
-              <h5 className="mb-0 fw-normal">/{totalExamMarks}</h5>
-            </Box>
+
+            {/* total marks obtained from obtained exam marks and obtained ca marks and GPA */}
+            {examMarksOfClass.length > 0 &&
+              <Box>
+                <Box className="d-flex justify-content-end">
+                  <h5 className={`mb-0 ${((totalObtainedMarks * 100) / totalExamMarks) < 40 && 'text-danger'}`}>{totalObtainedMarks}</h5>
+                  <h5 className="mb-0 fw-normal">/{totalExamMarks}</h5>
+                </Box>
+
+                <p className='mb-0 mt-2'>{calculateGpa(totalObtainedMarks, totalExamMarks)}</p>
+              </Box>
+            }
           </Box>
 
           {/* exam based info */}

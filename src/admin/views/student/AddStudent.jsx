@@ -12,6 +12,7 @@ export default function AddStudent() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
   const navigate = useNavigate();
 
   const [departments, setDepartments] = useState([])
@@ -87,7 +88,7 @@ export default function AddStudent() {
 
   // get all batchs
   const getBatchs = useCallback((dept_id) => {
-    axios.get(`/api/admin/batch_section/${dept_id}`).then(res => {
+    axios.get(`/api/${role}/batch_section/${dept_id}`).then(res => {
       if (res.status === 200) {
         setBatchs(res.data.batches)
         if (acInfo.batch_id !== 0) {
@@ -101,15 +102,14 @@ export default function AddStudent() {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
     });
-  }, [acInfo.batch_id])
+  }, [acInfo.batch_id, role])
 
   // store student .csv data
   const storeCsvData = () => {
     setLoading(true)
     let data = { ac_info: acInfo, csv_data: csvData }
-    axios.post('/api/admin/students/store-from-csv', data).then(res => {
+    axios.post(`/api/${role}/students/store-from-csv`, data).then(res => {
       if (res.status === 200) {
-        console.log(res.data)
         setSuccess(res.data.message)
         setLoading(false)
         setTimeout(() => { setSuccess('') }, 5000)
@@ -157,13 +157,29 @@ export default function AddStudent() {
   ]
 
   useEffect(() => {
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'));
+
+    if (role === 'moderator') {
+      const modDeptId = localStorage.getItem('user') ?
+        JSON.parse(localStorage.getItem('user')).dept_id
+        : JSON.parse(sessionStorage.getItem('user')).dept_id;
+
+      if (acInfo.dept_id === 0) {
+        setAcInfo({ dept_id: modDeptId, batch_id: 0, section_id: 0 })
+        getBatchs(modDeptId);
+      }
+    } else if (role === 'admin') {
+      getDepartments();
+    }
+
     if (sessionStorage.getItem('selectedId')) {
       setAcInfo(JSON.parse(sessionStorage.getItem('selectedId')))
       if (acInfo.dept_id !== 0)
         getBatchs(acInfo.dept_id)
     }
-    getDepartments()
-  }, [acInfo.batch_id, acInfo.dept_id, getBatchs])
+  }, [acInfo.batch_id, acInfo.dept_id, getBatchs, role])
 
   return (
     <div className="container">
@@ -178,20 +194,22 @@ export default function AddStudent() {
 
           <div className='row'>
             {/* select departments */}
-            <div className='col-6 col-md-4 col-lg-3'>
-              <label htmlFor="department" className="form-label">Department</label>
-              <TextField select fullWidth margin='small' size='small' value={acInfo.dept_id}
-                onChange={(e) => {
-                  setAcInfo({ ...acInfo, dept_id: e.target.value, batch_id: 0, section_id: 0 });
-                  getBatchs(e.target.value);
-                  sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
-                }}>
-                <MenuItem value={0} disabled>Select Department</MenuItem>
-                {departments.map((department) => (
-                  <MenuItem value={department.id}>{department.name}</MenuItem>
-                ))}
-              </TextField>
-            </div>
+            {role === 'admin' &&
+              <div className='col-6 col-md-4 col-lg-3'>
+                <label htmlFor="department" className="form-label">Department</label>
+                <TextField select fullWidth margin='small' size='small' value={acInfo.dept_id}
+                  onChange={(e) => {
+                    setAcInfo({ ...acInfo, dept_id: e.target.value, batch_id: 0, section_id: 0 });
+                    getBatchs(e.target.value);
+                    sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
+                  }}>
+                  <MenuItem value={0} disabled>Select Department</MenuItem>
+                  {departments.map((department) => (
+                    <MenuItem value={department.id}>{department.name}</MenuItem>
+                  ))}
+                </TextField>
+              </div>
+            }
 
             {/* select batch */}
             <div className='col-6 col-md-4 col-lg-3'>
@@ -225,7 +243,7 @@ export default function AddStudent() {
             </div>
 
             {/* csv file input */}
-            <div className='col-6 col-md-4 col-lg-3'>
+            <div className={`col-6 col-md-4 ${role === 'admin' ? 'col-lg-3' : 'col-lg-6'}`}>
               <div className="mb-2" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 <label htmlFor="department" className="form-label">Upload .csv file</label>
                 <CSVReader cssClass="form-control px-2" onFileLoaded={(data) => setCsvData(data.slice(1))} disabled={acInfo.section_id === 0} />

@@ -11,6 +11,7 @@ export default function ViewQuestion() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
 
   const location = useLocation();
   const assigned_class = location.state?.assigned_class;
@@ -82,7 +83,7 @@ export default function ViewQuestion() {
   // get question
   const getQuestion = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/user/exam-questions/${exam.id}`).then(res => {
+    axios.get(`/api/${role}/exam-questions/${exam.id}`).then(res => {
       if (res.status === 200) {
         setQuestionSets(res.data.questions)
 
@@ -98,7 +99,7 @@ export default function ViewQuestion() {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     })
-  }, [exam.id])
+  }, [exam.id, role])
 
   // update question
   const updateQuestion = () => {
@@ -176,8 +177,12 @@ export default function ViewQuestion() {
 
 
   useEffect(() => {
-    getQuestion()
-  }, [getQuestion])
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'))
+
+    role && getQuestion()
+  }, [getQuestion, role])
 
 
 
@@ -219,15 +224,16 @@ export default function ViewQuestion() {
                     <h5 className="mb-0">{`${questionSet.sl}. ${questionSet.question_type}`}</h5>
 
                     {/* Action buttons */}
-                    <div className="d-flex">
-                      <button className="btn btn-outline-secondary btn-sm btn-floating me-2"
-                        onClick={() => { setEditableQuestion(questionSet); setShowEditQuestionModal(true) }}>
-                        <i className="fas fa-edit"></i></button>
+                    {role === 'user' &&
+                      <div className="d-flex">
+                        <button className="btn btn-outline-secondary btn-sm btn-floating me-2"
+                          onClick={() => { setEditableQuestion(questionSet); setShowEditQuestionModal(true) }}>
+                          <i className="fas fa-edit"></i></button>
 
-                      <button className="btn btn-outline-secondary btn-sm btn-floating"
-                        onClick={() => deleteQuestionSet(questionSet.id)}>
-                        <i className="fas fa-trash-alt"></i></button>
-                    </div>
+                        <button className="btn btn-outline-secondary btn-sm btn-floating"
+                          onClick={() => deleteQuestionSet(questionSet.id)}>
+                          <i className="fas fa-trash-alt"></i></button>
+                      </div>}
                   </div>
 
                   {/* all questions */}
@@ -354,12 +360,14 @@ export default function ViewQuestion() {
               </div>
             ))}
 
+
             {/* Add Question Set button */}
-            <div className='text-center'>
-              <button type='button' onClick={handleAddQuestionSet} className='btn btn-secondary shadow add-btn'>
-                <i className='fa fa-plus me-1'></i> Add Question Set
-              </button>
-            </div>
+            {role === 'user' &&
+              <div className='text-center'>
+                <button type='button' onClick={handleAddQuestionSet} className='btn btn-secondary shadow add-btn'>
+                  <i className='fa fa-plus me-1'></i> Add Question Set
+                </button>
+              </div>}
 
 
             {/* submit and reset button */}

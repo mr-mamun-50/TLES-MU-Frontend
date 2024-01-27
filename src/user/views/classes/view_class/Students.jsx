@@ -7,9 +7,9 @@ import CustomSnackbar from "../../../../utilities/SnackBar"
 
 export default function EnrolledStudents({ assigned_class }) {
 
-  // const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
   // const classId = useParams().id
 
   const [students, setStudents] = useState([])
@@ -18,12 +18,12 @@ export default function EnrolledStudents({ assigned_class }) {
   const [filteredStudents, setFilteredStudents] = useState([])
   // const [selectedStudents, setSelectedStudents] = useState([])
 
-  // console.log(students)
+  // console.log(assigned_class)
 
   // get students
   const getStudents = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/user/students/${assigned_class.section.id}`).then(res => {
+    axios.get(`/api/${role}/class_students/${assigned_class.section.id}`).then(res => {
       if (res.status === 200) {
         setStudents(res.data.students)
       } else {
@@ -36,7 +36,7 @@ export default function EnrolledStudents({ assigned_class }) {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     })
-  }, [assigned_class.section.id])
+  }, [assigned_class.section.id, role])
 
   // datatable columns
   const columns = [
@@ -67,18 +67,22 @@ export default function EnrolledStudents({ assigned_class }) {
     {
       name: 'Details',
       button: true,
-      cell: row => <Link to={`/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
+      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
         className="btn btn-secondary btn-sm px-2"><i className="fas fa-eye" ></i></Link >,
     }
   ]
 
 
   useEffect(() => {
-    getStudents()
-  }, [getStudents])
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'))
+
+    role && getStudents()
+  }, [getStudents, role])
 
   useEffect(() => {
-    const filteredData = students.filter(student => {
+    const filteredData = students?.filter(student => {
       return student.student_id.toLowerCase().includes(searchStudents.toLowerCase())
         || student.name.toLowerCase().includes(searchStudents.toLowerCase())
         || student.email && student.email.toLowerCase().includes(searchStudents.toLowerCase())

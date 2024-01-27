@@ -4,17 +4,19 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
-import { MenuItem, TextField } from '@mui/material'
+import { Box, MenuItem, TextField } from '@mui/material'
 
 export default function BatchSection() {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
 
-  const [inputBatch, setInputBatch] = useState({ dept_id: '', batch_name: '' })
   const [departments, setDepartments] = useState([])
   const [selectedDepartment, setSelectedDepartment] = useState(0)
+  const [inputBatch, setInputBatch] = useState({ dept_id: '', batch_name: '' })
+  const [inputSections, setInputSections] = useState([[]])
 
   const [batchs, setBatchs] = useState([])
   const [searchBatchs, setSearchBatchs] = useState('')
@@ -22,7 +24,6 @@ export default function BatchSection() {
 
   const [editableBatch, setEditableBatch] = useState({})
   const [selectedBatchs, setSelectedBatchs] = useState([])
-  const [inputSections, setInputSections] = useState([[]])
   const [showEditBatchModal, setShowEditBatchModal] = useState(false)
   const [showAddBatchModal, setShowAddBatchModal] = useState(false)
 
@@ -43,8 +44,27 @@ export default function BatchSection() {
   }
 
 
+  // get all batchs
+  const getBatchs = useCallback((id) => {
+    setLoading(true)
+    axios.get(`/api/${role}/batch_section/${id}`).then(res => {
+      if (res.status === 200) {
+        setBatchs(res.data.batches)
+        setFilteredBatchs(res.data.batches)
+        setLoading(false)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+    });
+  }, [role])
+
   // get departments
   const getDepartments = useCallback((getBatch) => {
+    setLoading(true)
     axios.get('/api/admin/departments').then(res => {
       if (res.status === 200) {
         setDepartments(res.data.departments)
@@ -56,18 +76,20 @@ export default function BatchSection() {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
       }
+      setLoading(false)
     }).catch(err => {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
+      setLoading(false)
     });
-  }, [])
+  }, [getBatchs])
 
   // add batch
   const addBatch = (e) => {
     e.preventDefault()
     setLoading(true)
     let data = { batch: inputBatch, sections: inputSections }
-    axios.post('/api/admin/batch_section', data).then(res => {
+    axios.post(`/api/${role}/batch_section`, data).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         getBatchs(selectedDepartment)
@@ -85,29 +107,11 @@ export default function BatchSection() {
     });
   }
 
-  // get all batchs
-  const getBatchs = (id) => {
-    setLoading(true)
-    axios.get(`/api/admin/batch_section/${id}`).then(res => {
-      if (res.status === 200) {
-        setBatchs(res.data.batches)
-        setFilteredBatchs(res.data.batches)
-        setLoading(false)
-      } else {
-        setError(res.data.message)
-        setTimeout(() => { setError('') }, 5000)
-      }
-    }).catch(err => {
-      setError(err.response.data.message)
-      setTimeout(() => { setError('') }, 5000)
-    });
-  }
-
   // update batch
   const updateBatch = (e) => {
     e.preventDefault()
     setLoading(true)
-    axios.put(`/api/admin/batch_section/${editableBatch.id}`, editableBatch).then(res => {
+    axios.put(`/api/${role}/batch_section/${editableBatch.id}`, editableBatch).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
         getBatchs()
@@ -140,7 +144,7 @@ export default function BatchSection() {
     }).then((result) => {
       if (result.isConfirmed) {
         setLoading(true)
-        axios.post('/api/admin/batch_section/delete', deletableId).then(res => {
+        axios.post(`/api/${role}/batch_section/delete`, deletableId).then(res => {
           if (res.status === 200) {
             setSuccess(res.data.message)
             getBatchs()
@@ -195,14 +199,30 @@ export default function BatchSection() {
 
 
   useEffect(() => {
-    if (sessionStorage.getItem('selectedId')) {
-      setSelectedDepartment(JSON.parse(sessionStorage.getItem('selectedId')).dept_id)
-      getBatchs(JSON.parse(sessionStorage.getItem('selectedId')).dept_id)
-      getDepartments()
-    } else {
-      getDepartments(1)
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'));
+
+    if (role === 'moderator') {
+      const modDeptId = localStorage.getItem('user') ?
+        JSON.parse(localStorage.getItem('user')).dept_id
+        : JSON.parse(sessionStorage.getItem('user')).dept_id;
+
+      if (selectedDepartment === 0) {
+        getBatchs(modDeptId);
+        setSelectedDepartment(modDeptId);
+        setInputBatch({ ...inputBatch, dept_id: modDeptId });
+      }
+    } else if (role === 'admin') {
+      if (sessionStorage.getItem('selectedId')) {
+        setSelectedDepartment(JSON.parse(sessionStorage.getItem('selectedId')).dept_id)
+        getBatchs(JSON.parse(sessionStorage.getItem('selectedId')).dept_id)
+        getDepartments()
+      } else {
+        getDepartments(1)
+      }
     }
-  }, [getDepartments])
+  }, [getBatchs, getDepartments, inputBatch, role, selectedDepartment])
 
   useEffect(() => {
     const filteredData = batchs.filter(batch => {
@@ -213,37 +233,41 @@ export default function BatchSection() {
 
 
   return (
-    <div className="container">
-      <div className='card my-2'>
-        <div className='card-header d-flex justify-content-between align-items-center'>
+    <Box className="container">
+      <Box className='card my-2'>
+        {/* heading sectin */}
+        <Box className='card-header d-flex justify-content-between align-items-center'>
           <h5 className='mt-3'>All Batch</h5>
           <button onClick={() => setShowAddBatchModal(true)} className="btn btn-secondary">Add Batch</button>
-        </div>
+        </Box>
 
-        <div className='card-body pt-2'>
+        {/* body section */}
+        <Box className='card-body pt-2'>
           <DataTable
             title={
-              <div className="row">
-                <div className='col-3'>
-                  <TextField select fullWidth margin='small' size='small' value={selectedDepartment}
-                    onChange={(e) => {
-                      setSelectedDepartment(e.target.value);
-                      getBatchs(e.target.value)
-                      sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
-                    }}>
-                    <MenuItem value={0} disabled>Select Department</MenuItem>
-                    {departments.map((department) => (
-                      <MenuItem value={department.id}>{department.name}</MenuItem>
-                    ))}
-                  </TextField>
-                </div>
-                <div className='col-4'>
-                  <div className="input-group">
-                    <div className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></div>
+              <Box className="row">
+                {role === 'admin' &&
+                  <Box className='col-3'>
+                    <TextField select fullWidth margin='small' size='small' value={selectedDepartment}
+                      onChange={(e) => {
+                        setSelectedDepartment(e.target.value);
+                        getBatchs(e.target.value)
+                        sessionStorage.setItem('selectedId', JSON.stringify({ dept_id: e.target.value, batch_id: 0, section_id: 0 }))
+                      }}>
+                      <MenuItem value={0} disabled>Select Department</MenuItem>
+                      {departments.map((department) => (
+                        <MenuItem value={department.id}>{department.name}</MenuItem>
+                      ))}
+                    </TextField>
+                  </Box>
+                }
+                <Box className='col-4'>
+                  <Box className="input-group">
+                    <Box className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></Box>
                     <input type="text" className="form-control bb-input" placeholder="Search batch" value={searchBatchs} onChange={(e) => setSearchBatchs(e.target.value)} />
-                  </div>
-                </div>
-              </div>
+                  </Box>
+                </Box>
+              </Box>
             }
             columns={columns}
             data={filteredBatchs}
@@ -258,32 +282,32 @@ export default function BatchSection() {
             contextActions={<button className="btn btn-danger me-2 px-3" onClick={() => deleteBatchs()}><i className="fas fa-trash-alt"></i></button>}
             clearSelectedRows={loading}
           />
-        </div>
+        </Box>
 
 
         {/* Edit batch modal */}
-        <div className="modal" id="editBatchModal" data-mdb-backdrop="static" tabIndex="-1" aria-labelledby="pleModalLabel" aria-hidden="true">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
+        <Box className="modal" id="editBatchModal" data-mdb-backdrop="static" tabIndex="-1" aria-labelledby="pleModalLabel" aria-hidden="true">
+          <Box className="modal-dialog modal-dialog-centered">
+            <Box className="modal-content">
+              <Box className="modal-header">
                 <h1 className="modal-title fs-5" id="pleModalLabel">{editableBatch.name}</h1>
                 <button type="button" className="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-              </div>
+              </Box>
               <form onSubmit={updateBatch}>
-                <div className="modal-body">
-                  <div className="mb-3">
+                <Box className="modal-body">
+                  <Box className="mb-3">
                     <label htmlFor="name" className="form-label">Name</label>
                     <input type="text" className="form-control" id="name" value={editableBatch.name}
                       onChange={(e) => setEditableBatch({ ...editableBatch, name: e.target.value })} maxLength="255" />
-                  </div>
+                  </Box>
 
-                  <div className="mb-3">
+                  <Box className="mb-3">
                     <label htmlFor="email" className="form-label">Email</label>
                     <input type="email" className="form-control" id="email" value={editableBatch.email}
                       onChange={(e) => setEditableBatch({ ...editableBatch, email: e.target.value })} maxLength="255" />
-                  </div>
+                  </Box>
 
-                  <div className="mb-3">
+                  <Box className="mb-3">
                     <label htmlFor="department" className="form-label">Department</label>
                     <select className="form-select" id='department' value={editableBatch.dept_id}
                       onChange={(e) => { setEditableBatch({ ...editableBatch, dept_id: e.target.value }) }}>
@@ -292,21 +316,22 @@ export default function BatchSection() {
                         <option value={department.id}>{department.name}</option>
                       ))}
                     </select>
-                  </div>
+                  </Box>
 
-                  {error ? setTimeout(() => { setError(""); }, 3000) && <div className="alert alert-danger mt-3 mb-0">{error}</div> : ''}
-                </div>
-                <div className="modal-footer">
+                  {error ? setTimeout(() => { setError(""); }, 3000) && <Box className="alert alert-danger mt-3 mb-0">{error}</Box> : ''}
+                </Box>
+                <Box className="modal-footer">
                   <button type="button" className="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
                   <button type="submit" className="btn btn-primary">
                     {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> :
                       success ? setTimeout(() => { setSuccess(""); }, 3000) && success : 'Update changes'}
                   </button>
-                </div>
+                </Box>
               </form>
-            </div>
-          </div>
-        </div >
+            </Box>
+          </Box>
+        </Box >
+
 
         {/* Add batch modal */}
         <ModalDialog
@@ -314,34 +339,35 @@ export default function BatchSection() {
           onOpen={showAddBatchModal}
           content={
             <form onSubmit={addBatch} style={{ minWidth: '350px' }}>
-
-              <TextField label="Department" select value={inputBatch.dept_id}
-                onChange={(e) => setInputBatch({ ...inputBatch, dept_id: e.target.value })} fullWidth margin='normal' size='small'>
-                {departments.map((department) => (
-                  <MenuItem value={department.id}>{department.name}</MenuItem>
-                ))}
-              </TextField>
+              {role === 'admin' &&
+                <TextField label="Department" select value={inputBatch.dept_id}
+                  onChange={(e) => setInputBatch({ ...inputBatch, dept_id: e.target.value })} fullWidth margin='normal' size='small'>
+                  {departments.map((department) => (
+                    <MenuItem value={department.id}>{department.name}</MenuItem>
+                  ))}
+                </TextField>
+              }
 
               <TextField label="Batch Name" value={inputBatch.batch_name}
                 onChange={(e) => setInputBatch({ ...inputBatch, batch_name: e.target.value })} fullWidth margin='normal' size='small' />
 
               {/* Sections input */}
-              <div className='border p-3 pe-1 mt-3 rounded-5'>
+              <Box className='border p-3 pe-1 mt-3 rounded-5'>
                 <label htmlFor="section" className="form-label mb-3">Sections</label>
                 {inputSections.map((inputValue, index) => {
                   return (
-                    <div className="mb-3 d-flex">
+                    <Box className="mb-3 d-flex">
                       <TextField fullWidth label="Section name" value={inputValue}
                         onChange={(e) => handleInputChange(e, index)} size='small' />
 
                       <button type="button" onClick={() => handleRemoveInput(index)}
                         className='btn btn-light btn-floating btn-sm ms-1 mt-1'><i className="fas fa-times"></i></button>
-                    </div>
+                    </Box>
                   )
                 })}
-                <div><button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light">
-                  <i className="fas fa-plus me-1"></i> New</button></div>
-              </div>
+                <Box><button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light">
+                  <i className="fas fa-plus me-1"></i> New</button></Box>
+              </Box>
             </form>
           }
           onClose={() => setShowAddBatchModal(false)}
@@ -353,7 +379,7 @@ export default function BatchSection() {
         {/* Utilities */}
         <CustomSnackbar message={error} status={'error'} />
         <CustomSnackbar message={success} status={'success'} />
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }

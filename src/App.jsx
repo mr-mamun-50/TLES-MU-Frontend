@@ -10,20 +10,21 @@ axios.defaults.headers.post['Accept'] = 'application/json';
 axios.defaults.withCredentials = true;
 
 // if server respond with 401 error, clear session storage and local storage
-axios.interceptors.response.use(function (response) {
-  return response;
-}, function (error) {
-  if (error.response.status === 401) {
-    sessionStorage.clear();
-    localStorage.clear();
-    window.location.href = "/";
-  }
-  return Promise.reject(error);
-});
+// axios.interceptors.response.use(function (response) {
+//   return response;
+// }, function (error) {
+//   if (error.response.status === 401) {
+//     sessionStorage.clear();
+//     localStorage.clear();
+//     window.location.href = "/";
+//   }
+//   return Promise.reject(error);
+// });
 
 axios.interceptors.request.use(function (config) {
   const userToken = sessionStorage.getItem('userToken') || localStorage.getItem('userToken');
   const adminToken = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken');
+  const moderatorToken = sessionStorage.getItem('moderatorToken') || localStorage.getItem('moderatorToken');
 
   // Check the API route and attach the appropriate token
   if (config.url.includes('/api/user/')) {
@@ -33,6 +34,10 @@ axios.interceptors.request.use(function (config) {
   } else if (config.url.includes('/api/admin/')) {
     if (adminToken) {
       config.headers.Authorization = `Bearer ${adminToken}`;
+    }
+  } else if (config.url.includes('/api/moderator/')) {
+    if (moderatorToken) {
+      config.headers.Authorization = `Bearer ${moderatorToken}`;
     }
   }
   return config;

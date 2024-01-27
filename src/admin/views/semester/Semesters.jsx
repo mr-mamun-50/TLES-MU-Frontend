@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import CustomSnackbar from '../../../utilities/SnackBar'
-import { TextField } from '@mui/material'
+import { Box, TextField } from '@mui/material'
 import ModalDialog from '../../../utilities/ModalDialog'
 import axios from 'axios'
 import AssignCourse from './AssignCourse'
@@ -10,6 +10,7 @@ export default function Semesters() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
 
   const [semesters, setSemesters] = useState([])
   const [selectedSemester, setSelectedSemester] = useState({})
@@ -23,9 +24,9 @@ export default function Semesters() {
   // console.log(semesters)
 
   // get semesters
-  const getSemesters = () => {
+  const getSemesters = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/admin/semesters`).then(res => {
+    axios.get(`/api/${role}/semesters`).then(res => {
       if (res.status === 200) {
         setSemesters(res.data.semesters)
         setSelectedSemester(res.data.semesters[0])
@@ -40,7 +41,7 @@ export default function Semesters() {
       setTimeout(() => { setError('') }, 5000)
       setLoading(false)
     });
-  }
+  }, [role])
 
   // add semester
   const addSemester = () => {
@@ -67,39 +68,45 @@ export default function Semesters() {
 
 
   useEffect(() => {
-    getSemesters()
-  }, [])
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'));
+
+    role && getSemesters();
+  }, [getSemesters, role])
 
 
   return (
-    <div className="container">
-      <div className="row">
+    <Box className="container">
+      <Box className="row">
         {/* select semester */}
-        <div className="col-12 col-md-6 col-lg-3">
-          <div className='card my-2'>
-            <div className='card-header d-flex justify-content-between align-items-center'>
+        <Box className="col-12 col-md-6 col-lg-3">
+          <Box className='card my-2'>
+            <Box className='card-header d-flex justify-content-between align-items-center'>
               <h5 className='mt-2 mb-0'>Semesters</h5>
-              <button className='btn btn-secondary btn-sm' onClick={() => setShowAddSemesterModal(true)}>Add New</button>
-            </div>
+              {role === 'admin' &&
+                <button className='btn btn-secondary btn-sm' onClick={() => setShowAddSemesterModal(true)}>Add New</button>
+              }
+            </Box>
 
-            <div className="card-body px-3">
-              <div className="list-group list-group-light" style={{ height: "300px", overflowY: "scroll" }}>
+            <Box className="card-body px-3">
+              <Box className="list-group list-group-light" style={{ height: "300px", overflowY: "scroll" }}>
                 {semesters.map((semester) => (
                   <button onClick={() => setSelectedSemester(semester)}
                     className={`list-group-item list-group-item-action px-3 py-2 ${selectedSemester.id === semester.id && 'active'}`}>
                     <i className={`${selectedSemester.id === semester.id ? 'fas' : 'far'} fa-circle-check me-2`}></i>{semester.name}
                   </button>
                 ))}
-              </div>
-            </div>
-          </div>
-        </div>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
 
         {/* assign courses */}
-        <div className="col-12 col-md-6 col-lg-9">
-          {selectedSemester.id && <AssignCourse selectedSemester={selectedSemester} />}
-        </div>
-      </div>
+        <Box className="col-12 col-md-6 col-lg-9">
+          {selectedSemester.id && <AssignCourse selectedSemester={selectedSemester} role={role} />}
+        </Box>
+      </Box>
 
 
 
@@ -107,7 +114,7 @@ export default function Semesters() {
       <ModalDialog
         title={'Add New Semester'}
         content={
-          <div style={{ maxWidth: '350px' }}>
+          <Box style={{ maxWidth: '350px' }}>
             {/* semester name */}
             <TextField label="Semester Name" fullWidth value={inputSemester.name}
               onChange={(e) => setInputSemester({ ...inputSemester, name: e.target.value })} margin='normal' size='small' />
@@ -123,7 +130,7 @@ export default function Semesters() {
             {/* end date */}
             <TextField label="Ending Session" type='month' fullWidth value={inputSemester.end_date}
               onChange={(e) => setInputSemester({ ...inputSemester, end_date: e.target.value })} margin='normal' size='small' />
-          </div>
+          </Box>
         }
         onOpen={showAddSemesterModal}
         onClose={() => setShowAddSemesterModal(false)}
@@ -138,7 +145,7 @@ export default function Semesters() {
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
       <CustomSnackbar message={success} status={'success'} />
-    </div>
+    </Box>
   )
 
   // convert date function

@@ -259,7 +259,7 @@ export default function ImportMarks() {
           <Box className="d-flex justify-content-between mb-4">
             {/* download .xlsx file button */}
             <button onClick={downloadExcel} className='btn btn-outline-dark border-grey me-2' style={{ textTransform: 'none', fontSize: '14px' }}>
-              <i className="fas fa-download me-2"></i> Download .xlsx file</button>
+              <i className="fas fa-download me-2"></i> Download demo .xlsx file</button>
 
             {/* file input */}
             <Box className="col-6 col-lg-4">
@@ -269,7 +269,7 @@ export default function ImportMarks() {
           </Box>
 
           {/* input data table */}
-          {inputMarksData.length > 0 &&
+          {inputMarksData.length > 0 ?
             <Box>
               <Box className="table-responsive" ref={tableContainerRef} onScroll={handleScroll} style={{ height: '70vh' }}>
 
@@ -355,6 +355,7 @@ export default function ImportMarks() {
                   {submitLoading ? <span className='spinner-border spinner-border-sm'></span> : 'Save Changes'}</button>
               </Box>
             </Box>
+            : <Box className="my-5 text-center text-muted">Download demo file ➟ Edit the file ➟ Upload & recheck ➟ Save Changes</Box>
           }
         </Box>
       </Box>

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import PropTypes from 'prop-types';
 import { AppBar, Avatar, Box, Button, CssBaseline, Divider, Drawer, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -56,12 +55,11 @@ export default function UserLayout(props) {
       confirmButtonText: 'Yes, logout!'
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.post('/api/admin/logout').then(res => {
+        axios.post('/api/user/logout').then(res => {
           if (res.status === 200) {
             localStorage.clear()
             sessionStorage.clear()
-
-            navigate('/admin/login')
+            navigate('/login')
           } else {
             setError(res.data.message)
             setTimeout(() => { setError('') }, 5000)

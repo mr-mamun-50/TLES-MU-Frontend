@@ -8,6 +8,8 @@ export default function PublicRoute({ children }) {
     level = ''
   } else if (localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken')) {
     level = 'admin'
+  } else if (localStorage.getItem('moderatorToken') || sessionStorage.getItem('moderatorToken')) {
+    level = 'moderator'
   }
 
   return level !== 0 ? <Navigate to={`/${level}`} /> : children;

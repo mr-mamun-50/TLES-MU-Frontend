@@ -15,7 +15,7 @@ export default function ViewClass() {
 
   const location = useLocation();
   const assigned_class = location.state?.assigned_class;
-  // console.log(course);
+  // console.log(assigned_class);
 
 
   useEffect(() => {

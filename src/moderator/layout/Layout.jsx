@@ -9,11 +9,11 @@ import { useEffect } from 'react';
 import { useCallback } from 'react';
 import CustomSnackbar from '../../utilities/SnackBar';
 import PasswordChangeDialog from '../../utilities/PasswordChangeDialog';
-import AdminSideNav from './SideNav';
+import ModeratorSideNav from './SideNav';
 
 const drawerWidth = 240;
 
-export default function AdminLayout(props) {
+export default function ModeratorLayout(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -48,10 +48,11 @@ export default function AdminLayout(props) {
       confirmButtonText: 'Yes, logout!'
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.post('/api/admin/logout').then(res => {
+        axios.post('/api/moderator/logout').then(res => {
           if (res.status === 200) {
             localStorage.clear()
             sessionStorage.clear()
+
             navigate('/login')
           } else {
             setError(res.data.message)
@@ -67,7 +68,7 @@ export default function AdminLayout(props) {
 
   // get user details
   const getUser = useCallback(() => {
-    axios.get('/api/admin/profile').then(res => {
+    axios.get('/api/moderator/profile').then(res => {
       if (res.status === 200) {
         setUserDetails(res.data.user)
         if (userDetails.mustChangePass) {
@@ -118,7 +119,8 @@ export default function AdminLayout(props) {
               <Button size="large" aria-label="account" aria-controls="menu-appbar" aria-haspopup="true"
                 onClick={(event) => setAnchorEl(event.currentTarget)} color="inherit" style={{ textTransform: 'none' }}>
 
-                <Typography mr={1}>{userDetails.name}</Typography>
+                <Typography className='text-hide-ellipsis' mr={1} style={{ width: '110px' }}>
+                  {userDetails.name}</Typography>
                 <Avatar sx={{ width: 32, height: 32 }} />
               </Button>
             </div>
@@ -146,7 +148,7 @@ export default function AdminLayout(props) {
             display: { xs: 'block', sm: 'none' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}>
-          <AdminSideNav onClose={handleDrawerToggle} />
+          <ModeratorSideNav onClose={handleDrawerToggle} />
         </Drawer>
 
         <Drawer variant="permanent" className='bg-dark'
@@ -154,7 +156,7 @@ export default function AdminLayout(props) {
             display: { xs: 'none', sm: 'block' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }} open>
-          <AdminSideNav />
+          <ModeratorSideNav />
         </Drawer>
       </Box>
 
@@ -173,7 +175,7 @@ export default function AdminLayout(props) {
   );
 }
 
-AdminLayout.propTypes = {
+ModeratorLayout.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * You won't need it on your project.

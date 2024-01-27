@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
-import { Grid, MenuItem, TextField } from '@mui/material'
+import { Box, Grid, MenuItem, TextField } from '@mui/material'
 
 export default function Courses({ departments }) {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [role, setRole] = useState()
 
   const [selectedDepartment, setSelectedDepartment] = useState(0)
 
@@ -51,7 +52,7 @@ export default function Courses({ departments }) {
     formData.append('courses', JSON.stringify(inputValues))
     setLoading(true)
 
-    axios.post('/api/admin/courses', formData).then(res => {
+    axios.post(`/api/${role}/courses`, formData).then(res => {
       if (res.status === 200) {
         getCourses(selectedDepartment)
         setInputValues([[]])
@@ -86,7 +87,7 @@ export default function Courses({ departments }) {
     }).then((result) => {
       if (result.isConfirmed) {
         setLoading(true)
-        axios.post('/api/admin/courses/delete', deletableId).then(res => {
+        axios.post(`/api/${role}/courses/delete`, deletableId).then(res => {
           if (res.status === 200) {
             getCourses(selectedDepartment)
             setSelectedCourses([])
@@ -112,7 +113,7 @@ export default function Courses({ departments }) {
     e.preventDefault();
     setLoading(true)
 
-    axios.put(`/api/admin/courses/${editableCourse.id}`, editableCourse).then(res => {
+    axios.put(`/api/${role}/courses/${editableCourse.id}`, editableCourse).then(res => {
       if (res.status === 200) {
         getCourses(selectedDepartment)
         setShowEditCourseModal(false)
@@ -132,9 +133,9 @@ export default function Courses({ departments }) {
   }
 
   // get  courses
-  const getCourses = (id) => {
+  const getCourses = useCallback((id) => {
     setLoading(true)
-    axios.get(`/api/admin/courses/${id}`).then(res => {
+    axios.get(`/api/${role}/courses/${id}`).then(res => {
       if (res.status === 200) {
         setCourses(res.data.courses)
         setLoading(false)
@@ -148,7 +149,7 @@ export default function Courses({ departments }) {
       setLoading(false)
       setTimeout(() => { setError('') }, 5000)
     });
-  }
+  }, [role])
 
   // datatable columns
   const columns = [
@@ -181,6 +182,25 @@ export default function Courses({ departments }) {
 
 
   useEffect(() => {
+    localStorage.getItem('role') ?
+      setRole(localStorage.getItem('role'))
+      : setRole(sessionStorage.getItem('role'));
+
+    if (role === 'moderator') {
+      const modDeptId = localStorage.getItem('user') ?
+        JSON.parse(localStorage.getItem('user')).dept_id
+        : JSON.parse(sessionStorage.getItem('user')).dept_id;
+
+      if (selectedDepartment === 0) {
+        setSelectedDepartment(modDeptId);
+        getCourses(modDeptId);
+      }
+    }
+  }, [getCourses, role, selectedDepartment])
+
+
+
+  useEffect(() => {
     const result = courses.filter((course) => {
       return course.title.toLowerCase().match(searchCourse.toLowerCase())
         || course.course_code.toLowerCase().match(searchCourse.toLowerCase())
@@ -190,35 +210,37 @@ export default function Courses({ departments }) {
 
 
   return (
-    <div className='card'>
+    <Box className='card'>
       {/* heading */}
-      <div className='card-header d-flex justify-content-between align-items-center'>
+      <Box className='card-header d-flex justify-content-between align-items-center'>
         <h5 className='mt-3'>Courses</h5>
 
-        <TextField sx={{ width: '200px' }} select fullWidth margin='small' size='small' value={selectedDepartment}
-          onChange={(e) => {
-            setSelectedDepartment(e.target.value);
-            getCourses(e.target.value);
-          }}>
-          <MenuItem value={0} disabled>Select Department</MenuItem>
-          {departments.map((department) => (
-            <MenuItem value={department.id}>{department.name}</MenuItem>
-          ))}
-        </TextField>
-      </div>
+        {role === 'admin' &&
+          <TextField sx={{ width: '200px' }} select fullWidth margin='small' size='small' value={selectedDepartment}
+            onChange={(e) => {
+              setSelectedDepartment(e.target.value);
+              getCourses(e.target.value);
+            }}>
+            <MenuItem value={0} disabled>Select Department</MenuItem>
+            {departments.map((department) => (
+              <MenuItem value={department.id}>{department.name}</MenuItem>
+            ))}
+          </TextField>
+        }
+      </Box>
 
       {/* body */}
-      <div className='card-body pt-2'>
+      <Box className='card-body pt-2'>
         <DataTable
           title={
-            <div className="w-100 d-flex align-items-center justify-content-between my-2">
-              <div className="input-group w-50">
-                <div className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></div>
+            <Box className="w-100 d-flex align-items-center justify-content-between my-2">
+              <Box className="input-group w-50">
+                <Box className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></Box>
                 <input type="text" className="form-control bb-input" placeholder="Search course" value={searchCourse} onChange={(e) => setSearchCourse(e.target.value)} />
-              </div>
+              </Box>
 
               <button onClick={() => setShowAddCourseModal(true)} className="btn btn-secondary">Add Course</button>
-            </div>
+            </Box>
           }
           columns={columns}
           data={filteredCourse}
@@ -226,15 +248,15 @@ export default function Courses({ departments }) {
           responsive
           highlightOnHover
           noDataComponent={loading ? <span className="spinner-border" role="status" aria-hidden="true"></span>
-            : selectedDepartment === 0 ? <div className="text-center my-4">Please select a department</div>
-              : <div className="text-center my-4">No courses found</div>}
+            : selectedDepartment === 0 ? <Box className="text-center my-4">Please select a department</Box>
+              : <Box className="text-center my-4">No courses found</Box>}
           selectableRows
           selectableRowsHighlight
           onSelectedRowsChange={data => setSelectedCourses(data.selectedRows)}
           contextActions={<button className="btn btn-danger me-2 px-3" onClick={() => deleteCourses()}><i className="fas fa-trash-alt"></i></button>}
           clearSelectedRows={loading}
         />
-      </div>
+      </Box>
 
 
 
@@ -244,19 +266,21 @@ export default function Courses({ departments }) {
         content={
           <form onSubmit={addCourses} style={{ minWidth: '350px' }}>
             {/* select department */}
-            <TextField label="Department" value={selectedDepartment}
-              select fullWidth disabled margin='normal' size='small'>
-              <MenuItem value={0}>Please select a department</MenuItem>
-              {departments.map((department) => (
-                <MenuItem value={department.id} key={department.id}>{department.name}</MenuItem>
-              ))}
-            </TextField>
+            {role === 'admin' &&
+              <TextField label="Department" value={selectedDepartment}
+                select fullWidth disabled margin='normal' size='small'>
+                <MenuItem value={0}>Please select a department</MenuItem>
+                {departments.map((department) => (
+                  <MenuItem value={department.id} key={department.id}>{department.name}</MenuItem>
+                ))}
+              </TextField>
+            }
 
-            <div className="form-label mb-0 mt-3">Courses</div>
+            <Box className="form-label mb-0 mt-3">Courses</Box>
             {/* courses input fields */}
             {inputValues.map((inputField, index) => (
-              <div className='border-top border-light-grey py-3' key={index}>
-                <div className='d-flex justify-content-between'>
+              <Box className='border-top border-light-grey py-3' key={index}>
+                <Box className='d-flex justify-content-between'>
 
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={3}>
@@ -275,8 +299,8 @@ export default function Courses({ departments }) {
 
                   <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-floating btn-sm ms-1 mt-1'>
                     <i className="fas fa-times"></i></button>
-                </div>
-              </div>
+                </Box>
+              </Box>
             ))}
 
             {/* Add mew field button */}
@@ -319,6 +343,6 @@ export default function Courses({ departments }) {
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
       <CustomSnackbar message={success} status={'success'} />
-    </div >
+    </Box >
   )
 }

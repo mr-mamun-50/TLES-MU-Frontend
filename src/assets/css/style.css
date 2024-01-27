@@ -1,5 +1,12 @@
 body {
-    background: #f0f4f7;
+    /* background: #f0f4f7; */
+    background: linear-gradient(
+            25deg,
+            rgba(240, 244, 247, 0.6),
+            rgba(240, 244, 247, 0.9)
+        ),
+        url("../images/static/5372929.png");
+    background-size: cover;
     font-family: "Roboto", "Noto Serif Bengali", sans-serif !important;
     zoom: 95%;
 }
@@ -79,9 +86,9 @@ body {
 .bg-light-primary {
     background-color: #e3ebf750 !important;
 }
-.bg-dark {
+/* .bg-dark {
     background-color: #36344d !important;
-}
+} */
 .bg-white {
     background-color: #fff !important;
 }
