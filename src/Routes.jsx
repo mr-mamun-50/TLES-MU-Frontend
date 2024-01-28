@@ -27,6 +27,8 @@ import ModeratorLayout from "./moderator/layout/Layout";
 import ModeratorDashboard from "./moderator/views/Dashboard";
 import Moderators from "./admin/views/moderator/Moderators";
 import ModeratorCourses from "./moderator/views/Courses";
+import TeacherProfile from "./admin/views/teacher/TeacherProfile";
+import TeacherClassStats from "./admin/views/teacher/TeacherClassStats";
 
 export default function AllRoutes() {
   return (
@@ -67,6 +69,8 @@ export default function AllRoutes() {
 
         {/* Teacher Routes */}
         <Route path="teachers" element={<Teachers />} />
+        <Route path="teachers/profile/:id" element={<TeacherProfile />} />
+        <Route path="teachers/profile/class-statistics" element={<TeacherClassStats />} />
 
         {/* moderators */}
         <Route path="moderators" element={<Moderators />} />
@@ -80,17 +84,15 @@ export default function AllRoutes() {
         {/* Student Routes */}
         <Route path="students" element={<Students />} />
         <Route path="students/add" element={<AddStudent />} />
+        <Route path="students/profile/:id" element={<StudentProfile />} />
 
         {/* Semester & Assign Course */}
         <Route path="semester" element={<Semesters />} />
         <Route path="semester/classes/:id" element={<ViewClass />} />
-
         {/* Question routes */}
         <Route path="semester/classes/question/:id" element={<ViewQuestion />} />
-
         {/* Marks entry routes */}
         <Route path="semester/classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
-
         {/* Students routes */}
         <Route path="semester/classes/student-dashboard/:id" element={<StudentDashboard />} />
         <Route path="semester/classes/student-profile/:id" element={<StudentProfile />} />
@@ -107,6 +109,8 @@ export default function AllRoutes() {
 
         {/* Teacher Routes */}
         <Route path="teachers" element={<Teachers />} />
+        <Route path="teachers/profile/:id" element={<TeacherProfile />} />
+        <Route path="teachers/profile/class-statistics" element={<TeacherClassStats />} />
 
         {/* moderators */}
         <Route path="moderators" element={<Moderators />} />
@@ -120,6 +124,7 @@ export default function AllRoutes() {
         {/* Student Routes */}
         <Route path="students" element={<Students />} />
         <Route path="students/add" element={<AddStudent />} />
+        <Route path="students/profile/:id" element={<StudentProfile />} />
 
         {/* Semester & Assign Course */}
         <Route path="semester" element={<Semesters />} />

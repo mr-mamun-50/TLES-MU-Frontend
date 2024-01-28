@@ -27,6 +27,7 @@ export default function CourseStatistics({ assigned_class }) {
   // total exam marks
   const totalExamMarks = examMarksOfClass.length > 0 && examMarksOfClass.reduce((sum, exam) => sum + exam.total_marks, 0);
 
+
   // calculate all student marks stated
   const studentTotalMarks = {};
 
@@ -51,8 +52,53 @@ export default function CourseStatistics({ assigned_class }) {
   // calculate all student marks ended
 
 
-  // console.log(examMarksOfClass);
 
+  // calculate overall blooms level percentages started
+  // Initialize overAllBloomsLevelMarks for all exams
+  const overAllBloomsLevelMarks = {};
+
+  // Iterate over all exams
+  examMarksOfClass.forEach((exam) => {
+    // Iterate over obtained exam marks for each exam
+    exam.obtained_exam_marks.forEach((obtainedMark) => {
+      const bloomsLevel = obtainedMark.question.blooms_level;
+
+      if (!overAllBloomsLevelMarks[bloomsLevel]) {
+        overAllBloomsLevelMarks[bloomsLevel] = {
+          totalMarks: 0,
+          obtainedMarks: 0,
+        };
+      }
+
+      overAllBloomsLevelMarks[bloomsLevel].totalMarks += obtainedMark.question.marks;
+      overAllBloomsLevelMarks[bloomsLevel].obtainedMarks += obtainedMark.marks;
+    });
+  });
+
+  // Initialize all blooms levels with 'Not answered'
+  const overAllBloomsLevels = ['Remember', 'Understand', 'Apply', 'Analyze', 'Evaluate', 'Create'];
+
+  // Calculate percentages for all blooms levels
+  const overAllBloomsLevelPercentages = overAllBloomsLevels.map((bloomsLevel) => {
+    if (overAllBloomsLevelMarks[bloomsLevel]) {
+      const { totalMarks, obtainedMarks } = overAllBloomsLevelMarks[bloomsLevel];
+      const percentage = (obtainedMarks / totalMarks) * 100 || 0;
+
+      return {
+        bloomsLevel,
+        percentage,
+      };
+    } else {
+      return {
+        bloomsLevel,
+        percentage: 'N/A',
+      };
+    }
+  });
+  // calculate overall blooms level percentages ended
+
+
+  // console.log(overAllBloomsLevelPercentages);
 
   // get all exam marks
   const getAllExamMarks = useCallback(() => {
@@ -101,14 +147,18 @@ export default function CourseStatistics({ assigned_class }) {
 
               <button className={`btn btn${performanceTabIndex !== '2' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
                 onClick={() => setPerformanceTabIndex('2')}
+                title='Details'>Blooms Level</button>
+
+              <button className={`btn btn${performanceTabIndex !== '3' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
+                onClick={() => setPerformanceTabIndex('3')}
                 title='Details'>GPA</button>
             </Box>
           </Box>
 
-          {/* progressbar and graph */}
+          {/* category, blooms level and GPA progressbar and graph */}
           <TabContext value={performanceTabIndex}>
 
-            {/* circular progress bar */}
+            {/* category circular progress bar */}
             <TabPanel value='1' className='p-0'>
               <Box className="pb-2">
                 <StudentCategoryCircularLevel
@@ -120,8 +170,46 @@ export default function CourseStatistics({ assigned_class }) {
               </Box>
             </TabPanel>
 
-            {/* graph */}
+            {/* blooms level */}
             <TabPanel value='2' className='p-0'>
+              <Box className="pb-2">
+                <Box className='row mb-3 me-0'>
+                  {/* Show blooms graph */}
+                  <Box className="col-md-7 col-lg-8">
+                    <BarChart
+                      xAxis={[{
+                        id: 'barCategories',
+                        data: overAllBloomsLevelPercentages.map(({ bloomsLevel }) => bloomsLevel),
+                        scaleType: 'band',
+                      }]}
+                      series={[{
+                        data: overAllBloomsLevelPercentages.map(({ percentage }) => percentage !== 'N/A' ? percentage : 0),
+                        color: '#007bff',
+                      }]}
+                      height={220}
+                      margin={{ top: 15, right: 15, bottom: 20, left: 30 }}
+                    />
+                  </Box>
+
+                  {/* show list */}
+                  <Box className="col-md-5 col-lg-4 border rounded-3">
+                    <Table className='table-sm'>
+                      <TableBody>
+                        {overAllBloomsLevelPercentages.map(({ bloomsLevel, percentage }) => (
+                          <TableRow key={bloomsLevel}>
+                            <TableCell>{bloomsLevel}</TableCell>
+                            <TableCell className='text-end fw-semibold'>{percentage !== 'N/A' ? `${percentage.toFixed(2)} %` : percentage}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Box>
+                </Box>
+              </Box>
+            </TabPanel>
+
+            {/* GPA graph */}
+            <TabPanel value='3' className='p-0'>
               <Box className="pb-2">
                 <GpaCounts
                   studentTotalMarks={studentTotalMarksArray}

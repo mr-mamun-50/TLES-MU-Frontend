@@ -306,9 +306,9 @@ export default function AssignCourse({ selectedSemester, role }) {
                 assignedCourses.map((course, index) => (
                   <TableRow key={index}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell onClick={() => navigate(`/${role}/semester/classes/${course.id}`, { state: { assigned_class: course } })} style={{ cursor: 'pointer' }}>
+                    <TableCell onClick={() => navigate(`/${role}/semester/classes/${course.id}`, { state: { assigned_class: course } })} className='link'>
                       {course.course && course.course.course_code}</TableCell>
-                    <TableCell onClick={() => navigate(`/${role}/semester/classes/${course.id}`, { state: { assigned_class: course } })} style={{ cursor: 'pointer' }}>
+                    <TableCell onClick={() => navigate(`/${role}/semester/classes/${course.id}`, { state: { assigned_class: course } })} className='link fw-semibold'>
                       {course.course && course.course.title}</TableCell>
                     <TableCell>
                       <span>{course.teacher && course.teacher.name}</span><br />

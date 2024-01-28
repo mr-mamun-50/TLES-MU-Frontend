@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import logo from '../assets/images/logo/tles_logo_dark.png'
+import logo from '../assets/images/logo/tles_icon.png'
 import vectorArt from '../assets/images/static/6101072.svg'
 import axios from 'axios'
 import CustomSnackbar from '../utilities/SnackBar'
@@ -55,7 +55,7 @@ export default function UserLogin() {
         <Box className="d-md-flex justify-content-between">
           <Box className="d-flex align-items-center py-2 ms-lg-4">
             <Box className="shadow rounded-8">
-              <img className="my-4 px-2" src={logo} alt="MyADC" style={{ height: '35px', width: '80px' }} />
+              <img className="my-3 px-2" src={logo} alt="Icon" style={{ width: '80px', height: '50px' }} />
             </Box>
             <Box className="ms-4">
               <h1 className="text-primary mt-3 fw-bold mb-0">MU TLES</h1>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Toolbar } from "@mui/material";
-import logo from '../../assets/images/logo/tles_logo_light.png';
+import logo from '../../assets/images/logo/tles_logo.png';
 import { NavLink } from 'react-router-dom';
 
 
@@ -14,7 +14,7 @@ export default function ModeratorSideNav({ onClose }) {
       <nav id="sidebarMenu" className="collapse d-block sidebar">
         <Toolbar className='d-flex align-items-center justify-content-between pt-0'>
           {/* <img className='rounded-9' src={logo} alt="logo" style={{ height: '40px', filter: 'drop-shadow(0 0 10px #fff)' }} /> */}
-          <img className='' src={logo} alt="logo" style={{ height: '40px' }} />
+          <img className='' src={logo} alt="logo" style={{ height: '45px' }} />
 
           {/* Close button */}
           <button className='btn rounded-circle text-white d-block d-sm-none px-2 py-1'

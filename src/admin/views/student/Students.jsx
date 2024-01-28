@@ -168,12 +168,14 @@ export default function Students() {
     {
       name: 'Student ID',
       selector: row => row.student_id,
+      cell: row => <Link to={`/${role}/students/profile/${row.id}`} state={{ 'student': row }} className='text-dark link'>{row.student_id}</Link>,
       sortable: true,
       wrap: true,
     },
     {
       name: 'Name',
       selector: row => row.name,
+      cell: row => <Link to={`/${role}/students/profile/${row.id}`} state={{ 'student': row }} className='fw-semibold text-dark link'>{row.name}</Link>,
       sortable: true,
       wrap: true,
     },
@@ -192,8 +194,13 @@ export default function Students() {
     {
       name: 'Action',
       button: true,
-      cell: row => <button className="btn btn-secondary btn-sm px-2" onClick={() => { setEditableStudent(row); setShowEditStudentModal(true) }}>
-        <i className="fas fa-edit" ></i></button >,
+      cell: row => <Box className="d-flex">
+        <Link to={`/${role}/students/profile/${row.id}`} state={{ 'student': row }} className="btn btn-light border border-light-grey btn-sm px-2 me-2">
+          <i className="fas fa-eye"></i>
+        </Link>
+        <button className="btn btn-secondary btn-sm px-2" onClick={() => { setEditableStudent(row); setShowEditStudentModal(true) }}>
+          <i className="fas fa-edit" ></i></button >
+      </Box>,
     }
   ]
 
@@ -247,7 +254,7 @@ export default function Students() {
           {/* add student dropdown button and menu */}
           <button className="btn btn-secondary" id="basic-button" aria-controls={open ? 'basic-menu' : undefined} aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined} onClick={(event) => setAnchorEl(event.currentTarget)}>
-            Add Student
+            <i className="fas fa-plus me-1"></i> Add Student
           </button>
           <Menu id="basic-menu" anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}
             MenuListProps={{ 'aria-labelledby': 'basic-button' }}>

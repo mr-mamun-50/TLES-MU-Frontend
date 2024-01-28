@@ -4,6 +4,7 @@ import axios from 'axios'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
 import { Box, MenuItem, TextField } from '@mui/material'
+import { Link } from 'react-router-dom'
 
 export default function Teachers() {
 
@@ -141,6 +142,8 @@ export default function Teachers() {
     {
       name: 'Name',
       selector: row => row.name,
+      cell: row => <Link to={`/${role}/teachers/profile/${row.id}`} state={{ profile: row }}
+        className='fw-semibold text-dark link'>{row.name}</Link>,
       sortable: true,
       wrap: true,
     },
@@ -159,8 +162,14 @@ export default function Teachers() {
     {
       name: 'Action',
       button: true,
-      cell: row => <button className="btn btn-secondary btn-sm px-2"
-        onClick={() => { setEditableTeacher(row); setShowEditTeacherModal(true) }}><i className="fas fa-edit" ></i></button >,
+      cell: row => <Box className="d-flex">
+        <Link to={`/${role}/teachers/profile/${row.id}`}
+          className="btn btn-light border border-light-grey btn-sm px-2 me-2">
+          <i className="fas fa-eye"></i>
+        </Link>
+        <button className="btn btn-secondary btn-sm px-2"
+          onClick={() => { setEditableTeacher(row); setShowEditTeacherModal(true) }}><i className="fas fa-edit" ></i></button >
+      </Box>,
     }
   ]
 
@@ -206,7 +215,7 @@ export default function Teachers() {
       <Box className='card my-2'>
         <Box className='card-header d-flex justify-content-between align-items-center'>
           <h5 className='mt-3'>Teachers</h5>
-          <button onClick={() => setShowAddTeacherModal(true)} className="btn btn-secondary">Add Teacher</button>
+          <button onClick={() => setShowAddTeacherModal(true)} className="btn btn-secondary"><i className="fas fa-plus me-1"></i> Add Teacher</button>
         </Box>
 
         <Box className='card-body pt-2'>

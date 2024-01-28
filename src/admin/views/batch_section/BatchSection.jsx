@@ -238,7 +238,7 @@ export default function BatchSection() {
         {/* heading sectin */}
         <Box className='card-header d-flex justify-content-between align-items-center'>
           <h5 className='mt-3'>All Batch</h5>
-          <button onClick={() => setShowAddBatchModal(true)} className="btn btn-secondary">Add Batch</button>
+          <button onClick={() => setShowAddBatchModal(true)} className="btn btn-secondary"><i className="fas fa-plus me-1"></i> Add Batch</button>
         </Box>
 
         {/* body section */}

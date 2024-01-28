@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import logo from '../assets/images/logo/tles_logo_dark.png'
+import logo from '../assets/images/logo/tles_logo.png'
 import { useState } from 'react'
 import axios from 'axios'
 import CustomSnackbar from '../utilities/SnackBar'
@@ -49,9 +49,9 @@ export default function AdminLogin() {
     <div className='d-flex align-items-center justify-content-center p-5' style={{ minHeight: '100vh' }} >
       <div className='col-lg-4 col-md-6 col-12'>
         {/* Logo */}
-        <Link to={'/'} >
+        <Link to={'/'}>
           {/* <img src={logo} alt='logo' className='d-block mx-auto mb-3' height="50px" width="125px" /> */}
-          <img src={logo} alt='logo' className='d-block mx-auto mb-3' height="50px" width="90" />
+          <img src={logo} alt='logo' className='d-block mx-auto mb-3' width="120" />
         </Link>
         <h4 className='text-center mb-4'>Admin Login</h4>
 

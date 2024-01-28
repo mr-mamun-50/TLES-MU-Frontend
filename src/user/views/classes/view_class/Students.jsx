@@ -43,12 +43,16 @@ export default function EnrolledStudents({ assigned_class }) {
     {
       name: 'Student ID',
       selector: row => row.student_id,
+      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
+        className="text-dark link">{row.student_id}</Link>,
       sortable: true,
       wrap: true,
     },
     {
       name: 'Name',
       selector: row => row.name,
+      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
+        className="fw-semibold text-dark link">{row.name}</Link >,
       sortable: true,
       wrap: true,
     },
