@@ -95,7 +95,7 @@ export default function StudentDashboard() {
           </Box>
 
           {/* See student profile */}
-          <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/student-profile/${student_id}`} state={{ 'student': student }}
+          <Link to={`${role === 'user' ? '' : `/${role}/assign-classes`}/classes/student-profile/${student_id}`} state={{ 'student': student }}
             className='btn btn-outline-dark'>
             <i className='fas fa-user-circle fa-lg me-1'></i> See Profile
           </Link>

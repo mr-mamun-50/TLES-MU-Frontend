@@ -12,7 +12,7 @@ import Teachers from './admin/views/teacher/Teachers';
 import BatchSection from './admin/views/batch_section/BatchSection';
 import Students from './admin/views/student/Students';
 import AddStudent from './admin/views/student/AddStudent';
-import Semesters from "./admin/views/semester/Semesters";
+import SemestersSFRC from "./admin/views/assign_course/Semesters";
 import AssignedCourses from "./user/views/classes/AssignedCourses";
 import Departments from "./admin/views/department_courses/Departments";
 import ViewClass from "./user/views/classes/ViewClass";
@@ -29,6 +29,14 @@ import Moderators from "./admin/views/moderator/Moderators";
 import ModeratorCourses from "./moderator/views/Courses";
 import TeacherProfile from "./admin/views/teacher/TeacherProfile";
 import TeacherClassStats from "./admin/views/teacher/TeacherClassStats";
+import BatchStats from "./admin/views/batch_section/BatchStats";
+import AllSemesters from "./admin/views/semester/AllSemesters";
+import SemestersSFSE from "./admin/views/supplementary_exam/Semesters";
+import AssignedSupples from "./user/views/supplementary_exams/AssignedSupples";
+import SuppleQuestions from "./user/views/supplementary_exams/Questions";
+import ViewSuppleExam from "./admin/views/supplementary_exam/ViewExam";
+import SuppleMarks from "./user/views/supplementary_exams/Marks";
+import SuppleMarksImport from "./user/views/supplementary_exams/MarksImport";
 
 export default function AllRoutes() {
   return (
@@ -56,6 +64,12 @@ export default function AllRoutes() {
         {/* Students routes */}
         <Route path="classes/student-dashboard/:id" element={<StudentDashboard />} />
         <Route path="classes/student-profile/:id" element={<StudentProfile />} />
+
+        {/* supplementary exams routes */}
+        <Route path="supplementary-exams" element={<AssignedSupples />} />
+        <Route path="supplementary-exams/questions/:id" element={<SuppleQuestions />} />
+        <Route path="supplementary-exams/marks/:id" element={<SuppleMarks />} />
+        <Route path="supplementary-exams/marks/import/:id" element={<SuppleMarksImport />} />
       </Route>
 
 
@@ -77,25 +91,33 @@ export default function AllRoutes() {
 
         {/* Batches Routes  */}
         <Route path="batch-section" element={<BatchSection />} />
+        <Route path="batch-section/batch/:batch_id/statistics" element={<BatchStats />} />
 
         {/* Department Routes */}
         <Route path="departments-courses" element={<Departments />} />
+
+        {/* Semesters Routes */}
+        <Route path="semesters" element={<AllSemesters />} />
 
         {/* Student Routes */}
         <Route path="students" element={<Students />} />
         <Route path="students/add" element={<AddStudent />} />
         <Route path="students/profile/:id" element={<StudentProfile />} />
 
-        {/* Semester & Assign Course */}
-        <Route path="semester" element={<Semesters />} />
-        <Route path="semester/classes/:id" element={<ViewClass />} />
+        {/* Assign Course */}
+        <Route path="assign-classes" element={<SemestersSFRC />} />
+        <Route path="assign-classes/classes/:id" element={<ViewClass />} />
         {/* Question routes */}
-        <Route path="semester/classes/question/:id" element={<ViewQuestion />} />
+        <Route path="assign-classes/classes/question/:id" element={<ViewQuestion />} />
         {/* Marks entry routes */}
-        <Route path="semester/classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
+        <Route path="assign-classes/classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
         {/* Students routes */}
-        <Route path="semester/classes/student-dashboard/:id" element={<StudentDashboard />} />
-        <Route path="semester/classes/student-profile/:id" element={<StudentProfile />} />
+        <Route path="assign-classes/classes/student-dashboard/:id" element={<StudentDashboard />} />
+        <Route path="assign-classes/classes/student-profile/:id" element={<StudentProfile />} />
+
+        {/* Supplementary Exam routes */}
+        <Route path="supplementary-exams" element={<SemestersSFSE />} />
+        <Route path="supplementary-exams/:id" element={<ViewSuppleExam />} />
       </Route>
 
 
@@ -117,28 +139,33 @@ export default function AllRoutes() {
 
         {/* Batches Routes  */}
         <Route path="batch-section" element={<BatchSection />} />
+        <Route path="batch-section/batch/:batch_id/statistics" element={<BatchStats />} />
 
         {/* Department Routes */}
         <Route path="departments-courses" element={<ModeratorCourses />} />
+
+        {/* Semesters Routes */}
+        <Route path="semesters" element={<AllSemesters />} />
 
         {/* Student Routes */}
         <Route path="students" element={<Students />} />
         <Route path="students/add" element={<AddStudent />} />
         <Route path="students/profile/:id" element={<StudentProfile />} />
 
-        {/* Semester & Assign Course */}
-        <Route path="semester" element={<Semesters />} />
-        <Route path="semester/classes/:id" element={<ViewClass />} />
-
+        {/* Assign Course */}
+        <Route path="assign-classes" element={<SemestersSFRC />} />
+        <Route path="assign-classes/classes/:id" element={<ViewClass />} />
         {/* Question routes */}
-        <Route path="semester/classes/question/:id" element={<ViewQuestion />} />
-
+        <Route path="assign-classes/classes/question/:id" element={<ViewQuestion />} />
         {/* Marks entry routes */}
-        <Route path="semester/classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
-
+        <Route path="assign-classes/classes/manual-marks-entry/:id" element={<ManualMarksEntry />} />
         {/* Students routes */}
-        <Route path="semester/classes/student-dashboard/:id" element={<StudentDashboard />} />
-        <Route path="semester/classes/student-profile/:id" element={<StudentProfile />} />
+        <Route path="assign-classes/classes/student-dashboard/:id" element={<StudentDashboard />} />
+        <Route path="assign-classes/classes/student-profile/:id" element={<StudentProfile />} />
+
+        {/* Supplementary Exam routes */}
+        <Route path="supplementary-exams" element={<SemestersSFSE />} />
+        <Route path="supplementary-exams/:id" element={<ViewSuppleExam />} />
       </Route>
 
 

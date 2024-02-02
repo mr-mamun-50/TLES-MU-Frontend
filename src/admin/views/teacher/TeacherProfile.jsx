@@ -68,12 +68,14 @@ export default function TeacherProfile() {
 
 
   // get semesters
-  const getSemesters = useCallback(() => {
+  const getSemesters = useCallback((select = false) => {
     setLoading(true)
     axios.get(`/api/${role}/semesters`).then(res => {
       if (res.status === 200) {
         setSemesters(res.data.semesters)
-        setSelectedSemester(res.data.semesters[0])
+        if (select) {
+          setSelectedSemester(res.data.semesters[0])
+        }
         setLoading(false)
       } else {
         setError(res.data.message)
@@ -101,7 +103,12 @@ export default function TeacherProfile() {
 
   useEffect(() => {
     if (role) {
-      getSemesters();
+      if (sessionStorage.getItem('selectedSemester')) {
+        setSelectedSemester(JSON.parse(sessionStorage.getItem('selectedSemester')));
+        getSemesters();
+      } else {
+        getSemesters(true);
+      }
     }
   }, [getSemesters, role])
 
@@ -109,7 +116,7 @@ export default function TeacherProfile() {
   return (
     <Box className='container'>
       <Box className="card my-2">
-        {/* seading section */}
+        {/* heading section */}
         <Box className='card-header pb-0 d-flex justify-content-between align-items-center' sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Box className='d-flex'>
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
@@ -134,9 +141,12 @@ export default function TeacherProfile() {
                 <Box className="card-body p-3">
                   <Box className="list-group list-group-light" style={{ height: "300px", overflowY: "scroll" }}>
                     {semesters.map((semester) => (
-                      <button onClick={() => setSelectedSemester(semester)}
+                      <button key={semester.id} onClick={() => {
+                        setSelectedSemester(semester);
+                        sessionStorage.setItem('selectedSemester', JSON.stringify(semester));
+                      }}
                         className={`list-group-item list-group-item-action px-3 py-2 ${selectedSemester.id === semester.id && 'active'}`}>
-                        <i className={`${selectedSemester.id === semester.id ? 'fas' : 'far'} fa-circle-check me-2`}></i>{semester.name}
+                        <i className={`far fa-${selectedSemester.id === semester.id ? 'circle-dot' : 'circle'} me-2`}></i> {semester.name}
                       </button>
                     ))}
                   </Box>

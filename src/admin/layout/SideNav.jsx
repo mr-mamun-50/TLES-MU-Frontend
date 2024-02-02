@@ -60,15 +60,33 @@ export default function AdminSideNav({ onClose }) {
               </span>
             </NavLink>
 
-            <NavLink to="/admin/semester">
+            <NavLink to="/admin/assign-classes">
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-diagram-next fa-fw me-3"></i><span> Semesters</span>
+                <i className="fas fa-chalkboard-user fa-fw me-3"></i><span> Regular Classes</span>
+              </span>
+            </NavLink>
+
+            <NavLink to="/admin/retake-classes">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="fas fa-retweet fa-fw me-3"></i><span> Retake Classes</span>
+              </span>
+            </NavLink>
+
+            <NavLink to="/admin/supplementary-exams">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="far fa-handshake fa-fw me-3"></i><span> Supplementary Exams</span>
               </span>
             </NavLink>
 
             <NavLink to="/admin/batch-section">
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-users-rectangle fa-fw me-3"></i><span> Batches</span>
+              </span>
+            </NavLink>
+
+            <NavLink to="/admin/semesters">
+              <span className="list-group-item list-group-item-action py-2 ripple">
+                <i className="fas fa-sitemap fa-fw me-3"></i><span> Manage Semesters</span>
               </span>
             </NavLink>
 

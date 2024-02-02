@@ -43,7 +43,7 @@ export default function EnrolledStudents({ assigned_class }) {
     {
       name: 'Student ID',
       selector: row => row.student_id,
-      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
+      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/assign-classes`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
         className="text-dark link">{row.student_id}</Link>,
       sortable: true,
       wrap: true,
@@ -51,7 +51,7 @@ export default function EnrolledStudents({ assigned_class }) {
     {
       name: 'Name',
       selector: row => row.name,
-      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
+      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/assign-classes`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
         className="fw-semibold text-dark link">{row.name}</Link >,
       sortable: true,
       wrap: true,
@@ -71,7 +71,7 @@ export default function EnrolledStudents({ assigned_class }) {
     {
       name: 'Details',
       button: true,
-      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
+      cell: row => <Link to={`${role === 'user' ? '' : `/${role}/assign-classes`}/classes/student-dashboard/${row.id}`} state={{ 'assigned_class': assigned_class, 'student': row }}
         className="btn btn-secondary btn-sm px-2"><i className="fas fa-eye" ></i></Link >,
     }
   ]

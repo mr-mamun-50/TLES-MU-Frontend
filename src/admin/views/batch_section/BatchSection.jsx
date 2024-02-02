@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
 import { Box, MenuItem, TextField } from '@mui/material'
+import { Link } from 'react-router-dom'
 
 export default function BatchSection() {
 
@@ -170,6 +171,8 @@ export default function BatchSection() {
     {
       name: 'Name',
       selector: row => row.batch_name,
+      cell: row => <Link to={`/${role}/batch-section/batch/${row.id}/statistics`} state={{ batch: row }}
+        className='fw-semibold text-dark link'>{row.batch_name}</Link>,
       sortable: true,
       wrap: true,
       width: '130px'
@@ -192,8 +195,14 @@ export default function BatchSection() {
     {
       name: 'Action',
       button: true,
-      cell: row => <button className="btn btn-secondary btn-sm px-2" onClick={() => { setEditableBatch(row); setShowEditBatchModal(true) }}>
-        <i className="fas fa-edit" ></i></button >,
+      cell: row => <Box className="d-flex">
+        <Link to={`/${role}/batch-section/batch/${row.id}/statistics`} state={{ batch: row }}
+          className="btn btn-light border border-light-grey btn-sm px-2 me-2">
+          <i className="fas fa-eye"></i>
+        </Link>
+        <button className="btn btn-secondary btn-sm px-2" onClick={() => { setEditableBatch(row); setShowEditBatchModal(true) }}>
+          <i className="fas fa-edit" ></i></button >
+      </Box>,
     }
   ]
 

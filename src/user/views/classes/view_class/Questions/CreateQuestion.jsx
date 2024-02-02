@@ -159,7 +159,7 @@ export default function CreateQuestion() {
               {questionSet.question_type !== 'One question only' && <h6 className='mt-3 mb-1'>Questions:</h6>}
 
               {questionSet.questions.map((question, questionIndex) => (
-                <Grid container spacing={2} className={`my-0 ${questionSet.question_type === 'One question only' && 'ms-3'}`}>
+                <Grid container spacing={2} className={`my-0 ${questionSet.question_type === 'One question only' && 'ms-3'}`} key={questionIndex}>
 
                   {questionSet.question_type !== 'One question only' &&
                     <Grid item xs={1}>

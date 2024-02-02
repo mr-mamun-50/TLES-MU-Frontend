@@ -393,7 +393,8 @@ export default function ManualMarksEntry() {
                 <Table className='table-bordered table-sm border-grey'>
                   <TableHead className='sticky-header'>
                     <TableRow>
-                      <TableCell rowSpan={2} className="sticky-column text-center">Student ID</TableCell>
+                      <TableCell rowSpan={2} className="sticky-column sticky-header text-center">Student ID</TableCell>
+                      <TableCell rowSpan={2} className="text-center">Total Marks</TableCell>
                       {/* question set numbers */}
                       {question_sets.map((question_set, set_index) => (
                         <TableCell colSpan={question_set.questions.length} key={set_index} className='text-center'>{question_set.sl}</TableCell>
@@ -413,51 +414,57 @@ export default function ManualMarksEntry() {
                   </TableHead>
 
                   <TableBody>
-                    {students.map((student, student_index) => (
-                      <TableRow key={student_index}>
-                        <TableCell style={{ minWidth: '120px', padding: '0' }} className="sticky-column">
-                          <button onClick={() => {
-                            if (role === 'user') {
-                              setShowAddMarksModal(true);
-                              setInputStudent(student);
-                            }
-                          }}
-                            className='btn btn-light rounded-0 btn-block px-1' style={{ fontSize: '14px' }}>
-                            {student.student_id}
-                          </button>
-                        </TableCell>
+                    {students.map((student, student_index) => {
+                      // calculate total obtained marks
+                      const totalObtainedMarks = student.obtained_exam_marks.reduce((acc, obtained_marks) => acc + obtained_marks.marks, 0);
 
-                        {/* all questions input fields */}
-                        {question_sets.map((question_set) => (
-                          question_set.questions.map((question, question_index) => {
-                            const obtainedMark = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id);
+                      return (
+                        <TableRow key={student_index}>
+                          <TableCell style={{ minWidth: '120px', padding: '0' }} className="sticky-column">
+                            <button onClick={() => {
+                              if (role === 'user') {
+                                setShowAddMarksModal(true);
+                                setInputStudent(student);
+                              }
+                            }}
+                              className='btn btn-light rounded-0 btn-block px-1' style={{ fontSize: '14px' }}>
+                              {student.student_id}
+                            </button>
+                          </TableCell>
+                          <TableCell style={{ minWidth: '60px', padding: '0' }} className="text-center">{totalObtainedMarks}</TableCell>
 
-                            return (
-                              <TableCell key={question_index} style={{ minWidth: '60px', padding: '0' }}>
+                          {/* all questions input fields */}
+                          {question_sets.map((question_set) => (
+                            question_set.questions.map((question, question_index) => {
+                              const obtainedMark = student.obtained_exam_marks.find(obtained_marks => obtained_marks.question_id === question.id);
 
-                                {/* marks with edit button */}
-                                {obtainedMark?.marks > -1 &&
-                                  <button className='btn btn-block py-1' style={{ fontSize: '14px' }}
-                                    onClick={() => {
-                                      if (role === 'user') {
-                                        setEditableMarks({
-                                          ...obtainedMark,
-                                          qstn_no: `${question_set.sl}${question_set.questions.length > 1 ? `.${String.fromCharCode(question_index + 97)}` : ''}`,
-                                          qstn_marks: question.marks,
-                                          student_id: student.student_id
-                                        });
-                                        setShowEditMarksModal(true);
-                                      }
-                                    }}>
-                                    {obtainedMark.marks}
-                                  </button>
-                                }
-                              </TableCell>
-                            )
-                          })
-                        ))}
-                      </TableRow>
-                    ))}
+                              return (
+                                <TableCell key={question_index} style={{ minWidth: '60px', padding: '0' }}>
+
+                                  {/* marks with edit button */}
+                                  {obtainedMark?.marks > -1 &&
+                                    <button className='btn btn-block py-1' style={{ fontSize: '14px' }}
+                                      onClick={() => {
+                                        if (role === 'user') {
+                                          setEditableMarks({
+                                            ...obtainedMark,
+                                            qstn_no: `${question_set.sl}${question_set.questions.length > 1 ? `.${String.fromCharCode(question_index + 97)}` : ''}`,
+                                            qstn_marks: question.marks,
+                                            student_id: student.student_id
+                                          });
+                                          setShowEditMarksModal(true);
+                                        }
+                                      }}>
+                                      {obtainedMark.marks}
+                                    </button>
+                                  }
+                                </TableCell>
+                              )
+                            })
+                          ))}
+                        </TableRow>
+                      )
+                    })}
                   </TableBody>
                 </Table>
 

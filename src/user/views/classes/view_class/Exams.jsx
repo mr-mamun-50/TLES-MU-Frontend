@@ -185,12 +185,12 @@ export default function Exams({ assigned_class }) {
                   {/* Action buttons */}
                   <Box className="d-flex align-items-center mt-2">
                     {(exam.exam_type === 'Final' || exam.exam_type === 'Midterm') &&
-                      <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/question/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam }}
+                      <Link to={`${role === 'user' ? '' : `/${role}/assign-classes`}/classes/question/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam }}
                         className="btn btn-secondary btn-sm me-2">
                         <i className="fas fa-file-pen me-2"></i> Question
                       </Link>}
 
-                    <Link to={`${role === 'user' ? '' : `/${role}/semester`}/classes/manual-marks-entry/${exam.id}`}
+                    <Link to={`${role === 'user' ? '' : `/${role}/assign-classes`}/classes/manual-marks-entry/${exam.id}`}
                       state={{ assigned_class: assigned_class, exam: exam, question_sets: exam.exam_question_sets }}
                       className="btn btn-secondary btn-sm">
                       <i className="fas fa-edit me-2"></i> Marks</Link>

@@ -70,7 +70,7 @@ export default function UserLogin() {
           </Box>
         </Box>
 
-
+        {/* body section */}
         <Box className="row d-md-flex align-items-center">
           {/* left image */}
           <Box className="col-md-5 col-lg-6 p-3 p-lg-5 d-none d-md-block">
@@ -101,7 +101,7 @@ export default function UserLogin() {
 
                       <Box type='button' className={`btn pe-3 border w-100 mx-3 d-flex justify-content-between align-items-center ${loginCredentials.role === 'moderator' && 'border-primary'}`}
                         onClick={() => setLoginCredentials({ ...loginCredentials, role: 'moderator' })} >
-                        <span><i className="fas fa-user-gear text-secondary me-1"></i> HOD</span>
+                        <span><i className="fas fa-user-gear text-secondary me-1"></i> Head</span>
                         <i className={`far fa-${loginCredentials.role === 'moderator' ? 'circle-dot text-primary' : 'circle text-grey'}`}></i>
                       </Box>
 

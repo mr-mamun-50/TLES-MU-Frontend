@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
-import CustomSnackbar from '../../../utilities/SnackBar'
 import { Box, TextField } from '@mui/material'
-import ModalDialog from '../../../utilities/ModalDialog'
 import axios from 'axios'
-import AssignCourse from './AssignCourse'
+import { useCallback, useEffect, useState } from 'react'
+import ModalDialog from '../../../utilities/ModalDialog'
+import DataTable from 'react-data-table-component'
+import CustomSnackbar from '../../../utilities/SnackBar'
 
-export default function Semesters() {
+export default function AllSemesters() {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
@@ -13,7 +13,8 @@ export default function Semesters() {
   const [role, setRole] = useState()
 
   const [semesters, setSemesters] = useState([])
-  const [selectedSemester, setSelectedSemester] = useState({})
+  const [filteredSemesters, setFilteredSemesters] = useState([])
+  const [searchSemesters, setSearchSemesters] = useState('')
 
   const semesterOpt = { name: '', start_date: convertDate(new Date()), end_date: convertDate(new Date().setMonth(+16)) }
   const [inputSemester, setInputSemester] = useState(semesterOpt)
@@ -29,7 +30,7 @@ export default function Semesters() {
     axios.get(`/api/${role}/semesters`).then(res => {
       if (res.status === 200) {
         setSemesters(res.data.semesters)
-        setSelectedSemester(res.data.semesters[0])
+        setFilteredSemesters(res.data.semesters)
         setLoading(false)
       } else {
         setError(res.data.message)
@@ -46,11 +47,11 @@ export default function Semesters() {
   // add semester
   const addSemester = () => {
     setLoading(true)
-    axios.post('/api/admin/semesters', inputSemester).then(res => {
+    axios.post(`/api/${role}/semesters`, inputSemester).then(res => {
       setLoading(false)
       if (res.status === 200) {
-        setSuccess(res.data.message)
         getSemesters()
+        setSuccess(res.data.message)
         setInputSemester(semesterOpt)
         setTimeout(() => { setSuccess('') }, 5000)
         setLoading(false)
@@ -67,44 +68,83 @@ export default function Semesters() {
   }
 
 
+  // datatable columns
+  const columns = [
+    {
+      name: 'Name',
+      selector: row => row.name,
+      sortable: true,
+      wrap: true,
+    },
+    {
+      name: 'Session',
+      selector: row => row.start_date,
+      cell: row => `${new Date(row.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })} 
+      - ${new Date(row.end_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}`,
+      sortable: true,
+      wrap: true,
+    },
+    {
+      name: 'Action',
+      button: true,
+      cell: row => <Box className="d-flex">
+        <button className="btn btn-secondary btn-sm px-2"
+          onClick={() => { }}><i className="fas fa-edit" ></i></button >
+      </Box>,
+    }
+  ]
+
+
   useEffect(() => {
     localStorage.getItem('role') ?
       setRole(localStorage.getItem('role'))
       : setRole(sessionStorage.getItem('role'));
 
-    role && getSemesters();
+    if (role) {
+      getSemesters(true);
+    }
   }, [getSemesters, role])
 
 
+  useEffect(() => {
+    const filteredData = semesters.filter(semester => {
+      return semester.name.toLowerCase().includes(searchSemesters.toLowerCase());
+    })
+    setFilteredSemesters(filteredData)
+  }, [semesters, searchSemesters])
+
+
   return (
-    <Box className="container">
-      <Box className="row">
-        {/* select semester */}
-        <Box className="col-12 col-md-6 col-lg-3">
-          <Box className='card my-2'>
-            <Box className='card-header d-flex justify-content-between align-items-center'>
-              <h5 className='mt-2 mb-0'>Semesters</h5>
-              {role === 'admin' &&
-                <button className='btn btn-secondary btn-sm' onClick={() => setShowAddSemesterModal(true)}>Add New</button>
-              }
-            </Box>
+    <Box className='container d-flex justify-content-center'>
+      <Box className="col-lg-6 my-2">
+        <Box className='card my-2'>
+          <Box className='card-header d-flex justify-content-between align-items-center py-3'>
+            <h5 className='mt-2 mb-0'>Semesters</h5>
 
-            <Box className="card-body px-3">
-              <Box className="list-group list-group-light" style={{ height: "300px", overflowY: "scroll" }}>
-                {semesters.map((semester) => (
-                  <button onClick={() => setSelectedSemester(semester)}
-                    className={`list-group-item list-group-item-action px-3 py-2 ${selectedSemester.id === semester.id && 'active'}`}>
-                    <i className={`${selectedSemester.id === semester.id ? 'fas' : 'far'} fa-circle-check me-2`}></i>{semester.name}
-                  </button>
-                ))}
-              </Box>
-            </Box>
+            <button className='btn btn-secondary btn-sm' onClick={() => setShowAddSemesterModal(true)}><i className="fas fa-plus me-1"></i> Add New</button>
           </Box>
-        </Box>
 
-        {/* assign courses */}
-        <Box className="col-12 col-md-6 col-lg-9">
-          {selectedSemester.id && <AssignCourse selectedSemester={selectedSemester} role={role} />}
+          <Box className="card-body pt-2">
+            <DataTable
+              title={
+                <Box className="row">
+                  <Box className='col-4'>
+                    <Box className="input-group">
+                      <Box className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></Box>
+                      <input type="text" className="form-control bb-input" placeholder="Search semester" value={searchSemesters} onChange={(e) => setSearchSemesters(e.target.value)} />
+                    </Box>
+                  </Box>
+                </Box>
+              }
+              columns={columns}
+              data={filteredSemesters}
+              pagination
+              responsive
+              highlightOnHover
+              noDataComponent={loading ? <span className="spinner-border my-4" role="status" aria-hidden="true"></span>
+                : <Box className="text-center my-4">No semesters found</Box>}
+            />
+          </Box>
         </Box>
       </Box>
 
@@ -139,14 +179,12 @@ export default function Semesters() {
         loading={loading}
       />
 
-      {/* Edit semester modal */}
-
-
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
       <CustomSnackbar message={success} status={'success'} />
     </Box>
   )
+
 
   // convert date function
   function convertDate(inputDate) {

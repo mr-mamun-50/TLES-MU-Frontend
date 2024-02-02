@@ -35,6 +35,7 @@ export default function TeacherClassStats() {
           </Box>
         </Box>
 
+        {/* body section */}
         <Box className="card-body">
           <CourseStatistics assigned_class={assigned_class} />
         </Box>

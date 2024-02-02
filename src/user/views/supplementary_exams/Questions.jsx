@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
-import { Box, Grid, MenuItem, TextField } from "@mui/material";
-import { useLocation } from "react-router-dom";
-import axios from "axios";
-import CustomSnackbar from "../../../../../utilities/SnackBar";
-import ModalDialog from "../../../../../utilities/ModalDialog";
-import Swal from "sweetalert2";
+import { useCallback, useEffect, useState } from 'react'
+import CustomSnackbar from '../../../utilities/SnackBar'
+import { Box, Grid, MenuItem, TextField } from '@mui/material'
+import ModalDialog from '../../../utilities/ModalDialog'
+import axios from 'axios'
+import Swal from 'sweetalert2'
+import { useLocation } from 'react-router-dom'
 
-export default function ViewQuestion() {
+export default function SuppleQuestions() {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
@@ -14,7 +14,6 @@ export default function ViewQuestion() {
   const [role, setRole] = useState()
 
   const location = useLocation();
-  const assigned_class = location.state?.assigned_class;
   const exam = location.state?.exam;
 
   const [questionSets, setQuestionSets] = useState('')
@@ -83,7 +82,7 @@ export default function ViewQuestion() {
   // get question
   const getQuestion = useCallback(() => {
     setLoading(true)
-    axios.get(`/api/${role}/exam-questions/${exam.id}`).then(res => {
+    axios.get(`/api/${role}/supplementary-exams/questions/${exam.id}`).then(res => {
       if (res.status === 200) {
         setQuestionSets(res.data.questions)
 
@@ -104,7 +103,7 @@ export default function ViewQuestion() {
   // update question
   const updateQuestion = () => {
     setLoading(true)
-    axios.put(`/api/user/exam-questions/${editableQuestion.id}`, editableQuestion).then(res => {
+    axios.put(`/api/user/supplementary-exams/questions/${editableQuestion.id}`, editableQuestion).then(res => {
       if (res.status === 200) {
         getQuestion()
         setSuccess(res.data.message)
@@ -135,7 +134,7 @@ export default function ViewQuestion() {
     }).then((result) => {
       if (result.isConfirmed) {
         setLoading(true)
-        axios.delete(`/api/user/exam-questions/${id}`).then(res => {
+        axios.delete(`/api/user/supplementary-exams/questions/${id}`).then(res => {
           if (res.status === 200) {
             setSuccess(res.data.message)
             setTimeout(() => { setSuccess('') }, 5000)
@@ -157,7 +156,7 @@ export default function ViewQuestion() {
   // add questions
   const addQuestions = () => {
     setLoading(true)
-    axios.post(`/api/user/exam-questions/${exam.id}`, inputQuestionSets).then(res => {
+    axios.post(`/api/user/supplementary-exams/questions/${exam.id}`, inputQuestionSets).then(res => {
       if (res.status === 200) {
         getQuestion()
         setSuccess(res.data.message)
@@ -196,9 +195,8 @@ export default function ViewQuestion() {
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
               <i className='fas fa-arrow-left fa-lg'></i></button>
             <Box className='my-2'>
-              <h5 className='card-title mb-1'>{`${assigned_class.semester?.name} ${exam.exam_type} Exam`}</h5>
-              <small className='text-muted'>{` ${assigned_class.section?.batch.department.name} - ${assigned_class.section?.batch.batch_name} (${assigned_class.section?.section_name})`}</small> <br />
-              <small className='text-muted my-1'>{`${assigned_class.course?.course_code} :: ${assigned_class.course?.title}`}</small>
+              <h5 className='card-title mb-1'>{`${exam.semester?.name} Supplementary Exam`}</h5>
+              <p className='text-muted my-1'>{`${exam.course?.course_code} :: ${exam.course?.title}`}</p>
             </Box>
           </Box>
           <p className="text-muted">Full marks: {exam.total_marks}</p>

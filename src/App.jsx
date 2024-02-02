@@ -47,6 +47,9 @@ const theme = createTheme({
   typography: {
     fontFamily: "Roboto, Noto Serif Bengali",
   },
+  // palette: {
+  //   mode: 'dark',
+  // },
 });
 
 
