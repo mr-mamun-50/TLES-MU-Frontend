@@ -235,7 +235,7 @@ export default function AssignSupple({ selectedSemester, role }) {
                     </TableCell>
                   </TableRow>
                 ))
-                : <TableCell colSpan={7} className='text-center py-5'>No course found</TableCell>}
+                : <TableCell colSpan={7} className='text-center py-5'>No exams found</TableCell>}
           </TableBody>
         </Table>
 

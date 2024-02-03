@@ -242,7 +242,7 @@ export default function SuppleMarksImport() {
                 <Table className='table-bordered table-sm border-grey'>
                   <TableHead className='sticky-header'>
                     <TableRow>
-                      <TableCell rowSpan={2} className="sticky-column">Student ID</TableCell>
+                      <TableCell rowSpan={2} className="sticky-column text-center">Student ID</TableCell>
                       {/* question set numbers */}
                       {question_sets.map((question_set, set_index) => (
                         <TableCell colSpan={question_set.questions.length} key={set_index} className='text-center'>{question_set.sl}</TableCell>
@@ -264,7 +264,7 @@ export default function SuppleMarksImport() {
                   <TableBody>
                     {students.map((student, student_index) => (
                       <TableRow key={student_index}>
-                        <TableCell style={{ minWidth: '120px' }} className="sticky-column">{student.student_id}</TableCell>
+                        <TableCell style={{ minWidth: '120px' }} className="sticky-column text-center">{student.student_id}</TableCell>
 
                         {/* all questions marks */}
                         {question_sets.map((question_set) => (

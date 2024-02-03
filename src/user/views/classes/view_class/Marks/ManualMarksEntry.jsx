@@ -393,7 +393,7 @@ export default function ManualMarksEntry() {
                 <Table className='table-bordered table-sm border-grey'>
                   <TableHead className='sticky-header'>
                     <TableRow>
-                      <TableCell rowSpan={2} className="sticky-column sticky-header text-center">Student ID</TableCell>
+                      <TableCell rowSpan={2} className="sticky-column text-center">Student ID</TableCell>
                       <TableCell rowSpan={2} className="text-center">Total Marks</TableCell>
                       {/* question set numbers */}
                       {question_sets.map((question_set, set_index) => (

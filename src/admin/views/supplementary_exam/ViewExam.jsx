@@ -181,9 +181,11 @@ export default function ViewSuppleExam() {
           <DataTable
             title={
               <Box className="w-100 d-flex align-items-center justify-content-between my-2">
-                <Box className="input-group w-50">
-                  <Box className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></Box>
-                  <input type="text" className="form-control bb-input" placeholder="Search student" value={searchStudents} onChange={(e) => setSearchStudents(e.target.value)} />
+                <Box className="col-6 col-lg-3">
+                  <Box className="input-group">
+                    <Box className="input-group-text border-0 ps-0"><i className='fas fa-search'></i></Box>
+                    <input type="text" className="form-control bb-input" placeholder="Search student" value={searchStudents} onChange={(e) => setSearchStudents(e.target.value)} />
+                  </Box>
                 </Box>
                 <button className="btn btn-primary" onClick={() => { setShowAddStudentModal(true) }}><i className="fas fa-plus me-1"></i> Add Student</button>
               </Box>
