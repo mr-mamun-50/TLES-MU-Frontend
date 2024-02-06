@@ -375,10 +375,10 @@ export default function ManualMarksEntry() {
 
             {role === 'user' &&
               <Link to={`/classes/import-marks/${exam.id}`} state={{ assigned_class: assigned_class, exam: exam, question_sets: exam.exam_question_sets, students: students }}
-                className='btn btn-outline-dark border btn-sm mb-3 me-2'><i className="fas fa-file-import text-muted me-1"></i> Import</Link>}
+                className='btn btn-outline-dark border btn-sm mb-3'><i className="fas fa-file-import text-muted me-1"></i> Import</Link>}
 
             <button onClick={() => downloadExcel()}
-              className='btn btn-outline-dark border btn-sm mb-3'><i className="fas fa-file-export text-muted me-1"></i> Export</button>
+              className='btn btn-outline-dark border btn-sm mb-3 ms-2'><i className="fas fa-file-export text-muted me-1"></i> Export</button>
           </div>
         </Box>
 

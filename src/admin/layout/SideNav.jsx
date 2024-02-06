@@ -1,15 +1,12 @@
-import { useState } from 'react'
-import { Toolbar } from "@mui/material";
+import { Box, Toolbar } from "@mui/material";
 import logo from '../../assets/images/logo/tles_logo.png';
 import { NavLink } from 'react-router-dom';
 
 
 export default function AdminSideNav({ onClose }) {
 
-  const [showClinicalSubMenu, setShowClinicalSubMenu] = useState(false);
-
   return (
-    <div>
+    <Box>
       {/* navbar */}
       <nav id="sidebarMenu" className="collapse d-block sidebar">
         <Toolbar className='d-flex align-items-center justify-content-between pt-0'>
@@ -28,8 +25,8 @@ export default function AdminSideNav({ onClose }) {
           </button>
         </Toolbar>
 
-        <div className="position-sticky">
-          <div className="list-group list-group-flush mt-4">
+        <Box className="position-sticky">
+          <Box className="list-group list-group-flush mt-4">
 
             <small className='text-muted ms-4'>Core</small>
             <hr className='mb-1 mt-0 text-light' />
@@ -101,30 +98,10 @@ export default function AdminSideNav({ onClose }) {
                 <i className="fas fa-layer-group fa-fw me-3"></i><span> Dept. & Courses</span>
               </span>
             </NavLink>
-
-            <span className="list-group-item list-group-item-action py-2" onClick={() => setShowClinicalSubMenu(!showClinicalSubMenu)} >
-              <i className="fas fa-university fa-fw me-3"></i>{" "}
-              <span>Others</span>
-              <i className={`fas ${showClinicalSubMenu ? "fa-angle-down" : "fa-angle-right"} float-end mt-1`}></i>
-            </span>
-            <div className={`${showClinicalSubMenu ? "show" : "collapse"} glassy`}>
-              <NavLink to="/" className="list-group-item">
-                <span>
-                  <i className="fas fa-layer-group fa-fw me-3"></i>
-                  <span>Demo 1</span>
-                </span>
-              </NavLink>
-              <NavLink to="/" className="list-group-item">
-                <span>
-                  <i className="fas fa-layer-group fa-fw me-3"></i>
-                  <span>Demo 2</span>
-                </span>
-              </NavLink>
-            </div>
-          </div>
-        </div>
+          </Box>
+        </Box>
 
       </nav >
-    </div >
+    </Box >
   )
 }

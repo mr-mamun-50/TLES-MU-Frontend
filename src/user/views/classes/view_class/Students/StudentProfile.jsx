@@ -5,6 +5,7 @@ import { useLocation, useParams } from 'react-router-dom'
 import CustomSnackbar from '../../../../../utilities/SnackBar'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { BarChart } from '@mui/x-charts/BarChart'
+import { LineChart } from '@mui/x-charts/LineChart';
 
 export default function StudentProfile() {
 
@@ -26,6 +27,7 @@ export default function StudentProfile() {
     axios.get(`/api/${role}/student/profile/${student_id}`).then(res => {
       if (res.status === 200) {
         setSemesterWithMarks(res.data.semesters)
+        console.log(res.data.data)
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -78,44 +80,89 @@ export default function StudentProfile() {
     return 0;
   }
 
+  // calculate obtained marks
+  const calculateObtainedMarks = (exams) => {
+    let total = 0;
+    let final = 0;
+    let totalWithoutFinal = 0
+
+    exams.forEach(exam => {
+      const obtainedExamMarks = exam.obtainedExamMarks.reduce((sum, obtainedMark) => sum + obtainedMark.marks, 0);
+      const obtainedCaMarks = exam.obtainedCaMarks.reduce((sum, obtainedMark) => sum + obtainedMark.marks, 0);
+      total += obtainedExamMarks + obtainedCaMarks;
+
+      if (exam.exam_type === 'Final') {
+        final = obtainedExamMarks
+      } else {
+        totalWithoutFinal += obtainedExamMarks + obtainedCaMarks
+      }
+    })
+
+    return { total, final, totalWithoutFinal }
+  }
+
 
   // calculate average CGPA (SUM(all semester CGPA) / number of semesters)
   const averageCgpa = () => {
-    let semesterLength = 0;
-    let completedCredit = 0;
+    let totalCompletedCredit = 0;
+    let semestersCgpa = {};
+    let completedCoursesGpa = [];
 
-    let cgpa = semesterWithMarks?.map(semester => {
-      let totalCreditHours = 0;
-      let fail = false;
+    semesterWithMarks?.map(semester => {
+      let completedCredit = 0;
 
-      // calculate the semester cgpa (SUM(GPA * credit hours)/total credit hours)
       const totalGpaPoints = semester.assigned_classes.map(class_data => {
-        const totalObtainedExamMarks = class_data.exams.map(exam => exam.obtainedExamMarks?.map(obtained_marks => obtained_marks?.marks).reduce((acc, curr) => acc + curr, 0)).reduce((acc, curr) => acc + curr, 0);
-        const totalObtainedCaMarks = class_data.exams.map(exam => exam.obtainedCaMarks?.map(obtained_marks => obtained_marks?.marks).reduce((acc, curr) => acc + curr, 0)).reduce((acc, curr) => acc + curr, 0);
+        // obtained marks
+        const obtainedMarks = calculateObtainedMarks(class_data.exams).total;
+        const obtainedMarksWithoutFinal = calculateObtainedMarks(class_data.exams).totalWithoutFinal;
+        const obtainedFinalMarks = calculateObtainedMarks(class_data.exams).final;
 
+        // total marks
         const totalExamMarks = class_data.exams.reduce((acc, curr) => acc + curr.total_marks, 0);
-        if (totalExamMarks < 90) fail = true
+        const totalFinalExamMarks = class_data.exams.filter(exam => exam.exam_type === 'Final').reduce((acc, curr) => acc + curr.total_marks, 0);
+        const totalMarksWithoutFinal = class_data.exams.filter(exam => exam.exam_type !== 'Final').reduce((acc, curr) => acc + curr.total_marks, 0);
 
-        const gpa = calculateGpaPoints((totalObtainedExamMarks + totalObtainedCaMarks), totalExamMarks);
-        if (gpa === 0) fail = true;
-        else if (gpa >= 2) completedCredit += parseFloat(class_data.course_details.credit_hours);
+        // calculate GPA
+        const gpa = (obtainedFinalMarks * 100) / totalFinalExamMarks >= 40 ?
+          (obtainedMarksWithoutFinal * 100) / totalMarksWithoutFinal >= 40 ?
+            calculateGpaPoints(obtainedMarks, totalExamMarks)
+            : calculateGpaPoints(0, 0)
+          : calculateGpaPoints(0, 0);
 
-        totalCreditHours += parseFloat(class_data.course_details.credit_hours);
+        if (gpa === 0) return 0;
+
+        completedCoursesGpa.push({
+          'course_name': class_data.course_details.title,
+          'gpa': gpa,
+          'credit_hours': class_data.course_details.credit_hours,
+        });
+        completedCredit += parseFloat(class_data.course_details.credit_hours);
+        totalCompletedCredit += parseFloat(class_data.course_details.credit_hours);
+
         return gpa * class_data.course_details.credit_hours;
       }).reduce((acc, curr) => acc + curr, 0);
 
-      if (fail) return 0;
-      semesterLength++;
-      return totalGpaPoints / totalCreditHours;
-    }).reduce((acc, curr) => acc + curr, 0) / semesterLength;
+      // semester CGPA
+      const semesterCgpa = totalGpaPoints / completedCredit;
+      semestersCgpa[semester.name] = semesterCgpa > 0 ? semesterCgpa.toFixed(2) : 0;
+    });
+
+    // calculate CGPA (SUM(course credit * gpa) / total completed credit) credit
+    let cgpa = completedCoursesGpa.map(course => {
+      return course.gpa * course.credit_hours
+    }).reduce((acc, curr) => acc + curr, 0) / totalCompletedCredit
+
+    cgpa = cgpa > 0 ? cgpa : 0;
 
     return {
       'cgpa': cgpa,
-      'completedCredit': completedCredit,
+      'completedCredit': totalCompletedCredit,
+      'semestersCgpa': semestersCgpa,
+      'completedCoursesGpa': completedCoursesGpa,
     }
   }
 
-  // console.log(averageCgpa)
+  // console.log(averageCgpa().semestersCgpa)
 
 
   return (
@@ -143,33 +190,63 @@ export default function StudentProfile() {
         {/* body section */}
         <Box className="card-body">
 
+          {/* semester performance graph */}
+          {semesterWithMarks.length > 0 &&
+            <Box className="mb-5 px-2">
+              <LineChart
+                xAxis={[{
+                  data: Object.keys(averageCgpa().semestersCgpa),
+                  scaleType: 'point',
+                }]}
+                series={[{
+                  data: Object.values(averageCgpa().semestersCgpa),
+                  color: '#007bff',
+                }]}
+                height={220}
+                margin={{ top: 15, bottom: 20 }}
+              />
+            </Box>
+          }
+
+
+          {/* semester wise result accordion */}
           {semesterWithMarks.length > 0 ?
             semesterWithMarks.map((semester, semester_index) => {
 
-              let totalCreditHours = 0;
-              let fail = false;
+              let totalCredit = semester.assigned_classes.reduce((acc, curr) => acc + parseFloat(curr.course_details.credit_hours), 0);
+              let CompletedCredit = 0;
 
               // calculate the semester cgpa (SUM(GPA * credit hours)/total credit hours)
               const totalGpaPoints = semester.assigned_classes.map(class_data => {
-                const totalObtainedExamMarks = class_data.exams.map(exam => exam.obtainedExamMarks?.map(obtained_marks => obtained_marks?.marks).reduce((acc, curr) => acc + curr, 0)).reduce((acc, curr) => acc + curr, 0);
-                const totalObtainedCaMarks = class_data.exams.map(exam => exam.obtainedCaMarks?.map(obtained_marks => obtained_marks?.marks).reduce((acc, curr) => acc + curr, 0)).reduce((acc, curr) => acc + curr, 0);
+                // obtained marks
+                const obtainedMarks = calculateObtainedMarks(class_data.exams).total;
+                const obtainedMarksWithoutFinal = calculateObtainedMarks(class_data.exams).totalWithoutFinal;
+                const obtainedFinalMarks = calculateObtainedMarks(class_data.exams).final;
 
+                // total marks
                 const totalExamMarks = class_data.exams.reduce((acc, curr) => acc + curr.total_marks, 0);
-                if (totalExamMarks < 90) fail = true
+                const totalFinalExamMarks = class_data.exams.filter(exam => exam.exam_type === 'Final').reduce((acc, curr) => acc + curr.total_marks, 0);
+                const totalMarksWithoutFinal = class_data.exams.filter(exam => exam.exam_type !== 'Final').reduce((acc, curr) => acc + curr.total_marks, 0);
 
-                const gpa = calculateGpaPoints((totalObtainedExamMarks + totalObtainedCaMarks), totalExamMarks);
-                if (gpa === 0) fail = true;
+                // calculate GPA
+                const gpa = (obtainedFinalMarks * 100) / totalFinalExamMarks >= 40 ?
+                  (obtainedMarksWithoutFinal * 100) / totalMarksWithoutFinal >= 40 ?
+                    calculateGpaPoints(obtainedMarks, totalExamMarks)
+                    : calculateGpaPoints(0, 0)
+                  : calculateGpaPoints(0, 0);
 
-                totalCreditHours += parseFloat(class_data.course_details.credit_hours);
+                if (gpa === 0) return 0;
+
+                CompletedCredit += parseFloat(class_data.course_details.credit_hours);
                 return gpa * class_data.course_details.credit_hours;
               }).reduce((acc, curr) => acc + curr, 0);
 
-              const semesterCgpa = fail ? 'F' : (totalGpaPoints / totalCreditHours).toFixed(2);
+              const semesterCgpa = (totalGpaPoints / CompletedCredit).toFixed(2);
 
               return (
-                <Box className='my-3' key={semester_index}>
-                  <Accordion className='border border-light-grey'>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
+                <Box className='my-3 mx-2' key={semester_index}>
+                  <Accordion className='border border-light-grey' >
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} color='red' aria-controls="panel1-content" id="panel1-header">
                       <Box className="w-100 d-flex justify-content-between align-items-center me-3">
                         <Box>
                           <h6 className='mb-1' style={{ fontSize: '18px' }}>{semester.name}</h6>
@@ -178,18 +255,31 @@ export default function StudentProfile() {
                           - ${new Date(semester.end_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}`}
                           </small>
                         </Box>
-                        <p className='mb-0'>CGPA: <b>{semesterCgpa}</b></p>
+                        <Box className='text-end'>
+                          <p className='mb-1'>CGPA: <b>{semesterCgpa > 0 ? semesterCgpa : '0.00'}</b></p>
+                          <small>Credit completed: <b>{CompletedCredit}</b>/{totalCredit}</small>
+                        </Box>
                       </Box>
                     </AccordionSummary>
 
                     <AccordionDetails className='p-3 border-top bg-light-primary'>
                       {semester.assigned_classes?.map((class_data, class_index) => {
-                        // marks and gpa calculation
-                        const totalObtainedExamMarks = class_data.exams.map(exam => exam.obtainedExamMarks?.map(obtained_marks => obtained_marks?.marks).reduce((acc, curr) => acc + curr, 0)).reduce((acc, curr) => acc + curr, 0);
-                        const totalObtainedCaMarks = class_data.exams.map(exam => exam.obtainedCaMarks?.map(obtained_marks => obtained_marks?.marks).reduce((acc, curr) => acc + curr, 0)).reduce((acc, curr) => acc + curr, 0);
+                        // obtained marks
+                        const obtainedMarks = calculateObtainedMarks(class_data.exams).total;
+                        const obtainedMarksWithoutFinal = calculateObtainedMarks(class_data.exams).totalWithoutFinal;
+                        const obtainedFinalMarks = calculateObtainedMarks(class_data.exams).final;
 
+                        // total marks
                         const totalExamMarks = class_data.exams.reduce((acc, curr) => acc + curr.total_marks, 0);
-                        const gpa = calculateGpa((totalObtainedExamMarks + totalObtainedCaMarks), totalExamMarks);
+                        const totalFinalExamMarks = class_data.exams.filter(exam => exam.exam_type === 'Final').reduce((acc, curr) => acc + curr.total_marks, 0);
+                        const totalMarksWithoutFinal = class_data.exams.filter(exam => exam.exam_type !== 'Final').reduce((acc, curr) => acc + curr.total_marks, 0);
+
+                        // calculate GPA
+                        const gpa = (obtainedFinalMarks * 100) / totalFinalExamMarks >= 40 ?
+                          (obtainedMarksWithoutFinal * 100) / totalMarksWithoutFinal >= 40 ?
+                            calculateGpa(obtainedMarks, totalExamMarks)
+                            : calculateGpa(0, 0)
+                          : calculateGpa(0, 0);
 
 
                         // Initialize bloomsLevelMarks for all exams
@@ -240,13 +330,23 @@ export default function StudentProfile() {
                             <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
                               <Box className="w-100 d-flex justify-content-between align-items-center me-3">
                                 <Box>
-                                  <h6 className='mb-1' style={{ fontSize: '16px' }}>{class_data.course_details?.title}</h6>
+                                  <h6 className='mb-1' style={{ fontSize: '16px' }}>
+                                    {class_data.course_details?.title}
+                                    <span className="badge badge-warning ms-2">{class_data.retake ? 'Retaken' : ''}</span>
+                                  </h6>
                                   <small className="text-muted">Code: {class_data.course_details?.course_code} | Credit hours: {class_data.course_details?.credit_hours}</small>
                                 </Box>
 
                                 <Box className='text-end'>
+                                  {totalExamMarks === 100 ?
+                                    <span span className="badge badge-danger me-3">
+                                      {(obtainedMarksWithoutFinal * 100) / totalMarksWithoutFinal < 40 ?
+                                        'Retake' : (obtainedFinalMarks * 100) / totalFinalExamMarks < 40 ? 'Supple' : ''}
+                                    </span>
+                                    : <span className="badge badge-info me-3">Not Completed</span>
+                                  }
                                   <span className="border-end border-dark pe-2 me-2">{gpa}</span>
-                                  <small><b>{totalObtainedExamMarks + totalObtainedCaMarks}</b>/{totalExamMarks}</small>
+                                  <small><b>{obtainedMarks}</b>/{totalExamMarks}</small>
                                 </Box>
                               </Box>
                             </AccordionSummary>

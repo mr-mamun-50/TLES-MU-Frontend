@@ -20,20 +20,8 @@ export default function StudentDashboard() {
   const student = location.state?.student
 
   const [examMarksOfClass, setExamMarksOfClass] = useState([])
-
-  const totalExamMarks = examMarksOfClass.length > 0 && examMarksOfClass.reduce((sum, exam) => sum + exam.total_marks, 0);
-
-  const totalObtainedMarks = examMarksOfClass.length > 0 && examMarksOfClass.map((exam) => {
-    const obtainedExamMarks = exam.obtained_exam_marks.reduce((sum, obtainedMark) => sum + obtainedMark.marks, 0);
-    const obtainedCaMarks = exam.obtained_ca_marks.length > 0 ? exam.obtained_ca_marks[0].marks : 0;
-    return obtainedExamMarks + obtainedCaMarks;
-  }).reduce((sum, obtainedMarks) => sum + obtainedMarks, 0);
-
-
   // tab index for graph and details
   const [tabIndex, setTabIndex] = useState({ Midterm: '1', Final: '1' });
-
-  // console.log(examMarksOfClass)
 
 
   // get all exam marks
@@ -64,6 +52,31 @@ export default function StudentDashboard() {
   }, [getAllExamMarks, role])
 
 
+  const totalExamMarks = examMarksOfClass.length > 0 && examMarksOfClass.reduce((sum, exam) => sum + exam.total_marks, 0);
+  const totalFinalExamMarks = examMarksOfClass.length > 0 && examMarksOfClass.filter(exam => exam.exam_type === 'Final').reduce((sum, exam) => sum + exam.total_marks, 0);
+  const totalMarksWithoutFinal = examMarksOfClass.length > 0 && examMarksOfClass.filter(exam => exam.exam_type !== 'Final').reduce((sum, exam) => sum + exam.total_marks, 0);
+
+  // calculate obtained marks
+  const obtainedMarks = () => {
+    let total = 0;
+    let final = 0;
+    let totalWithoutFinal = 0
+
+    examMarksOfClass.forEach(exam => {
+      const obtainedExamMarks = exam.obtained_exam_marks.reduce((sum, obtainedMark) => sum + obtainedMark.marks, 0);
+      const obtainedCaMarks = exam.obtained_ca_marks.length > 0 ? exam.obtained_ca_marks[0].marks : 0;
+      total += obtainedExamMarks + obtainedCaMarks;
+
+      if (exam.exam_type === 'Final') {
+        final = obtainedExamMarks
+      } else {
+        totalWithoutFinal += obtainedExamMarks + obtainedCaMarks
+      }
+    })
+
+    return { total, final, totalWithoutFinal }
+  }
+
   // calculate gpa
   const calculateGpa = (obtained, total) => {
     let marks = obtained / total * 100;
@@ -80,10 +93,12 @@ export default function StudentDashboard() {
   }
 
 
+  // console.log(totalFinalExamMarks)
+
   return (
     <Box className="container">
       <Box className="card my-2">
-        {/* seading section */}
+        {/* Heading section */}
         <Box className='card-header pb-0 d-flex justify-content-between align-items-center' sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Box className='d-flex'>
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
@@ -112,13 +127,23 @@ export default function StudentDashboard() {
 
             {/* total marks obtained from obtained exam marks and obtained ca marks and GPA */}
             {examMarksOfClass.length > 0 &&
-              <Box>
-                <Box className="d-flex justify-content-end">
-                  <h5 className={`mb-0 ${((totalObtainedMarks * 100) / totalExamMarks) < 40 && 'text-danger'}`}>{totalObtainedMarks}</h5>
-                  <h5 className="mb-0 fw-normal">/{totalExamMarks}</h5>
+              <Box className="d-flex align-items-center">
+                {totalExamMarks === 100 ?
+                  <span span className="badge badge-danger me-3">
+                    {(obtainedMarks().totalWithoutFinal * 100) / totalMarksWithoutFinal < 40 ?
+                      'Retake' : (obtainedMarks().final * 100) / totalFinalExamMarks < 40 ? 'Supple' : ''}
+                  </span>
+                  : <span className="badge badge-info me-3">Not Completed</span>
+                }
+                <Box>
+                  <Box className="d-flex justify-content-end">
+                    <h5 className="mb-0">{obtainedMarks().total}</h5>
+                    <h5 className="mb-0 fw-normal">/{totalExamMarks}</h5>
+                  </Box>
+                  <p className='mb-0 mt-2 text-end'>
+                    {calculateGpa((obtainedMarks().totalWithoutFinal * 100) / totalMarksWithoutFinal > 40 ? obtainedMarks().total : 0, totalExamMarks)}
+                  </p>
                 </Box>
-
-                <p className='mb-0 mt-2'>{calculateGpa(totalObtainedMarks, totalExamMarks)}</p>
               </Box>
             }
           </Box>
@@ -269,6 +294,6 @@ export default function StudentDashboard() {
 
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
-    </Box>
+    </Box >
   )
 }
