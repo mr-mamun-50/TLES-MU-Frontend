@@ -263,7 +263,6 @@ export default function CourseStatistics({ assigned_class }) {
                   }
                 });
 
-
                 // calculated per student total marks like [{student_id: 109, total_marks: 34}, {student_id: 110, total_marks: 29}]
                 const studentTotalMarks = exam.obtained_exam_marks.reduce((acc, obtainedMark) => {
                   const studentId = obtainedMark.student_id;

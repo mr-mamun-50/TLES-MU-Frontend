@@ -5,11 +5,10 @@ import { useEffect, useState } from 'react'
 export default function GpaCounts({ studentTotalMarks, examTotalMarks }) {
 
   const [gpaCount, setGpaCount] = useState({
-    'A+ (4.00)': 0, 'A (3.75)': 0, 'A- (3.50)': 0,
-    'B+ (3.25)': 0, 'B (3.00)': 0, 'B- (2.75)': 0,
-    'C+ (2.50)': 0, 'C (2.25)': 0,
-    'D (2.00)': 0, 'F (0.00)': 0,
-  })
+    'F (0.00)': 0, 'D (2.00)': 0, 'C (2.25)': 0, 'C+ (2.50)': 0,
+    'B- (2.75)': 0, 'B (3.00)': 0, 'B+ (3.25)': 0,
+    'A- (3.50)': 0, 'A (3.75)': 0, 'A+ (4.00)': 0,
+  });
 
   const gpaKeys = Object.keys(gpaCount);
 
@@ -20,9 +19,10 @@ export default function GpaCounts({ studentTotalMarks, examTotalMarks }) {
   // count student GPA
   useEffect(() => {
     let gpaCount = {
-      'A+ (4.00)': 0, 'A (3.75)': 0, 'A- (3.50)': 0, 'B+ (3.25)': 0, 'B (3.00)': 0, 'B- (2.75)': 0,
-      'C+ (2.50)': 0, 'C (2.25)': 0, 'D (2.00)': 0, 'F (0.00)': 0,
+      'F (0.00)': 0, 'D (2.00)': 0, 'C (2.25)': 0, 'C+ (2.50)': 0,
+      'B- (2.75)': 0, 'B (3.00)': 0, 'B+ (3.25)': 0, 'A- (3.50)': 0, 'A (3.75)': 0, 'A+ (4.00)': 0,
     };
+
     studentTotalMarks.map((student) => {
       let marks = student.total_marks * 100 / examTotalMarks;
       if (marks >= 80) {

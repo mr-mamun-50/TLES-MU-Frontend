@@ -27,7 +27,6 @@ export default function StudentProfile() {
     axios.get(`/api/${role}/student/profile/${student_id}`).then(res => {
       if (res.status === 200) {
         setSemesterWithMarks(res.data.semesters)
-        console.log(res.data.data)
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
