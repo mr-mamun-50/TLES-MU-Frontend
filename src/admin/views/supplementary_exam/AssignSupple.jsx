@@ -103,10 +103,10 @@ export default function AssignSupple({ selectedSemester, role }) {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
       }
-      setLoading(false)
     }).catch(err => {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
+    }).finally(() => {
       setLoading(false)
     });
   }, [role, selectedSemester.id])
@@ -119,7 +119,7 @@ export default function AssignSupple({ selectedSemester, role }) {
     axios.post(`/api/${role}/supplementary-exams`, data).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
-        getSuppleExams(selectedSemester.id)
+        getSuppleExams(filterVals.dept_id)
         setInputValues([])
       } else {
         setError(res.data.message)

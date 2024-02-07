@@ -113,9 +113,19 @@ export default function StudentProfile() {
 
       const totalGpaPoints = semester.assigned_classes.map(class_data => {
         // obtained marks
-        const obtainedMarks = calculateObtainedMarks(class_data.exams).total;
         const obtainedMarksWithoutFinal = calculateObtainedMarks(class_data.exams).totalWithoutFinal;
-        const obtainedFinalMarks = calculateObtainedMarks(class_data.exams).final;
+        let obtainedFinalMarks = calculateObtainedMarks(class_data.exams).final;
+
+        if (typeof class_data.obtainedSuppleMarks === 'object' && Object.keys(class_data.obtainedSuppleMarks).length > 0) {
+          // calculate the marks of each values of each keys
+          Object.keys(class_data.obtainedSuppleMarks).forEach(examId => {
+            let newMark = class_data.obtainedSuppleMarks[examId].reduce((acc, curr) => acc + curr.marks, 0);
+            if (newMark > obtainedFinalMarks) {
+              obtainedFinalMarks = newMark;
+            }
+          });
+        }
+        const obtainedMarks = obtainedMarksWithoutFinal + obtainedFinalMarks;
 
         // total marks
         const totalExamMarks = class_data.exams.reduce((acc, curr) => acc + curr.total_marks, 0);
@@ -131,6 +141,7 @@ export default function StudentProfile() {
 
         if (gpa === 0) return 0;
 
+        // add course to completedCoursesGpa array, adding completed credit, totalCompletedCredit
         completedCoursesGpa.push({
           'course_name': class_data.course_details.title,
           'gpa': gpa,
@@ -144,7 +155,10 @@ export default function StudentProfile() {
 
       // semester CGPA
       const semesterCgpa = totalGpaPoints / completedCredit;
-      semestersCgpa[semester.name] = semesterCgpa > 0 ? semesterCgpa.toFixed(2) : 0;
+      // add semester CGPA to semestersCgpa object
+      semestersCgpa[semester.name] = semesterCgpa > 0 ?
+        { 'semesterCgpa': semesterCgpa.toFixed(2), 'completedCredit': completedCredit }
+        : { 'semesterCgpa': 0, 'completedCredit': 0 };
     });
 
     // calculate CGPA (SUM(course credit * gpa) / total completed credit) credit
@@ -191,7 +205,7 @@ export default function StudentProfile() {
         <Box className="card-body">
 
           {/* semester performance graph */}
-          {semesterWithMarks.length > 0 &&
+          {Object.values(averageCgpa().semestersCgpa).length > 0 &&
             <Box className="mb-5 px-2">
               <LineChart
                 xAxis={[{
@@ -199,7 +213,7 @@ export default function StudentProfile() {
                   scaleType: 'point',
                 }]}
                 series={[{
-                  data: Object.values(averageCgpa().semestersCgpa),
+                  data: Object.values(averageCgpa().semestersCgpa).map(semester => semester.semesterCgpa),
                   color: '#007bff',
                 }]}
                 height={220}
@@ -214,34 +228,6 @@ export default function StudentProfile() {
             semesterWithMarks.map((semester, semester_index) => {
 
               let totalCredit = semester.assigned_classes.reduce((acc, curr) => acc + parseFloat(curr.course_details.credit_hours), 0);
-              let CompletedCredit = 0;
-
-              // calculate the semester cgpa (SUM(GPA * credit hours)/total credit hours)
-              const totalGpaPoints = semester.assigned_classes.map(class_data => {
-                // obtained marks
-                const obtainedMarks = calculateObtainedMarks(class_data.exams).total;
-                const obtainedMarksWithoutFinal = calculateObtainedMarks(class_data.exams).totalWithoutFinal;
-                const obtainedFinalMarks = calculateObtainedMarks(class_data.exams).final;
-
-                // total marks
-                const totalExamMarks = class_data.exams.reduce((acc, curr) => acc + curr.total_marks, 0);
-                const totalFinalExamMarks = class_data.exams.filter(exam => exam.exam_type === 'Final').reduce((acc, curr) => acc + curr.total_marks, 0);
-                const totalMarksWithoutFinal = class_data.exams.filter(exam => exam.exam_type !== 'Final').reduce((acc, curr) => acc + curr.total_marks, 0);
-
-                // calculate GPA
-                const gpa = (obtainedFinalMarks * 100) / totalFinalExamMarks >= 40 ?
-                  (obtainedMarksWithoutFinal * 100) / totalMarksWithoutFinal >= 40 ?
-                    calculateGpaPoints(obtainedMarks, totalExamMarks)
-                    : calculateGpaPoints(0, 0)
-                  : calculateGpaPoints(0, 0);
-
-                if (gpa === 0) return 0;
-
-                CompletedCredit += parseFloat(class_data.course_details.credit_hours);
-                return gpa * class_data.course_details.credit_hours;
-              }).reduce((acc, curr) => acc + curr, 0);
-
-              const semesterCgpa = (totalGpaPoints / CompletedCredit).toFixed(2);
 
               return (
                 <Box className='my-3 mx-2' key={semester_index}>
@@ -256,18 +242,31 @@ export default function StudentProfile() {
                           </small>
                         </Box>
                         <Box className='text-end'>
-                          <p className='mb-1'>CGPA: <b>{semesterCgpa > 0 ? semesterCgpa : '0.00'}</b></p>
-                          <small>Credit completed: <b>{CompletedCredit}</b>/{totalCredit}</small>
+                          <p className='mb-1'>CGPA: <b>{averageCgpa().semestersCgpa[semester.name].semesterCgpa}</b></p>
+                          <small>Credit completed: <b>{averageCgpa().semestersCgpa[semester.name].completedCredit}</b>/{totalCredit}</small>
                         </Box>
                       </Box>
                     </AccordionSummary>
 
+                    {/* course list */}
                     <AccordionDetails className='p-3 border-top bg-light-primary'>
                       {semester.assigned_classes?.map((class_data, class_index) => {
                         // obtained marks
-                        const obtainedMarks = calculateObtainedMarks(class_data.exams).total;
                         const obtainedMarksWithoutFinal = calculateObtainedMarks(class_data.exams).totalWithoutFinal;
-                        const obtainedFinalMarks = calculateObtainedMarks(class_data.exams).final;
+                        let obtainedFinalMarks = calculateObtainedMarks(class_data.exams).final;
+                        let withSupple = false;
+
+                        if (typeof class_data.obtainedSuppleMarks === 'object' && Object.keys(class_data.obtainedSuppleMarks).length > 0) {
+                          // calculate the marks of each values of each keys
+                          Object.keys(class_data.obtainedSuppleMarks).forEach(examId => {
+                            let newMark = class_data.obtainedSuppleMarks[examId].reduce((acc, curr) => acc + curr.marks, 0);
+                            if (newMark > obtainedFinalMarks) {
+                              obtainedFinalMarks = newMark;
+                              withSupple = true;
+                            }
+                          });
+                        }
+                        const obtainedMarks = obtainedMarksWithoutFinal + obtainedFinalMarks;
 
                         // total marks
                         const totalExamMarks = class_data.exams.reduce((acc, curr) => acc + curr.total_marks, 0);
@@ -332,21 +331,23 @@ export default function StudentProfile() {
                                 <Box>
                                   <h6 className='mb-1' style={{ fontSize: '16px' }}>
                                     {class_data.course_details?.title}
-                                    <span className="badge badge-warning ms-2">{class_data.retake ? 'Retaken' : ''}</span>
+                                    <span className="badge badge-warning ms-2">{class_data.retake ? 'Retaken' : withSupple ? 'With Supple' : ''}</span>
                                   </h6>
                                   <small className="text-muted">Code: {class_data.course_details?.course_code} | Credit hours: {class_data.course_details?.credit_hours}</small>
                                 </Box>
 
-                                <Box className='text-end'>
+                                <Box className='text-end my-1'>
+                                  <Box>
+                                    <span className="border-end border-dark pe-2 me-2">{gpa}</span>
+                                    <small><b>{obtainedMarks}</b>/{totalExamMarks}</small>
+                                  </Box>
                                   {totalExamMarks === 100 ?
-                                    <span span className="badge badge-danger me-3">
+                                    <span span className="badge badge-danger mt-2">
                                       {(obtainedMarksWithoutFinal * 100) / totalMarksWithoutFinal < 40 ?
                                         'Retake' : (obtainedFinalMarks * 100) / totalFinalExamMarks < 40 ? 'Supple' : ''}
                                     </span>
-                                    : <span className="badge badge-info me-3">Not Completed</span>
+                                    : <span className="badge badge-info mt-2">Incomplete</span>
                                   }
-                                  <span className="border-end border-dark pe-2 me-2">{gpa}</span>
-                                  <small><b>{obtainedMarks}</b>/{totalExamMarks}</small>
                                 </Box>
                               </Box>
                             </AccordionSummary>
@@ -378,7 +379,19 @@ export default function StudentProfile() {
                                       if (exam.exam_type === 'Midterm' || exam.exam_type === 'Final') {
 
                                         // calculate the sum of all the obtained marks
-                                        const obtainedMarks = exam.obtainedExamMarks?.map(obtained_marks => obtained_marks.marks).reduce((acc, curr) => acc + curr, 0)
+                                        let obtainedMarks = exam.obtainedExamMarks?.map(obtained_marks => obtained_marks.marks).reduce((acc, curr) => acc + curr, 0)
+
+                                        if (exam.exam_type === 'Final' &&
+                                          typeof class_data.obtainedSuppleMarks === 'object' &&
+                                          Object.keys(class_data.obtainedSuppleMarks).length > 0
+                                        ) {
+                                          // calculate the marks of each values of each keys
+                                          Object.keys(class_data.obtainedSuppleMarks).forEach(examId => {
+                                            let newMark = class_data.obtainedSuppleMarks[examId].reduce((acc, curr) => acc + curr.marks, 0);
+                                            if (newMark > obtainedMarks)
+                                              obtainedMarks = newMark;
+                                          });
+                                        }
 
                                         return (
                                           <li className='list-group-item d-flex justify-content-between align-items-center' key={exam_index}>
