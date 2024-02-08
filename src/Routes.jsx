@@ -7,7 +7,7 @@ import AdminLogin from './auth/AdminLogin';
 import UserPrivateRoute from './user/layout/PrivateRoute';
 import UserLayout from './user/layout/Layout';
 import AdminDashboard from './admin/views/Dashboard';
-import UserDashboard from './user/views/Dashboard';
+import UserDashboard from './user/views/dashboard/Dashboard';
 import Teachers from './admin/views/teacher/Teachers';
 import BatchSection from './admin/views/batch_section/BatchSection';
 import Students from './admin/views/student/Students';

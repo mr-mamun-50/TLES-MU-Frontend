@@ -61,7 +61,7 @@ export default function ModeratorSideNav({ onClose }) {
 
             <NavLink to="/moderator/assign-classes">
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-chalkboard-user fa-fw me-3"></i><span> Regular Classes</span>
+                <i className="fas fa-chalkboard-user fa-fw me-3"></i><span> Manage Classes</span>
               </span>
             </NavLink>
 

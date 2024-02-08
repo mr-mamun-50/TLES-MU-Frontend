@@ -18,7 +18,6 @@ export default function BatchStats() {
 
   const [batchProfiles, setBatchProfiles] = useState([])
 
-  // console.log(students);
 
   // get batch students info of a batch
   const getBatchInfo = useCallback(() => {
@@ -281,7 +280,7 @@ export default function BatchStats() {
   const secondColumn = gpaKeys.slice(5);
 
 
-  // console.log(calculateStudentsBloomsLevel());
+  // console.log(batchProfiles);
 
   return (
     <Box className="container">
@@ -380,7 +379,7 @@ export default function BatchStats() {
                       data: Object.values(calculateStudentsBloomsLevel()),
                       color: '#007bff',
                     }]}
-                    height={220}
+                    height={230}
                     margin={{ top: 15, right: 15, bottom: 20, left: 30 }}
                   />
                 </Box>

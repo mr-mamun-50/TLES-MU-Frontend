@@ -38,7 +38,7 @@ export default function UserSideNav({ onClose }) {
             </NavLink>
             <NavLink to="/classes">
               <span className="list-group-item list-group-item-action py-2 ripple">
-                <i className="fas fa-graduation-cap fa-fw me-3"></i> <span>Classes</span>
+                <i className="fas fa-chalkboard-user fa-fw me-3"></i> <span>Classes</span>
               </span>
             </NavLink>
             <NavLink to="/supplementary-exams">
