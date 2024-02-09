@@ -132,7 +132,7 @@ export default function AssignedCourses() {
     <Box className="container">
       {/* <Box className='card my-2'> */}
       <Box className='card-header d-flex justify-content-between align-items-center mb-3'>
-        <h5 className='mt-3'>My Classes</h5>
+        <h5 className='mt-2'>My Classes</h5>
 
         <Box className="col-6 col-md-3 col-xl-2">
           <TextField select fullWidth margin='small' size='small' value={filterClass.classStatus}

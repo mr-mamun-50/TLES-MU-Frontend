@@ -10,16 +10,16 @@ axios.defaults.headers.post['Accept'] = 'application/json';
 axios.defaults.withCredentials = true;
 
 // if server respond with 401 error, clear session storage and local storage
-// axios.interceptors.response.use(function (response) {
-//   return response;
-// }, function (error) {
-//   if (error.response.status === 401) {
-//     sessionStorage.clear();
-//     localStorage.clear();
-//     window.location.href = "/";
-//   }
-//   return Promise.reject(error);
-// });
+axios.interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  if (error.response.status === 401) {
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = "/";
+  }
+  return Promise.reject(error);
+});
 
 axios.interceptors.request.use(function (config) {
   const userToken = sessionStorage.getItem('userToken') || localStorage.getItem('userToken');

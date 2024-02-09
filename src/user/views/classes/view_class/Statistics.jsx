@@ -98,7 +98,7 @@ export default function CourseStatistics({ assigned_class }) {
   // calculate overall blooms level percentages ended
 
 
-  // console.log(overAllBloomsLevelPercentages);
+  // console.log(studentTotalMarksArray);
 
   // get all exam marks
   const getAllExamMarks = useCallback(() => {
@@ -143,7 +143,7 @@ export default function CourseStatistics({ assigned_class }) {
             <Box className="btn-group shadow-0 align-items-center">
               <button className={`btn btn${performanceTabIndex !== '1' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
                 onClick={() => setPerformanceTabIndex('1')}
-                title='Graph'>Category</button>
+                title='Details'>GPA</button>
 
               <button className={`btn btn${performanceTabIndex !== '2' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
                 onClick={() => setPerformanceTabIndex('2')}
@@ -151,21 +151,19 @@ export default function CourseStatistics({ assigned_class }) {
 
               <button className={`btn btn${performanceTabIndex !== '3' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
                 onClick={() => setPerformanceTabIndex('3')}
-                title='Details'>GPA</button>
+                title='Graph'>Category</button>
             </Box>
           </Box>
 
           {/* category, blooms level and GPA progressbar and graph */}
           <TabContext value={performanceTabIndex}>
 
-            {/* category circular progress bar */}
+            {/* GPA graph */}
             <TabPanel value='1' className='p-0'>
               <Box className="pb-2">
-                <StudentCategoryCircularLevel
+                <GpaCounts
                   studentTotalMarks={studentTotalMarksArray}
                   examTotalMarks={totalExamMarks}
-                  barWidth={'80px'}
-                  colClasses={'col-4 col-md-2'}
                 />
               </Box>
             </TabPanel>
@@ -208,15 +206,18 @@ export default function CourseStatistics({ assigned_class }) {
               </Box>
             </TabPanel>
 
-            {/* GPA graph */}
+            {/* category circular progress bar */}
             <TabPanel value='3' className='p-0'>
               <Box className="pb-2">
-                <GpaCounts
+                <StudentCategoryCircularLevel
                   studentTotalMarks={studentTotalMarksArray}
                   examTotalMarks={totalExamMarks}
+                  barWidth={'80px'}
+                  colClasses={'col-4 col-md-2'}
                 />
               </Box>
             </TabPanel>
+
           </TabContext>
 
 
