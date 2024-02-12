@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useEffect, useState } from 'react'
 
-export default function GpaCounts({ studentTotalMarks, examTotalMarks }) {
+export default function GpaCountsPrint({ studentTotalMarks, examTotalMarks }) {
 
   const [gpaCount, setGpaCount] = useState({
     'A+ (4.00)': 0, 'A (3.75)': 0, 'A- (3.50)': 0, 'B+ (3.25)': 0,
@@ -51,10 +51,10 @@ export default function GpaCounts({ studentTotalMarks, examTotalMarks }) {
 
 
   return (
-    <Box className='row mb-3 me-0'>
+    <Box className='row'>
 
       {/* Show GPA counts graph */}
-      <Box className="col-md-7 col-lg-8">
+      <Box className="col-sm-7 col-lg-8">
         <BarChart
           xAxis={[{
             id: 'GPA',
@@ -65,15 +65,15 @@ export default function GpaCounts({ studentTotalMarks, examTotalMarks }) {
             data: Object.values(gpaCount).reverse(),
             color: '#007bff',
           }]}
-          height={220}
+          height={230}
           margin={{ top: 15, right: 15, bottom: 20, left: 30 }}
         />
       </Box>
 
       {/* show list */}
-      <Box className="col-md-5 col-lg-4">
+      <Box className="col-sm-5 col-lg-4">
 
-        <Box className='row mt-4 border border-light-grey rounded'>
+        <Box className='row mt-3 border border-light-grey rounded'>
           {/* First Column */}
           <Box className='col border-end'>
             <ul className='list-group list-group-light list-group-small px-3'>

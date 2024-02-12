@@ -1,6 +1,6 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box, Table, TableBody, TableCell, TableRow } from '@mui/material'
 import axios from 'axios'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import CustomSnackbar from '../../../../utilities/SnackBar'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
@@ -11,6 +11,8 @@ import GpaCounts from './Statistics/GpaCounts'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import MarksRangeCount from './Statistics/MarksRangeCount'
+import { useReactToPrint } from 'react-to-print'
+import { ClassStatsPrint } from '../../print_views/ClassStats'
 
 export default function CourseStatistics({ assigned_class }) {
 
@@ -128,30 +130,59 @@ export default function CourseStatistics({ assigned_class }) {
   }, [getAllExamMarks, role])
 
 
+  const componentRef = useRef(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const handlePrint = useReactToPrint({
+    documentTitle: `Class Stats - ${assigned_class.course?.course_code} - ${assigned_class.section?.batch.department.name}
+     - ${assigned_class.section?.batch.batch_name} (${assigned_class.section?.section_name})`,
+    onBeforeGetContent: () => {
+      setIsPrinting(true);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+    },
+    content: () => componentRef.current,
+    onAfterPrint: () => {
+      setIsPrinting(false);
+    }
+  });
+
+
   return (
     <Box>
 
       {/* exam based info */}
       {examMarksOfClass.length > 0 ?
-        <Box className="pt-3">
+        <Box className="pt-2">
 
           {/* overall performance */}
           <Box className="pb-2 border-bottom mb-3 d-flex justify-content-between align-items-center" sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <h5 className='mb-0'>Overall Performance</h5>
 
-            {/* tab indexes */}
-            <Box className="btn-group shadow-0 align-items-center">
-              <button className={`btn btn${performanceTabIndex !== '1' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
-                onClick={() => setPerformanceTabIndex('1')}
-                title='Details'>GPA</button>
+            {/* tab indexes and print button */}
+            <Box className="d-flex">
+              {/* tab indexes */}
+              <Box className="btn-group shadow-0 align-items-center">
+                <button className={`btn btn${performanceTabIndex !== '1' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
+                  onClick={() => setPerformanceTabIndex('1')}
+                  title='Details'>GPA</button>
 
-              <button className={`btn btn${performanceTabIndex !== '2' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
-                onClick={() => setPerformanceTabIndex('2')}
-                title='Details'>Blooms Level</button>
+                <button className={`btn btn${performanceTabIndex !== '2' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
+                  onClick={() => setPerformanceTabIndex('2')}
+                  title='Details'>Blooms Level</button>
 
-              <button className={`btn btn${performanceTabIndex !== '3' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
-                onClick={() => setPerformanceTabIndex('3')}
-                title='Graph'>Category</button>
+                <button className={`btn btn${performanceTabIndex !== '3' ? '-outline' : ''}-secondary btn-sm btn-rounded`}
+                  onClick={() => setPerformanceTabIndex('3')}
+                  title='Graph'>Category</button>
+              </Box>
+
+              {/* print button */}
+              <button className="btn btn-outline-dark ms-3 d-flex align-items-center" onClick={handlePrint}>
+                <i className="fas fa-print me-2"></i> Print
+              </button>
             </Box>
           </Box>
 
@@ -190,7 +221,7 @@ export default function CourseStatistics({ assigned_class }) {
                   </Box>
 
                   {/* show list */}
-                  <Box className="col-md-5 col-lg-4 border rounded-3">
+                  <Box className="col-md-5 col-lg-4 border border-light-grey rounded-3">
                     <Table className='table-sm'>
                       <TableBody>
                         {overAllBloomsLevelPercentages.map(({ bloomsLevel, percentage }) => (
@@ -407,6 +438,18 @@ export default function CourseStatistics({ assigned_class }) {
         </Box>
         : loading ? <div className="text-center"><span className='spinner-border my-4'></span></div>
           : <div className="text-center my-5">No Exams Found</div>}
+
+
+      {/* print component */}
+      {isPrinting &&
+        <ClassStatsPrint
+          ref={componentRef}
+          examMarksOfClass={examMarksOfClass}
+          performanceTabIndex={performanceTabIndex}
+          examTabIndex={examTabIndex}
+          assigned_class={assigned_class}
+        />
+      }
 
 
       {/* Utilities */}

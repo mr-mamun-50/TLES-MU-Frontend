@@ -1,11 +1,18 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box } from '@mui/material'
 import axios from 'axios'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import CustomSnackbar from '../../../../../utilities/SnackBar'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { BarChart } from '@mui/x-charts/BarChart'
 import { LineChart } from '@mui/x-charts/LineChart';
+import { useReactToPrint } from 'react-to-print'
+import { StudentProfilePrint } from '../../../print_views/StudentProfile'
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import MuLogo from '../../../../../assets/images/logo/mu_logo.png';
+import TlesLogo from '../../../../../assets/images/logo/tles_logo_dt.png';
+
 
 export default function StudentProfile() {
 
@@ -178,10 +185,98 @@ export default function StudentProfile() {
   // console.log(averageCgpa().semestersCgpa)
 
 
+  const componentRef = useRef(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const handlePrint = useReactToPrint({
+    documentTitle: `${student.student_id} - Academic Record`,
+    onBeforeGetContent: () => {
+      setIsPrinting(true);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+    },
+    content: () => componentRef.current,
+    onAfterPrint: () => {
+      setIsPrinting(false);
+    }
+  });
+
+
+  const downloadPDF = () => {
+    const input = document.getElementById('pdf-content');
+
+    html2canvas(input)
+      .then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        const imgWidth = 210 - (0.5 * 2) * 25.4; // A4 width - 0.7 inch margin converted to mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const marginLeft = 0.5 * 25.4; // Convert inches to mm for jsPDF
+        const marginTop = 0.7 * 25.4; // Convert inches to mm for jsPDF
+
+        // student profile text
+        pdf.setFontSize(16);
+        pdf.text('Student Profile', marginLeft, marginTop);
+        //  name
+        pdf.setFontSize(12);
+        pdf.text('Name: ' + student.name, marginLeft, marginTop + 7);
+        // id
+        pdf.setFontSize(10);
+        pdf.text('ID: ' + student.student_id, marginLeft, marginTop + 13);
+        // department
+        pdf.setFontSize(10);
+        pdf.text('Department: ' + student.department?.name, marginLeft, marginTop + 19);
+        // batch, section
+        pdf.setFontSize(10);
+        pdf.text('Batch: ' + student.batch?.batch_name + ', Section: ' + student.section?.section_name, marginLeft, marginTop + 25);
+
+        // Right side
+        const rightMarginProfile = marginLeft + imgWidth - 80; // Adjust as needed
+        const rightMarginLabels = rightMarginProfile + 15;
+        const rightMarginValues = rightMarginProfile + 60; // Adjust as needed
+        const logoHeight = 10; // Adjust as needed
+
+        // Add MU Logo
+        const muLogoImg = new Image();
+        muLogoImg.src = MuLogo;
+        pdf.addImage(muLogoImg, 'PNG', rightMarginProfile, marginTop - 5, 30, logoHeight);
+
+        // draw a vertical line as a divider of two logo
+        pdf.setLineWidth(0.1);
+        pdf.line(rightMarginProfile + 35, marginTop - 5, rightMarginProfile + 35, marginTop - 5 + logoHeight);
+
+        // Add TLES Logo
+        const tlesLogoImg = new Image();
+        tlesLogoImg.src = TlesLogo;
+        pdf.addImage(tlesLogoImg, 'PNG', rightMarginProfile + 40, marginTop - 5, 30, logoHeight);
+
+        const cgpaTopMargin = marginTop + logoHeight + 8;
+        pdf.text('CGPA:', rightMarginLabels, cgpaTopMargin);
+        pdf.text(averageCgpa().cgpa.toFixed(2), rightMarginValues, cgpaTopMargin);
+
+        const creditCompletedTopMargin = cgpaTopMargin + 6;
+        pdf.text('Credit Completed:', rightMarginLabels, creditCompletedTopMargin);
+        pdf.text(averageCgpa().completedCredit.toFixed(), rightMarginValues, creditCompletedTopMargin);
+
+        // Draw a horizontal line below the Student Profile section
+        const lineY = marginTop + 30; // Adjust the vertical position of the line as needed
+        pdf.setLineWidth(0.3); // Adjust line width as needed
+        pdf.line(12, lineY, marginLeft + imgWidth, lineY);
+
+        pdf.addImage(imgData, 'PNG', marginLeft, marginTop + 35, imgWidth, imgHeight);
+
+        pdf.save(`${student.student_id} - Student Profile`);
+      });
+  };
+
+
   return (
     <Box className="container">
       <Box className="card my-2">
-        {/* seading section */}
+        {/* Heading section */}
         <Box className='card-header pb-0 d-flex justify-content-between align-items-center' sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Box className='d-flex'>
             <button onClick={() => window.history.back()} className='btn btn-light btn-floating me-3 mt-2'>
@@ -200,8 +295,21 @@ export default function StudentProfile() {
           }
         </Box>
 
+        {/* Print button */}
+        <Box className="d-flex justify-content-end mb-2 px-4 pt-3">
+          {/* download snapshot */}
+          <button className="btn btn-outline-dark border-grey ms-2 d-flex align-items-center" onClick={downloadPDF}>
+            <i className="fas fa-download me-2"></i> Snapshot
+          </button>
+          {/* print button */}
+          <button className="btn btn-outline-dark border-grey ms-2 d-flex align-items-center" onClick={handlePrint}>
+            <i className="fas fa-print me-2"></i> Print
+          </button>
+        </Box>
+
+
         {/* body section */}
-        <Box className="card-body">
+        <Box className="card-body pt-2" id="pdf-content">
 
           {/* semester performance graph */}
           {Object.values(averageCgpa().semestersCgpa).length > 0 &&
@@ -431,6 +539,15 @@ export default function StudentProfile() {
         </Box>
       </Box>
 
+
+      {/* print view */}
+      {isPrinting &&
+        <StudentProfilePrint
+          ref={componentRef}
+          student={student}
+          semesterWithMarks={semesterWithMarks}
+        />
+      }
 
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />

@@ -89,6 +89,10 @@ export default function StudentCategoryCircularLevel({ studentTotalMarks, examTo
                 </Box>
               </Box>
               <span className='text-muted'>{category}: {marksCategory[category]}</span>
+              <br />
+              <span className='text-muted' style={{ fontSize: '13px' }}>Marks: {
+                index === 0 ? '≥ 80' : index === 1 ? '≥ 70' : index === 2 ? '≥ 60' : index === 3 ? '≥ 50' : index === 4 ? '≥ 40' : '< 40'
+              }</span>
             </Box>
           </Box>
         )

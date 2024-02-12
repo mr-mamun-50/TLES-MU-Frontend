@@ -342,7 +342,7 @@ th {
     visibility: hidden;
 }
 
-/* @media print {
+@media print {
     body {
         background: #fff;
     }
@@ -353,22 +353,20 @@ th {
     .print-section * {
         visibility: visible;
     }
-    .print-section {
+    /*  .print-section {
         position: absolute;
         left: 0;
         top: 0;
-    }
+    } */
 
     @page {
-        margin-top: 0.7in;
-        margin-right: 0;
-        margin-left: 0;
-        margin-bottom: 0.5in;
+        margin: 0.6in 0.5in 0.5in 0.5in;
+        size: A4;
     }
-    @page :first {
+    /* @page :first {
         margin-top: 0;
-    }
-} */
+    } */
+}
 
 td p {
     margin-bottom: 5px !important;

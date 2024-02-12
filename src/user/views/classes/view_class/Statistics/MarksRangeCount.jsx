@@ -39,7 +39,7 @@ export default function MarksRangeCount({ studentTotalMarks, examTotalMarks }) {
       {/* marks list */}
       {Object.keys(marksCategory).map((category, index) => {
         return (
-          <Box className={`col-6 col-md-3 ${(index + 1) % 4 !== 0 && 'border-end'} py-1`} key={index}>
+          <Box className={`col-6 col-sm-3 ${(index + 1) % 4 !== 0 && 'border-end'} py-1`} key={index}>
             <Box className='d-flex justify-content-between align-items-center'>
               <small className='mb-0'>{category}</small>
               <p className='mb-0 text-primary'><b>{marksCategory[category]}</b></p>

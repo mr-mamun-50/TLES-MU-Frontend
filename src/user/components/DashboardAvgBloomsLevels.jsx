@@ -64,9 +64,9 @@ export default function DashboardAvgBloomsLevels({ current_classes }) {
 
 
   return (
-    <Box className='row mb-4 me-0'>
+    <Box className='row'>
       {/* show graph */}
-      <Box className="col-md-7 col-lg-8">
+      <Box className="col-sm-7 col-lg-8">
         <BarChart
           xAxis={[{
             id: 'barCategories',
@@ -83,7 +83,7 @@ export default function DashboardAvgBloomsLevels({ current_classes }) {
       </Box>
 
       {/* show list details */}
-      <Box className="col-md-5 col-lg-4">
+      <Box className="col-sm-5 col-lg-4">
         <Box className='border border-light-grey rounded'>
           <ul className='list-group list-group-light list-group-small px-3'>
             {averageBloomsLevelPercentages.map((level, index) => (

@@ -133,6 +133,47 @@ export default function AssignSupple({ selectedSemester, role }) {
     });
   }
 
+  // edit assigned course
+  const editSuppleExam = (e) => {
+    e.preventDefault()
+    setLoading(true)
+    axios.put(`/api/${role}/supplementary-exams/${editableExam.id}`, editableExam).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        getSuppleExams(filterVals.dept_id)
+        setShowEditExamModal(false)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+      setLoading(false)
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+      setLoading(false)
+    });
+  }
+
+  // delete assigned course
+  const deleteSuppleExam = () => {
+    axios.delete(`/api/${role}/supplementary-exams/${deletableId}`).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        getSuppleExams(filterVals.dept_id)
+        setShowExamDelete(false)
+        setDeleteExamInput('')
+        setDeletableId(null)
+        setTimeout(() => { setSuccess('') }, 5000)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+    });
+  }
+
 
   useEffect(() => {
     if (role === 'moderator') {
@@ -340,7 +381,7 @@ export default function AssignSupple({ selectedSemester, role }) {
         }
         onOpen={showEditExamModal}
         onClose={() => setShowEditExamModal(false)}
-        // onConfirm={editAssignedCourse}
+        onConfirm={editSuppleExam}
         confirmText={'Save Changes'}
         loading={loading}
       />
@@ -364,7 +405,7 @@ export default function AssignSupple({ selectedSemester, role }) {
         confirmText={'Delete'}
         actionColor={'error'}
         disabledAction={deleteExamInput !== 'delete'}
-        // onConfirm={deleteAssignedCourse}
+        onConfirm={deleteSuppleExam}
         loading={loading}
       />
 

@@ -1,16 +1,20 @@
 import { Box, MenuItem, TextField } from "@mui/material";
 import DashboardCountShowCard from "../components/DashboardCountShowCard";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import CustomSnackbar from "../../utilities/SnackBar";
 import DashboardAvgBloomsLevels from "../components/DashboardAvgBloomsLevels";
 import DashboardAvgGpa from "../components/DashboardAvgGpa";
+import { useReactToPrint } from 'react-to-print';
+import { UserDashboardPrint } from "./print_views/UserDashboard";
 
 export default function UserDashboard() {
 
   // const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const teacher = JSON.parse(localStorage.getItem('user')) || JSON.parse(sessionStorage.getItem('user'));
 
   const [dashboardContent, setDashboardContent] = useState({});
   const [semesters, setSemesters] = useState([])
@@ -63,6 +67,24 @@ export default function UserDashboard() {
   }, [getDashboardContent, selectedSemester])
 
 
+  const componentRef = useRef(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const handlePrint = useReactToPrint({
+    documentTitle: `Teacher Dashboard - ${teacher.name}`,
+    onBeforeGetContent: () => {
+      setIsPrinting(true);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+    },
+    content: () => componentRef.current,
+    onAfterPrint: () => {
+      setIsPrinting(false);
+    }
+  });
 
 
   return (
@@ -71,20 +93,25 @@ export default function UserDashboard() {
       <Box className='card-header d-flex justify-content-between align-items-center mb-3'>
         <h5 className='mt-2'>Dashboard</h5>
 
-        <Box className="col-6 col-md-3 col-xl-2">
+        <Box className="col-7 col-md-5 col-xl-3 d-flex">
           <TextField select fullWidth margin='small' size='small' value={selectedSemester}
             onChange={(e) => { setSelectedSemester(e.target.value); }}>
             {semesters.map(semester =>
               <MenuItem key={semester.id} value={semester.id}>{semester.name}</MenuItem>
             )}
           </TextField>
+
+          {/* print button */}
+          <button className="btn btn-outline-dark border-grey ms-2 d-flex align-items-center" onClick={handlePrint}>
+            <i className="fas fa-print me-2"></i> Print
+          </button>
         </Box>
       </Box>
 
 
       {loading ? <Box className="text-center"><span className="spinner-border my-5" role="status"></span></Box>
         :
-        <Box className="row my-2">
+        <Box className="row my-2" id="pdf-content">
 
           {/* heading cards */}
           <DashboardCountShowCard label={'Semester Classes'} count={dashboardContent.assigned_classes_count}
@@ -104,7 +131,7 @@ export default function UserDashboard() {
           <Box className="col-12 col-lg-8 mb-4">
             <Box className="card h-100">
               <Box className="card-header">
-                <h6 className="my-2">Average Blooms Levels of My Classes</h6>
+                <h6 className="my-2">Average Blooms Levels of Classes</h6>
               </Box>
 
               <Box className="card-body">
@@ -122,7 +149,7 @@ export default function UserDashboard() {
           <Box className="col-12 col-lg-4 mb-4">
             <Box className="card h-100">
               <Box className="card-header">
-                <h6 className="my-2">Average GPA of My Classes</h6>
+                <h6 className="my-2">Average GPA of Classes</h6>
               </Box>
 
               <Box className="card-body">
@@ -139,6 +166,11 @@ export default function UserDashboard() {
         </Box>
       }
 
+
+      {isPrinting &&
+        <UserDashboardPrint ref={componentRef} dashboardContent={dashboardContent}
+          semester={semesters.find(semester => semester.id === selectedSemester)} />
+      }
 
 
       {/* Utilities */}

@@ -168,8 +168,8 @@ export default function BatchStats() {
 
     // Count the number of CGPAs
     let countCGPAs = {
-      'F (0.00)': 0, 'D (2.00+)': 0, 'C (2.25+)': 0, 'C+ (2.50+)': 0,
-      'B- (2.75+)': 0, 'B (3.00+)': 0, 'B+ (3.25+)': 0, 'A- (3.50+)': 0, 'A (3.75+)': 0, 'A+ (4.00)': 0,
+      'A+ (4.00)': 0, 'A (3.75+)': 0, 'A- (3.50+)': 0, 'B+ (3.25+)': 0, 'B (3.00+)': 0, 'B- (2.75+)': 0,
+      'C+ (2.50+)': 0, 'C (2.25+)': 0, 'D (2.00+)': 0, 'F (0.00)': 0,
     };
 
     allStudentsCGPA.forEach(student => {
@@ -319,11 +319,11 @@ export default function BatchStats() {
                   <BarChart
                     xAxis={[{
                       id: 'GPA',
-                      data: Object.keys(calculateStudentsCGPA().countCGPAs),
+                      data: Object.keys(calculateStudentsCGPA().countCGPAs).reverse(),
                       scaleType: 'band',
                     }]}
                     series={[{
-                      data: Object.values(calculateStudentsCGPA().countCGPAs),
+                      data: Object.values(calculateStudentsCGPA().countCGPAs).reverse(),
                       color: '#007bff',
                     }]}
                     height={220}
