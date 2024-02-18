@@ -1,7 +1,14 @@
 body {
+    /* background: #f0f4f7; */
+    background: linear-gradient(
+            25deg,
+            rgba(240, 244, 247, 0.6),
+            rgba(240, 244, 247, 0.9)
+        ),
+        url("../images/static/5372929.png");
     background-size: cover;
     font-family: "Roboto", "Noto Serif Bengali", sans-serif !important;
-    /* zoom: 95%; */
+    zoom: 95%;
 }
 
 /* small scrollbar style */
@@ -14,8 +21,82 @@ body {
     width: 10px;
     height: 10px;
 }
+*::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
 *::-webkit-scrollbar-thumb {
+    background: #d2d2d2;
     border-radius: 10px;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: #ccc;
+}
+
+.text-primary {
+    color: #3b71ca;
+}
+.text-secondary {
+    color: #6c757d;
+}
+.text-success {
+    color: #00c292;
+}
+.text-info {
+    color: #00b0f0;
+}
+.text-warning {
+    color: #ffba00;
+}
+.text-light {
+    color: #f0f4f7;
+}
+.text-dark {
+    color: #36344d;
+}
+.text-white {
+    color: #fff;
+}
+.text-grey {
+    color: #bdbdbd;
+}
+.text-muted {
+    color: #757575;
+}
+.bg-primary {
+    background-color: #3b71ca;
+}
+.bg-secondary {
+    background-color: #6c757d;
+}
+.bg-success {
+    background-color: #00c292;
+}
+.bg-info {
+    background-color: #00b0f0;
+}
+.bg-warning {
+    background-color: #ffba00;
+}
+.bg-danger {
+    background-color: #ff4546;
+}
+.bg-light {
+    background-color: #f0f4f7;
+}
+.bg-light-primary {
+    background-color: #e3ebf750;
+}
+/* .bg-dark {
+    background-color: #36344d ;
+} */
+.bg-white {
+    background-color: #fff;
+}
+.border-grey {
+    border: 1px solid #bdbdbd;
+}
+.border-light-grey {
+    border-color: #e3ebf7;
 }
 
 .sidebar {
@@ -25,8 +106,10 @@ body {
     left: 0;
     /* Height of navbar */
     padding: 0 0 20px;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%), 0 2px 10px 0 rgb(0 0 0 / 5%);
     width: 240px;
     z-index: 600;
+    background: #36344d;
     font-size: 15px;
     overflow-y: scroll !important;
     /* Hide scrollbar for IE, Edge and Firefox */
@@ -37,6 +120,13 @@ body {
 /* Hide scrollbar for Chrome, Safari and Opera */
 .sidebar::-webkit-scrollbar {
     display: none; /* Hide scrollbar for Chrome, Safari and Opera */
+}
+
+.sidebar .active {
+    /* border-radius: 10px; */
+    background: #5e75f8 !important;
+    color: #fff;
+    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
 }
 
 .sidebar-sticky {
@@ -52,19 +142,30 @@ body {
     border: none;
     margin: 3px 0;
     background: none;
+    color: #fbfbfb;
     font-size: 14px;
+}
+
+.sidebar .list-group-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
 /* nav-drop down list */
 .glassy {
+    background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     margin: 0 10px 10px !important;
     padding: 0;
 }
 .glassy .list-group-item {
     margin: 0;
+}
+.glassy .active {
+    color: #fff !important;
 }
 
 .btn {
@@ -76,12 +177,14 @@ body {
 .bb-input {
     border-radius: 0;
     border: none;
+    border-bottom: 1px solid #dedede;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
     box-shadow: none;
 }
 .bb-input:focus {
     box-shadow: none !important;
+    border-bottom: 1px solid #3b71ca !important;
     border-radius: 0;
 }
 
@@ -93,8 +196,8 @@ body {
 /* add-btn */
 .add-btn {
     position: relative;
-    padding: 0.5rem 2rem !important;
-    border-radius: 0 0 25px 25px !important;
+    padding: 0.5rem 2rem;
+    border-radius: 0 0 25px 25px;
 }
 
 .wrap50p {
@@ -108,6 +211,12 @@ body {
 
 .nav-item {
     border-radius: 10px;
+    color: #fbfbfb;
+}
+
+.menu .nav-item .nav-link:hover {
+    /* color: #ed3e80; */
+    color: #3b71ca;
 }
 
 .menu .nav-item .nav-link {
@@ -120,7 +229,10 @@ body {
 }
 
 .nav-item .active {
+    /* background: #ed3e80; */
+    background: #3b71ca;
     border-radius: 10px;
+    color: #fff !important;
 }
 
 @media (max-width: 991.98px) {
@@ -151,6 +263,7 @@ body {
 .hcgwbo,
 .bRaWwA {
     font-weight: bold !important;
+    color: #3b71ca !important;
     font-size: 14px !important;
 }
 
@@ -159,11 +272,19 @@ body {
 }
 
 .class-card {
+    background: rgba(255, 255, 255, 0.4);
     transition: 0.3s ease;
 }
 
 .class-card:hover {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid #3b71ca !important;
     transform: scale(1.01);
+}
+
+.exam-card:hover {
+    box-shadow: 0 3px 10px #ccc !important;
+    border: 1px solid #3b71ca !important;
 }
 
 .table-small td {
@@ -191,7 +312,9 @@ th {
     border-top-right-radius: 0.25rem !important;
     border-bottom-right-radius: 0.25rem !important;
     border-top-left-radius: 0 !important;
+    border-bottom: 1px solid #ccced1 !important;
     height: 113px !important;
+    border-color: #00b0f0 !important;
 }
 .ck-editor__editable {
     min-height: 113px;
@@ -199,6 +322,7 @@ th {
     border-top-left-radius: 0.25rem !important;
     border-bottom-left-radius: 0.25rem !important;
     border-bottom-right-radius: 0 !important;
+    border-color: #00b0f0 !important;
     line-height: 0.5;
 }
 .ck-editor__main {
@@ -219,6 +343,9 @@ th {
 }
 
 @media print {
+    body {
+        background: #fff;
+    }
     body * {
         visibility: hidden;
     }
@@ -253,10 +380,16 @@ td p {
 
 /* marks input styles */
 .marks-input {
-    border: none !important;
-    border-radius: 0 !important;
+    border: none;
+    border-radius: 0;
     padding-top: 5.5px;
     padding-bottom: 5px;
+}
+.input-active {
+    box-shadow: inset 0px 0px 0px 1px #00b0f0 !important;
+}
+.input-error {
+    box-shadow: inset 0px 0px 0px 1px #ff4546 !important;
 }
 
 /* Style for the sticky table */
@@ -265,10 +398,8 @@ td p {
     position: sticky;
     left: 0;
     /* z-index: 1; */ /* overlap the 1st cell */
-}
-.sticky-column-2 {
-    position: sticky;
-    left: 120px;
+    background-color: #f2f2f2;
+    outline: 1px solid #bdbdbd;
 }
 
 /* Style for the fixed header (1st row) */
@@ -276,6 +407,9 @@ td p {
     position: sticky;
     top: 0;
     z-index: 1;
+    background-color: #f2f2f2;
+    box-shadow: 0px 2px 5px #ccc;
+    outline: 1px solid #bdbdbd;
 }
 
 /* link decoration */

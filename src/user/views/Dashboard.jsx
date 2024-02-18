@@ -39,12 +39,14 @@ export default function UserDashboard() {
   }, [selectedSemester])
 
   // get semesters
-  const getSemesters = useCallback(() => {
+  const getSemesters = (select = false) => {
     setLoading(true)
     axios.get(`/api/user/semesters`).then(res => {
       if (res.status === 200) {
         setSemesters(res.data.semesters)
-        setSelectedSemester(res.data.semesters[0].id)
+        if (select) {
+          setSelectedSemester(res.data.semesters[0].id)
+        }
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -53,12 +55,17 @@ export default function UserDashboard() {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
     });
-  }, [])
+  }
 
 
   useEffect(() => {
-    getSemesters()
-  }, [getSemesters])
+    if (sessionStorage.getItem('selectedSemester')) {
+      setSelectedSemester(JSON.parse(sessionStorage.getItem('selectedSemester')).id);
+      getSemesters();
+    } else {
+      getSemesters(true);
+    }
+  }, [])
 
   useEffect(() => {
     if (selectedSemester !== 0) {
@@ -90,12 +97,15 @@ export default function UserDashboard() {
   return (
     <Box className="container">
       {/* title and select semester */}
-      <Box className='card-header d-flex justify-content-between align-items-center mb-3'>
+      <Box className='d-flex justify-content-between align-items-center mb-3'>
         <h5 className='mt-2'>Dashboard</h5>
 
         <Box className="col-7 col-md-5 col-xl-3 d-flex">
           <TextField select fullWidth margin='small' size='small' value={selectedSemester}
-            onChange={(e) => { setSelectedSemester(e.target.value); }}>
+            onChange={(e) => {
+              setSelectedSemester(e.target.value);
+              sessionStorage.setItem('selectedSemester', JSON.stringify({ id: e.target.value, name: '' }))
+            }}>
             {semesters.map(semester =>
               <MenuItem key={semester.id} value={semester.id}>{semester.name}</MenuItem>
             )}
@@ -131,7 +141,8 @@ export default function UserDashboard() {
           <Box className="col-12 col-lg-8 mb-4">
             <Box className="card h-100">
               <Box className="card-header">
-                <h6 className="my-2">Average Blooms Levels of Classes</h6>
+                {/* <h6 className="my-2">Average Blooms Levels of Classes</h6> */}
+                <h6 className="my-2">Total Attainment</h6>
               </Box>
 
               <Box className="card-body">
@@ -139,7 +150,7 @@ export default function UserDashboard() {
                   <DashboardAvgBloomsLevels
                     current_classes={dashboardContent.assigned_classes}
                   />
-                  : <Box className='text-center my-5'>Not enough data to show this report</Box>
+                  : <Box className='text-center text-dark my-5'>Not enough data to show this report</Box>
                 }
               </Box>
             </Box>

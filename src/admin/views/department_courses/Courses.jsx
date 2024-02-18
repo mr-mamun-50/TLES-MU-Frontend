@@ -304,7 +304,7 @@ export default function Courses({ departments }) {
             ))}
 
             {/* Add mew field button */}
-            <button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light">
+            <button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light text-dark">
               <i className="fas fa-plus me-1"></i> New</button>
           </form>
         }

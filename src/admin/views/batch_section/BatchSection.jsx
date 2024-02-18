@@ -172,7 +172,7 @@ export default function BatchSection() {
       name: 'Name',
       selector: row => row.batch_name,
       cell: row => <Link to={`/${role}/batch-section/batch/${row.id}/statistics`} state={{ batch: row }}
-        className='fw-semibold text-dark link'>{row.batch_name}</Link>,
+        className='fw-semibold text-dark link h5'>{row.batch_name}</Link>,
       sortable: true,
       wrap: true,
       width: '130px'
@@ -374,7 +374,7 @@ export default function BatchSection() {
                     </Box>
                   )
                 })}
-                <Box><button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light">
+                <Box><button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light text-dark">
                   <i className="fas fa-plus me-1"></i> New</button></Box>
               </Box>
             </form>

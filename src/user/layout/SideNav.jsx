@@ -14,12 +14,12 @@ export default function UserSideNav({ onClose }) {
           <img className='' src={logo} alt="logo" style={{ height: '45px' }} />
 
           {/* Close button */}
-          <button className='btn rounded-circle text-white d-block d-sm-none px-2 py-1'
+          <button className='btn rounded-circle text-light d-block d-sm-none px-2 py-1'
             onClick={onClose} style={{ background: '#787a7b' }}>
             <i className="fas fa-close fa-lg"></i>
           </button>
           {/* Fullscreen button */}
-          <button className="btn btn-floating btn-sm text-white d-none d-sm-block" style={{ background: '#787a7b' }}
+          <button className="btn btn-floating btn-sm text-light d-none d-sm-block" style={{ background: '#787a7b' }}
             onClick={e => { e.preventDefault(); document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen() }}>
             <i className={`bi ${document.fullscreenElement ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'}`}></i>
           </button>

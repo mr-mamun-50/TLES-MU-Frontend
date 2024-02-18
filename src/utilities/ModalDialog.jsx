@@ -7,8 +7,8 @@ export default function ModalDialog({ title, content, confirmText, onConfirm, lo
       <DialogTitle id="modal-dialog-title">
         {title}
         {/* floating action button for close */}
-        <button className='btn btn-floating btn-sm float-end shadow-0'
-          onClick={onClose} style={{ background: '#EEEEEE' }}>
+        <button className='btn btn-floating btn-sm float-end shadow-0 btn-cross'
+          onClick={onClose}>
           <i className="fas fa-close fa-lg"></i>
         </button>
       </DialogTitle>

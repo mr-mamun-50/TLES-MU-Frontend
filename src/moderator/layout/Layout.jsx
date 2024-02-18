@@ -4,9 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Swal, { } from "sweetalert2";
 import axios from 'axios';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useEffect } from 'react';
-import { useCallback } from 'react';
 import CustomSnackbar from '../../utilities/SnackBar';
 import PasswordChangeDialog from '../../utilities/PasswordChangeDialog';
 import ModeratorSideNav from './SideNav';
@@ -71,7 +70,7 @@ export default function ModeratorLayout(props) {
     axios.get('/api/moderator/profile').then(res => {
       if (res.status === 200) {
         setUserDetails(res.data.user)
-        if (userDetails.mustChangePass) {
+        if (res.data.user.mustChangePass && userDetails.mustChangePass) {
           setOpenChangePass(true)
         }
       } else {
@@ -161,7 +160,7 @@ export default function ModeratorLayout(props) {
       </Box>
 
       {/* main */}
-      <Box component="main" className='bg-light' sx={{ minHeight: '105vh', flexGrow: 1, p: 2, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
+      <Box component="main" className='bg-light' sx={{ minHeight: '100vh', flexGrow: 1, p: 2, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
         <Toolbar />
         <Outlet />
       </Box>
@@ -169,7 +168,7 @@ export default function ModeratorLayout(props) {
 
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
-      <PasswordChangeDialog level={'admin'} onOpen={openChangePass} onClose={() => { getUser(); setOpenChangePass(false) }}
+      <PasswordChangeDialog level={'moderator'} onOpen={openChangePass} onClose={() => { getUser(); setOpenChangePass(false) }}
         mustChange={userDetails.mustChangePass ? true : false} />
     </Box >
   );

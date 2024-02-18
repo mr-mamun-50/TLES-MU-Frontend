@@ -14,12 +14,12 @@ export default function AdminSideNav({ onClose }) {
           <img className='' src={logo} alt="logo" style={{ height: '45px' }} />
 
           {/* Close button */}
-          <button className='btn rounded-circle text-white d-block d-sm-none px-2 py-1'
+          <button className='btn rounded-circle text-light d-block d-sm-none px-2 py-1'
             onClick={onClose} style={{ background: '#787a7b' }}>
             <i className="fas fa-close fa-lg"></i>
           </button>
           {/* Fullscreen button */}
-          <button className="btn btn-floating btn-sm text-white d-none d-sm-block" style={{ background: '#787a7b' }}
+          <button className="btn btn-floating btn-sm text-light d-none d-sm-block" style={{ background: '#787a7b' }}
             onClick={e => { e.preventDefault(); document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen() }}>
             <i className={`bi ${document.fullscreenElement ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'}`}></i>
           </button>
@@ -36,14 +36,11 @@ export default function AdminSideNav({ onClose }) {
                 <i className="fas fa-chart-area fa-fw me-3"></i> <span> Dashboard</span>
               </span>
             </NavLink>
-            <NavLink to="/">
+            {/* <NavLink to="/">
               <span className="list-group-item list-group-item-action py-2 ripple">
                 <i className="fas fa-clipboard-list fa-fw me-3"></i> <span> Notices</span>
               </span>
-            </NavLink>
-
-            <small className='text-muted mt-2 ms-4'>Administrative</small>
-            <hr className='mb-1 mt-0 text-light' />
+            </NavLink> */}
 
             <NavLink to="/admin/students">
               <span className="list-group-item list-group-item-action py-2 ripple">
@@ -68,6 +65,9 @@ export default function AdminSideNav({ onClose }) {
                 <i className="far fa-handshake fa-fw me-3"></i><span> Supplementary Exams</span>
               </span>
             </NavLink>
+
+            <small className='text-muted mt-2 ms-4'>Administrative</small>
+            <hr className='mb-1 mt-0 text-light' />
 
             <NavLink to="/admin/batch-section">
               <span className="list-group-item list-group-item-action py-2 ripple">

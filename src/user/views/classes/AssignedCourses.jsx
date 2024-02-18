@@ -131,7 +131,7 @@ export default function AssignedCourses() {
   return (
     <Box className="container">
       {/* <Box className='card my-2'> */}
-      <Box className='card-header d-flex justify-content-between align-items-center mb-3'>
+      <Box className='d-flex justify-content-between align-items-center mb-3'>
         <h5 className='mt-2'>My Classes</h5>
 
         <Box className="col-6 col-md-3 col-xl-2">
@@ -160,7 +160,7 @@ export default function AssignedCourses() {
                     <Link to={`/classes/${assigned_class.id}`} state={{ assigned_class: assigned_class }}>
                       <Box className="card-header bg-dark d-flex align-items-end" style={{
                         height: '110px',
-                        background: `linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3)), url("${assigned_class.image}") no-repeat center/cover`
+                        background: `linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.5)), url("${assigned_class.image}") no-repeat center/cover`
                       }}>
                         <Box className="w-100 text-shadow">
                           <h5 className='text-white text-hide-ellipsis' title={`${assigned_class.course.course_code} :: ${assigned_class.course.title}`}

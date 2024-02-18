@@ -1,8 +1,9 @@
 import { Box, Grid, MenuItem, TextField } from "@mui/material";
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import CustomSnackbar from "../../../../../utilities/SnackBar";
 import axios from "axios";
+import ModalDialog from "../../../../../utilities/ModalDialog";
 
 export default function CreateQuestion() {
 
@@ -10,7 +11,7 @@ export default function CreateQuestion() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
   const location = useLocation();
   const assigned_class = location.state?.assigned_class;
   const exam = location.state?.exam;
@@ -18,6 +19,10 @@ export default function CreateQuestion() {
   const setOptions = { sl: 1, question_type: 'With subquestions', questions: [{ blooms_level: 'Remember', marks: '' }] }
   const [inputQuestionSets, setInputQuestionSets] = useState([setOptions]);
 
+  const [importExamID, setImportExamID] = useState('');
+  const [showImportQuestionModal, setShowImportQuestionModal] = useState(false);
+
+  console.log(inputQuestionSets)
 
   // handle, add & remove question sets
   const handleAddQuestionSet = () => {
@@ -64,7 +69,8 @@ export default function CreateQuestion() {
       if (res.status === 200) {
         setSuccess(res.data.message)
         setTimeout(() => { setSuccess('') }, 5000)
-        navigate(`/classes/question/${exam.id}`, { state: { assigned_class: assigned_class, exam: exam } })
+        // navigate(`/classes/question/${exam.id}`, { state: { assigned_class: assigned_class, exam: exam } })
+        window.history.back();
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -73,6 +79,28 @@ export default function CreateQuestion() {
     }).catch(err => {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
+      setLoading(false)
+    })
+  }
+
+  // import questions
+  const importQuestions = () => {
+    setLoading(true)
+    const convertedId = parseInt(importExamID, 16);
+
+    axios.post(`/api/user/exam-question/import`, { exam_id: convertedId }).then(res => {
+      if (res.status === 200) {
+        setInputQuestionSets(res.data.questions.exam_question_sets)
+        setImportExamID('')
+        setShowImportQuestionModal(false)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+    }).finally(() => {
       setLoading(false)
     })
   }
@@ -98,8 +126,16 @@ export default function CreateQuestion() {
         </Box>
 
 
-        <Box className="card-body">
+        <Box className="card-body pt-3">
 
+          {/* import button */}
+          <div className="d-flex justify-content-end">
+            <button className="btn btn-secondary btn-sm" onClick={() => setShowImportQuestionModal(true)}>
+              <i className="fas fa-file-import text-muted me-1"></i> Import questions</button>
+          </div>
+
+
+          {/* all input questions */}
           {inputQuestionSets.map((questionSet, questionSetIndex) => (
             <div className='card card-body pt-3 mt-3 shadow-sm border border-light-grey' key={questionSetIndex}>
               <div className='d-flex align-items-center'>
@@ -156,7 +192,7 @@ export default function CreateQuestion() {
               </div>
 
 
-              {questionSet.question_type !== 'One question only' && <h6 className='mt-3 mb-1'>Questions:</h6>}
+              {questionSet.question_type !== 'One question only' && <h6 className='mt-3 mb-1 text-muted'>Questions:</h6>}
 
               {questionSet.questions.map((question, questionIndex) => (
                 <Grid container spacing={2} className={`my-0 ${questionSet.question_type === 'One question only' && 'ms-3'}`} key={questionIndex}>
@@ -200,10 +236,10 @@ export default function CreateQuestion() {
 
               {/* Add question button */}
               {questionSet.question_type !== 'One question only' &&
-                <div className='row align-items-md-center mt-3'>
+                <div className='row align-items-md-center mt-3 ms-5'>
                   <div className='col'>
                     <button type='button' onClick={() => handleAddQuestion(questionSetIndex)}
-                      className='btn btn-rounded btn-sm bg-light'>
+                      className='btn btn-rounded btn-sm bg-light text-dark'>
                       <i className='fas fa-plus'></i> Add Question
                     </button>
                   </div>
@@ -234,6 +270,24 @@ export default function CreateQuestion() {
 
         </Box>
       </Box>
+
+
+      {/* import question modal */}
+      <ModalDialog
+        title={'Import Questions'}
+        content={
+          <Box sx={{ maxWidth: '350px' }}>
+            <p className="mb-4 text-muted">Copy the exam ID of the exam you want to import and paste it here</p>
+
+            <TextField label='Exam ID' required fullWidth value={importExamID} onChange={(e) => setImportExamID(e.target.value)} />
+          </Box>
+        }
+        onOpen={showImportQuestionModal}
+        onClose={() => setShowImportQuestionModal(false)}
+        onConfirm={importQuestions}
+        confirmText={'Import'}
+        loading={loading}
+      />
 
 
       {/* Utilities */}

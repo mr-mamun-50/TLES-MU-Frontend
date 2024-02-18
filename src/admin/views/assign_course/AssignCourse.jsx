@@ -20,13 +20,14 @@ export default function AssignCourse({ selectedSemester, role }) {
   const [teachers, setTeachers] = useState([])
   const [assignedCourses, setAssignedCourses] = useState([])
 
-  const [inputValues, setInputValues] = useState([]);
+  const [inputValues, setInputValues] = useState([[]]);
   const [assignForAllSection, setAssignForAllSection] = useState(true)
   const [editableCourse, setEditableCourse] = useState([])
   const [deletableId, setDeletableId] = useState(null)
   const [deleteCourseInput, setDeleteCourseInput] = useState('')
 
   // modal show hide
+  const [showAddCourseModal, setShowAddCourseModal] = useState(false)
   const [showEditCourseModal, setShowEditCourseModal] = useState(false)
   const [showCourseDelete, setShowCourseDelete] = useState(false)
 
@@ -140,7 +141,8 @@ export default function AssignCourse({ selectedSemester, role }) {
       if (res.status === 200) {
         setSuccess(res.data.message)
         getAssignedCourses(selectedSemester.id, filterVals.section_id)
-        setInputValues([])
+        setInputValues([[]])
+        setShowAddCourseModal(false)
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -285,6 +287,12 @@ export default function AssignCourse({ selectedSemester, role }) {
                 ))}
               </TextField>
             </Grid>
+
+            {/* add course button */}
+            <Grid item xs={12} sm={role === 'admin' ? 3 : 6} className='text-end'>
+              <button className='btn btn-secondary' onClick={() => setShowAddCourseModal(true)} disabled={filterVals.section_id === 0}>
+                <i className="fas fa-plus me-1"></i> Add Courses</button>
+            </Grid>
           </Grid>
         </Box>
 
@@ -331,65 +339,67 @@ export default function AssignCourse({ selectedSemester, role }) {
           </TableBody>
         </Table>
 
+      </Box>
 
-        {/* add course */}
-        {/* dynamic input courses */}
-        {inputValues.map((inputField, index) => (
-          <Box className='border-bottom border-light-grey py-3' key={index}>
-            <Box className='d-flex justify-content-between'>
 
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  {/* Course select */}
-                  <TextField select fullWidth label="Course" value={inputField.course_id || ''}
-                    onChange={(e) => handleInputChange({ course_id: e.target.value }, index)} size='small' >
-                    {courses.map((course) => (
-                      <MenuItem value={course.id} key={course.id}>
-                        {`${course.course_code} :: ${course.title}`}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  {/* Teacher select */}
-                  <TextField select fullWidth label="Teacher" value={inputField.teacher_id || ''}
-                    onChange={(e) => handleInputChange({ teacher_id: e.target.value }, index)} size='small' >
-                    {teachers.map((teacher) => (
-                      <MenuItem value={teacher.id} key={teacher.id}>
-                        {teacher.name}
-                        <small className='text-muted ms-1'>({teacher.department.name})</small>
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-              </Grid>
+      {/* add course modal */}
+      <ModalDialog
+        title={'Add New Course'}
+        content={
+          <Box sx={{ minWidth: '550px' }}>
+            {/* dynamic input courses */}
+            {inputValues.map((inputField, index) => (
+              <Box className='border-bottom border-light-grey py-3' key={index}>
+                <Box className='d-flex justify-content-between'>
 
-              <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-floating btn-sm ms-1 mt-1'>
-                <i className="fas fa-times"></i></button>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      {/* Course select */}
+                      <TextField select fullWidth label="Course" value={inputField.course_id || ''}
+                        onChange={(e) => handleInputChange({ course_id: e.target.value }, index)} size='small' >
+                        {courses.map((course) => (
+                          <MenuItem value={course.id} key={course.id}>
+                            {`${course.course_code} :: ${course.title}`}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      {/* Teacher select */}
+                      <TextField select fullWidth label="Teacher" value={inputField.teacher_id || ''}
+                        onChange={(e) => handleInputChange({ teacher_id: e.target.value }, index)} size='small' >
+                        {teachers.map((teacher) => (
+                          <MenuItem value={teacher.id} key={teacher.id}>
+                            {teacher.name}
+                            <small className='text-muted ms-1'>({teacher.department.name})</small>
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                  </Grid>
+
+                  <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-floating btn-sm ms-1 mt-1'>
+                    <i className="fas fa-times"></i></button>
+                </Box>
+              </Box>
+            ))}
+
+            {/* Add mew field button */}
+            <Box className="d-flex justify-content-between align-items-center mt-2">
+              <button type="button" onClick={() => handleAddField()} className="btn btn-secondary btn-sm">
+                <i className="fas fa-plus me-1"></i> New Course</button>
+
+              <FormControlLabel label="Assign for all sections"
+                control={<Checkbox checked={assignForAllSection} onChange={(e) => setAssignForAllSection(e.target.checked)} size='small' />} />
             </Box>
           </Box>
-        ))}
-
-
-        {/* add new and save button */}
-        <Box className='d-flex align-items-center justify-content-between mt-3'>
-          <Box>
-            {/* Add mew field button */}
-            <button type="button" onClick={() => handleAddField()} className="btn btn-secondary btn-sm">
-              <i className="fas fa-plus me-1"></i> New Course</button>
-
-            {/* save new courses */}
-            {inputValues.length > 0 &&
-              <button type="button" onClick={addAssignCourse} className="btn btn-primary btn-sm ms-2">
-                <i className="fas fa-save me-1"></i> Save</button>}
-          </Box>
-
-          {/* assign for all section */}
-          {inputValues.length > 0 &&
-            <FormControlLabel label="Assign for all sections"
-              control={<Checkbox checked={assignForAllSection} onChange={(e) => setAssignForAllSection(e.target.checked)} size='small' />} />}
-        </Box>
-      </Box>
+        }
+        onOpen={showAddCourseModal}
+        onClose={() => { setShowAddCourseModal(false); setInputValues([[]]) }}
+        onConfirm={addAssignCourse}
+        confirmText={'Save'}
+        loading={loading}
+      />
 
 
       {/* edit modal */}

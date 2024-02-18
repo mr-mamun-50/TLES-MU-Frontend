@@ -6,10 +6,10 @@ import { PrintHeading } from "./components/PrintHeading";
 import DashboardAvgGpaPrint from "./components/DashboardAvgGpa";
 
 // eslint-disable-next-line react/display-name
-export const UserDashboardPrint = forwardRef((props, ref) => {
+export const AdminModDashboardPrint = forwardRef((props, ref) => {
 
   const { dashboardContent, semester } = props;
-  const teacher = JSON.parse(localStorage.getItem('user')) || JSON.parse(sessionStorage.getItem('user'));
+  const moderator = JSON.parse(localStorage.getItem('user')) || JSON.parse(sessionStorage.getItem('user'));
 
   return (
     <Box ref={ref} className="print-section">
@@ -18,12 +18,10 @@ export const UserDashboardPrint = forwardRef((props, ref) => {
       <PrintHeading content={
         <Box>
           <h5>
-            {"Techer's Dashboard"}
+            {"Department Dashboard"}
             <small className="fw-normal"> - {semester.name}</small>
           </h5>
-          <h6 className="mb-0">{teacher.name}</h6>
-          {/* <small>{teacher.email}</small> */}
-          <small>{teacher.department?.name}</small>
+          <h6 className="mb-0">{moderator.department?.name}</h6>
         </Box>
       } />
 
@@ -31,17 +29,17 @@ export const UserDashboardPrint = forwardRef((props, ref) => {
       <Box className="row mt-2">
 
         {/* heading cards */}
-        <DashboardCountShowCard label={'Semester Classes'} count={dashboardContent.assigned_classes_count}
+        <DashboardCountShowCard label={'Semester Classes'} count={dashboardContent.current_classes_count}
           icon={'fas fa-chalkboard-user'} color={'success'} />
 
-        <DashboardCountShowCard label={'Assigned Students'} count={dashboardContent.assigned_students}
+        <DashboardCountShowCard label={'Running Students'} count={dashboardContent.running_students}
           icon={'fas fa-people-roof'} color={'info'} />
 
-        <DashboardCountShowCard label={'Retaking Students'} count={dashboardContent.retake_students}
+        <DashboardCountShowCard label={'Retaking Students'} count={dashboardContent.retaking_students}
           icon={'fas fa-person-walking-arrow-loop-left'} color={'danger'} />
 
-        <DashboardCountShowCard label={'Total Conducted Classes'} count={dashboardContent.total_classes}
-          icon={'fas fa-clipboard-check'} color={'primary'} />
+        <DashboardCountShowCard label={'Working Teachers'} count={dashboardContent.working_teachers}
+          icon={'fas fa-person-chalkboard'} color={'primary'} />
 
 
         {/* blooms level counts */}
@@ -52,9 +50,9 @@ export const UserDashboardPrint = forwardRef((props, ref) => {
             </Box>
 
             <Box className="card-body">
-              {dashboardContent.assigned_classes?.length > 0 ?
+              {dashboardContent.current_classes?.length > 0 ?
                 <DashboardAvgBloomsLevels
-                  current_classes={dashboardContent.assigned_classes}
+                  current_classes={dashboardContent.current_classes}
                 />
                 : <Box className='text-center my-5'>Not enough data to show this report</Box>
               }
@@ -70,9 +68,9 @@ export const UserDashboardPrint = forwardRef((props, ref) => {
             </Box>
 
             <Box className="card-body">
-              {dashboardContent.assigned_classes?.length > 0 ?
+              {dashboardContent.current_classes?.length > 0 ?
                 <DashboardAvgGpaPrint
-                  current_classes={dashboardContent.assigned_classes}
+                  current_classes={dashboardContent.current_classes}
                 />
                 : <Box className='text-center my-5'>Not enough data to show this report</Box>
               }

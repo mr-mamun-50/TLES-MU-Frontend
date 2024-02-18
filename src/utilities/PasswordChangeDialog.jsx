@@ -69,16 +69,16 @@ export default function PasswordChangeDialog({ level, onOpen, onClose, mustChang
       <DialogTitle id="password-change-dialog-title">
         Change your password
         {/* floating action button for close */}
-        <button className='btn btn-floating btn-sm float-end shadow-0'
-          onClick={onClose} style={{ background: '#EEEEEE' }}>
+        <button className='btn btn-floating btn-sm float-end shadow-0 btn-cross '
+          onClick={onClose}>
           <i className="fas fa-close fa-lg"></i>
         </button>
       </DialogTitle>
-      <DialogContent>
-        <DialogContentText id="password-change-dialog-description" mb={3}>
+      <DialogContent sx={{ maxWidth: '350px' }}>
+        <DialogContentText id="password-change-dialog-description" mb={3} className='text-warning'>
           {mustChange ? 'Your account is protected by a default password. You must change your password to protect your account.' : ''}
         </DialogContentText>
-        <Box style={{ maxWidth: '350px' }}>
+        <Box>
           <form onSubmit={handleSubmit}>
 
             <TextField label="Old Password" type="password" name="oldPass" value={passwords.oldPass}

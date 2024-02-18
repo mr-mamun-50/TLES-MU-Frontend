@@ -276,7 +276,7 @@ export default function StudentDashboard() {
                       <Box className="col-12 col-md-6 mb-4" key={index}>
                         <Box className="card border border-light-grey">
                           <Box className="card-body d-flex justify-content-between align-items-center">
-                            <h6 className='mb-0' style={{ fontSize: '18px' }}>{exam.exam_type}</h6>
+                            <h6 className='mb-0 text-dark' style={{ fontSize: '18px' }}>{exam.exam_type}</h6>
                             <p className="mb-0"><b>{exam.obtained_ca_marks[0]?.marks ?? 0}</b>/{exam.total_marks}</p>
                           </Box>
                         </Box>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CustomSnackbar from "../../utilities/SnackBar";
 import { Box, MenuItem, TextField } from "@mui/material";
 import DashboardCountShowCard from "../../user/components/DashboardCountShowCard";
@@ -6,6 +6,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import DashboardAvgBloomsLevels from "../../user/components/DashboardAvgBloomsLevels";
 import DashboardAvgGpa from "../../user/components/DashboardAvgGpa";
+import { useReactToPrint } from "react-to-print";
+import { AdminModDashboardPrint } from "../../user/views/print_views/AdminModDashboard";
 
 export default function ModeratorDashboard() {
 
@@ -44,12 +46,14 @@ export default function ModeratorDashboard() {
   }, [selectedSemester])
 
   // get semesters
-  const getSemesters = useCallback(() => {
+  const getSemesters = (select = false) => {
     setLoading(true)
     axios.get(`/api/moderator/semesters`).then(res => {
       if (res.status === 200) {
         setSemesters(res.data.semesters)
-        setSelectedSemester(res.data.semesters[0].id)
+        if (select) {
+          setSelectedSemester(res.data.semesters[0].id)
+        }
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -58,7 +62,7 @@ export default function ModeratorDashboard() {
       setError(err.response.data.message)
       setTimeout(() => { setError('') }, 5000)
     });
-  }, [])
+  }
 
   // search student
   const searchStudent = (e) => {
@@ -102,8 +106,13 @@ export default function ModeratorDashboard() {
 
 
   useEffect(() => {
-    getSemesters()
-  }, [getSemesters])
+    if (sessionStorage.getItem('selectedSemester')) {
+      setSelectedSemester(JSON.parse(sessionStorage.getItem('selectedSemester')).id);
+      getSemesters();
+    } else {
+      getSemesters(true);
+    }
+  }, [])
 
   useEffect(() => {
     if (selectedSemester !== 0) {
@@ -112,20 +121,47 @@ export default function ModeratorDashboard() {
   }, [getDashboardContent, selectedSemester])
 
 
+  const componentRef = useRef(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const handlePrint = useReactToPrint({
+    documentTitle: `Department Dashboard - `,
+    onBeforeGetContent: () => {
+      setIsPrinting(true);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+    },
+    content: () => componentRef.current,
+    onAfterPrint: () => {
+      setIsPrinting(false);
+    }
+  });
+
 
   return (
     <Box className="container">
       {/* title and select semester */}
-      <Box className='card-header d-flex justify-content-between align-items-center mb-3'>
+      <Box className='d-flex justify-content-between align-items-center mb-3'>
         <h5 className='mt-2'>Dashboard</h5>
 
-        <Box className="col-6 col-md-3 col-xl-2">
+        <Box className="col-7 col-md-5 col-xl-3 d-flex">
           <TextField select fullWidth margin='small' size='small' value={selectedSemester}
-            onChange={(e) => { setSelectedSemester(e.target.value); }}>
+            onChange={(e) => {
+              setSelectedSemester(e.target.value);
+              sessionStorage.setItem('selectedSemester', JSON.stringify({ id: e.target.value, name: '' }))
+            }}>
             {semesters.map(semester =>
               <MenuItem key={semester.id} value={semester.id}>{semester.name}</MenuItem>
             )}
           </TextField>
+
+          {/* print button */}
+          <button className="btn btn-outline-dark border-grey ms-2 d-flex align-items-center" onClick={handlePrint}>
+            <i className="fas fa-print me-2"></i> Print
+          </button>
         </Box>
       </Box>
 
@@ -197,7 +233,7 @@ export default function ModeratorDashboard() {
           <Box className="col-12 col-lg-8 mb-4">
             <Box className="card h-100">
               <Box className="card-header">
-                <h6 className="my-2">Average Blooms Levels</h6>
+                <h6 className="my-2">Total Attainment</h6>
               </Box>
 
               <Box className="card-body">
@@ -232,6 +268,11 @@ export default function ModeratorDashboard() {
         </Box>
       }
 
+
+      {isPrinting &&
+        <AdminModDashboardPrint ref={componentRef} dashboardContent={dashboardContent}
+          semester={semesters.find(semester => semester.id === selectedSemester)} />
+      }
 
 
       {/* Utilities */}

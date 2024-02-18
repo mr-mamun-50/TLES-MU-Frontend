@@ -303,7 +303,7 @@ export default function ViewQuestion() {
                 </Box>
 
 
-                {questionSet.question_type !== 'One question only' && <h6 className='mt-3 mb-1'>Questions:</h6>}
+                {questionSet.question_type !== 'One question only' && <h6 className='mt-3 mb-1 text-muted'>Questions:</h6>}
 
                 {questionSet.questions.map((question, questionIndex) => (
                   <Grid container spacing={2} className={`my-0 ${questionSet.question_type === 'One question only' && 'ms-3'}`} key={questionIndex}>
@@ -347,10 +347,10 @@ export default function ViewQuestion() {
 
                 {/* Add question button */}
                 {questionSet.question_type !== 'One question only' &&
-                  <Box className='row align-items-md-center mt-3'>
+                  <Box className='row align-items-md-center mt-3 ms-5'>
                     <Box className='col'>
                       <button type='button' onClick={() => handleAddQuestion(questionSetIndex)}
-                        className='btn btn-rounded btn-sm bg-light'>
+                        className='btn btn-rounded btn-sm bg-light text-dark'>
                         <i className='fas fa-plus'></i> Add Question
                       </button>
                     </Box>
@@ -459,7 +459,7 @@ export default function ViewQuestion() {
                 <Box className='row align-items-md-center mt-3'>
                   <Box className='col'>
                     <button type='button' onClick={() => handleAddEditQuestion()}
-                      className='btn btn-rounded btn-sm bg-light'>
+                      className='btn btn-rounded btn-sm bg-light text-dark'>
                       <i className='fas fa-plus'></i> Add Question
                     </button>
                   </Box>

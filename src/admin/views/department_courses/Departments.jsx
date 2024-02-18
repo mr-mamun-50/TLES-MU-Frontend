@@ -224,12 +224,13 @@ export default function Departments() {
                 <Box className='d-flex align-items-center' key={index}>
                   <TextField label="Enter department name" variant="outlined" value={inputValue}
                     onChange={(e) => handleInputChange(e, index)} fullWidth margin='normal' size='small' />
-                  <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-floating mt-2'>
+                  <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-sm btn-floating mt-2 ms-1'>
                     <i className="fas fa-times"></i></button>
                 </Box>
               )
             })}
-            <button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light"><i className="fas fa-plus me-1"></i> New</button>
+            <button type="button" onClick={() => handleAddField()} className="btn btn-rounded btn-sm bg-light text-dark">
+              <i className="fas fa-plus me-1"></i> New</button>
           </form>
         }
         onOpen={showAddDeptModal}

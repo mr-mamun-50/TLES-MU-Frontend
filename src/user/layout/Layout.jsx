@@ -4,9 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Swal, { } from "sweetalert2";
 import axios from 'axios';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useEffect } from 'react';
-import { useCallback } from 'react';
 import CustomSnackbar from '../../utilities/SnackBar';
 import PasswordChangeDialog from '../../utilities/PasswordChangeDialog';
 import UserSideNav from './SideNav';
@@ -77,7 +76,7 @@ export default function UserLayout(props) {
     axios.get('/api/user/profile').then(res => {
       if (res.status === 200) {
         setUserDetails(res.data.user)
-        if (userDetails.mustChangePass) {
+        if (res.data.user.mustChangePass && userDetails.mustChangePass) {
           setOpenChangePass(true)
         }
       } else {
@@ -93,6 +92,8 @@ export default function UserLayout(props) {
   useEffect(() => {
     getUser()
   }, [getUser])
+
+
 
 
   return (
@@ -120,8 +121,9 @@ export default function UserLayout(props) {
               {userDetails.email}</p>
           </Box> */}
           {/* dropdown list */}
-          <Box className='ms-auto'>
-            <div className="bg-light rounded-7 ps-1">
+          <Box className='ms-auto d-flex align-items-center'>
+
+            <Box className="bg-light rounded-7 ps-1">
               <Button size="large" aria-label="account" aria-controls="menu-appbar" aria-haspopup="true"
                 onClick={handleMenu} color="inherit" style={{ textTransform: 'none' }}>
 
@@ -129,7 +131,7 @@ export default function UserLayout(props) {
                   {userDetails.name}</Typography>
                 <Avatar sx={{ width: 32, height: 32 }} />
               </Button>
-            </div>
+            </Box>
 
             <Menu id="menu-appbar" anchorEl={anchorEl} sx={{ mt: '40px' }}
               anchorOrigin={{ vertical: 'top', horizontal: 'right', }} keepMounted
@@ -167,7 +169,7 @@ export default function UserLayout(props) {
       </Box>
 
       {/* main */}
-      <Box component="main" className='bg-light' sx={{ minHeight: '105vh', flexGrow: 1, p: 2, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
+      <Box component="main" className='bg-light' sx={{ minHeight: '100vh', flexGrow: 1, p: 2, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
         <Toolbar />
         <Outlet />
       </Box>
@@ -175,7 +177,7 @@ export default function UserLayout(props) {
 
       {/* Utilities */}
       <CustomSnackbar message={error} status={'error'} />
-      <PasswordChangeDialog level={'admin'} onOpen={openChangePass} onClose={() => { getUser(); setOpenChangePass(false) }}
+      <PasswordChangeDialog level={'user'} onOpen={openChangePass} onClose={() => { getUser(); setOpenChangePass(false) }}
         mustChange={userDetails.mustChangePass ? true : false} />
     </Box >
   );

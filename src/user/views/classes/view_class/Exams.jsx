@@ -146,6 +146,20 @@ export default function Exams({ assigned_class }) {
     }
   }
 
+  // copy exam ID
+  const handleCopyExamID = (id) => {
+    // integer to hexadecimal
+    const hexID = parseInt(id).toString(16);
+
+    navigator.clipboard.writeText(hexID).then(() => {
+      setSuccess('Exam ID copied!');
+      setTimeout(() => { setSuccess('') }, 5000)
+    }, () => {
+      setError('Failed to copy exam ID!');
+      setTimeout(() => { setError('') }, 5000)
+    });
+  };
+
 
   return (
     <Box className='px-2 pt-1'>
@@ -170,13 +184,15 @@ export default function Exams({ assigned_class }) {
               {/* Basic info and actions */}
               <Box className="d-flex">
                 {/* leading icon */}
-                <Box className="rounded-circle bg-secondary d-flex justify-content-center align-items-center me-3" sx={{ width: '50px', height: '50px' }}>
+                <Box className="rounded-circle bg-primary d-flex justify-content-center align-items-center me-3" sx={{ width: '50px', height: '50px' }}>
                   <i className={`${iconSelector(exam.exam_type)} fa-xl text-light`}></i>
                 </Box>
 
                 {/* informations and actions */}
                 <Box className="">
+                  {/* exam name */}
                   <h5 className="card-title mb-1">{exam.exam_type}</h5>
+
                   <small className="text-muted">
                     Total: <b>{exam.total_marks}</b> marks
                     {(exam.exam_type === 'Final' || exam.exam_type === 'Midterm') && <> • Created questions for: <b>{exam.added_marks}</b> marks</>}
@@ -199,14 +215,22 @@ export default function Exams({ assigned_class }) {
               </Box>
 
               {/* Status and date, edit-delete */}
-              <Box className="">
+              <Box className="text-end">
                 <small className="text-muted">
                   {new Date(exam.exam_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', })}
                 </small>
 
                 {role === 'user' &&
                   <Box className="d-flex justify-content-end mt-4">
-                    <button className="btn btn-outline-secondary btn-sm btn-floating me-2"
+                    {/* copy button */}
+                    {(exam.exam_type === 'Final' || exam.exam_type === 'Midterm') &&
+                      <button onClick={() => handleCopyExamID(exam.id)} className="btn btn-outline-secondary btn-sm btn-rounded me-2"
+                        title="Copy Exam ID">
+                        <i className="far fa-copy text-info me-1"></i> Copy ID</button>
+                    }
+
+                    {/* edit */}
+                    <button className="btn btn-outline-secondary text-primary btn-sm btn-floating me-2"
                       onClick={() => {
                         const selectedExam = { ...exam }
                         if (exam.exam_type !== 'Final' && exam.exam_type !== 'Midterm' && exam.exam_type !== 'Class Test' && exam.exam_type !== 'Presentation' && exam.exam_type !== 'Viva') {
@@ -221,7 +245,8 @@ export default function Exams({ assigned_class }) {
                         setOpenEditExamModal(true)
                       }}><i className="fas fa-edit"></i></button>
 
-                    <button className="btn btn-outline-secondary btn-sm btn-floating"
+                    {/* delete */}
+                    <button className="btn btn-outline-secondary text-danger btn-sm btn-floating"
                       onClick={() => deleteExam(exam.id)}><i className="fas fa-trash-alt"></i></button>
                   </Box>
                 }

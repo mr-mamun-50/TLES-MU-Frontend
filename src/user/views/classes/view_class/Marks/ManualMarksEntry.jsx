@@ -394,7 +394,7 @@ export default function ManualMarksEntry() {
                   <TableHead className='sticky-header'>
                     <TableRow>
                       <TableCell rowSpan={2} className="sticky-column text-center">Student ID</TableCell>
-                      <TableCell rowSpan={2} className="text-center">Total Marks</TableCell>
+                      <TableCell rowSpan={2} className="sticky-column-2 text-center">Total Marks</TableCell>
                       {/* question set numbers */}
                       {question_sets.map((question_set, set_index) => (
                         <TableCell colSpan={question_set.questions.length} key={set_index} className='text-center'>{question_set.sl}</TableCell>
@@ -427,11 +427,11 @@ export default function ManualMarksEntry() {
                                 setInputStudent(student);
                               }
                             }}
-                              className='btn btn-light rounded-0 btn-block px-1' style={{ fontSize: '14px' }}>
+                              className='btn btn-light rounded-0 btn-block px-1 border border-light-grey' style={{ fontSize: '14px' }}>
                               {student.student_id}
                             </button>
                           </TableCell>
-                          <TableCell style={{ minWidth: '60px', padding: '0' }} className="text-center">{totalObtainedMarks}</TableCell>
+                          <TableCell style={{ minWidth: '60px', padding: '0' }} className="sticky-column-2 text-center">{totalObtainedMarks}</TableCell>
 
                           {/* all questions input fields */}
                           {question_sets.map((question_set) => (
@@ -443,7 +443,7 @@ export default function ManualMarksEntry() {
 
                                   {/* marks with edit button */}
                                   {obtainedMark?.marks > -1 &&
-                                    <button className='btn btn-block py-1' style={{ fontSize: '14px' }}
+                                    <button className='btn btn-block text-dark py-1' style={{ fontSize: '14px' }}
                                       onClick={() => {
                                         if (role === 'user') {
                                           setEditableMarks({
@@ -490,7 +490,7 @@ export default function ManualMarksEntry() {
 
                             {/* marks input field and edit button */}
                             {obtainedMark?.marks > -1 ?
-                              <button className='btn btn-block py-1 text-start' style={{ fontSize: '14px' }}
+                              <button className='btn btn-block py-1 text-start text-dark' style={{ fontSize: '14px' }}
                                 onClick={() => {
                                   if (role === 'user') {
                                     setEditableMarks({ ...obtainedMark, student_id: student.student_id });
@@ -499,7 +499,7 @@ export default function ManualMarksEntry() {
                                 }}>
                                 {obtainedMark.marks}</button>
                               : role === 'user' &&
-                              <input
+                              <input type='number'
                                 className={`form-control marks-input ${inputMarksValue > exam.total_marks && 'input-error'} ${inputMarksValue && 'input-active'}`}
                                 value={inputMarksValue}
                                 onChange={(e) => handleCaMarksChange(student.id, e.target.value)} />

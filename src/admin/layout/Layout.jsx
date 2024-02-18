@@ -159,7 +159,7 @@ export default function AdminLayout(props) {
       </Box>
 
       {/* main */}
-      <Box component="main" className='bg-light' sx={{ minHeight: '105vh', flexGrow: 1, p: 2, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
+      <Box component="main" className='bg-light' sx={{ minHeight: '100vh', flexGrow: 1, p: 2, width: { sm: `calc(100% - ${drawerWidth}px)` } }}>
         <Toolbar />
         <Outlet />
       </Box>

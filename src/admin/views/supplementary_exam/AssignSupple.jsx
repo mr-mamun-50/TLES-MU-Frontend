@@ -12,7 +12,7 @@ export default function AssignSupple({ selectedSemester, role }) {
   const [error, setError] = useState('')
   let navigate = useNavigate();
 
-  const [inputValues, setInputValues] = useState([]);
+  const [inputValues, setInputValues] = useState([{ course_id: '', teacher_id: '', total_marks: 40, exam_date: convertDate(new Date()) }]);
   const [filterVals, setFilterVals] = useState({ dept_id: 0, batch_id: 0, section_id: 0 })
   const [departments, setDepartments] = useState([])
   const [courses, setCourses] = useState([])
@@ -24,6 +24,7 @@ export default function AssignSupple({ selectedSemester, role }) {
   const [deleteExamInput, setDeleteExamInput] = useState('')
 
   // modal show hide
+  const [showAddExamModal, setShowAddExamModal] = useState(false)
   const [showEditExamModal, setShowEditExamModal] = useState(false)
   const [showExamDelete, setShowExamDelete] = useState(false)
 
@@ -120,7 +121,8 @@ export default function AssignSupple({ selectedSemester, role }) {
       if (res.status === 200) {
         setSuccess(res.data.message)
         getSuppleExams(filterVals.dept_id)
-        setInputValues([])
+        setInputValues([{ course_id: '', teacher_id: '', total_marks: 40, exam_date: convertDate(new Date()) }])
+        setShowAddExamModal(false)
       } else {
         setError(res.data.message)
         setTimeout(() => { setError('') }, 5000)
@@ -209,15 +211,20 @@ export default function AssignSupple({ selectedSemester, role }) {
   return (
     <Box className="card my-2">
       <Box className='card-header d-flex justify-content-between align-items-center'>
-        <h5 className='mt-2 mb-0'>Supplementary Exams</h5>
+        <h5 className='mb-0'>Supplementary Exams</h5>
+
+        {role === 'moderator' &&
+          <button className='btn btn-secondary' onClick={() => setShowAddExamModal(true)} disabled={filterVals.dept_id === 0}>
+            <i className="fas fa-plus me-1"></i> Add Exam</button>
+        }
       </Box>
 
       <Box className="card-body">
         {/* Filter section */}
-        <Box className="d-flex align-items-center mb-1">
-          <Grid container spacing={2}>
-            {/* select department */}
-            {role === 'admin' &&
+        {role === 'admin' &&
+          <Box className="d-flex align-items-center mb-1">
+            <Grid container spacing={2}>
+              {/* select department */}
               <Grid item xs={12} sm={5}>
                 <TextField select fullWidth margin='small' size='small' value={filterVals.dept_id}
                   onChange={(e) => {
@@ -230,9 +237,15 @@ export default function AssignSupple({ selectedSemester, role }) {
                   ))}
                 </TextField>
               </Grid>
-            }
-          </Grid>
-        </Box>
+
+              {/* add course button */}
+              <Grid item xs={12} sm={7} className='text-end'>
+                <button className='btn btn-secondary' onClick={() => setShowAddExamModal(true)} disabled={filterVals.dept_id === 0}>
+                  <i className="fas fa-plus me-1"></i> Add Exam</button>
+              </Grid>
+            </Grid>
+          </Box>
+        }
 
 
         {/* supple exams table */}
@@ -280,72 +293,76 @@ export default function AssignSupple({ selectedSemester, role }) {
           </TableBody>
         </Table>
 
-
-        {/* add course */}
-        {/* dynamic input courses */}
-        {inputValues.map((inputField, index) => (
-          <Box className='border-bottom border-light-grey py-3' key={index}>
-            <Box className='d-flex justify-content-between'>
-
-              <Grid container spacing={2}>
-                {/* Course select */}
-                <Grid item xs={12} sm={4}>
-                  <TextField select fullWidth label="Course" value={inputField.course_id || ''}
-                    onChange={(e) => handleInputChange({ course_id: e.target.value }, index)} size='small' >
-                    {courses.map((course) => (
-                      <MenuItem value={course.id} key={course.id}>
-                        {`${course.course_code} :: ${course.title}`}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                {/* Teacher select */}
-                <Grid item xs={12} sm={4}>
-                  <TextField select fullWidth label="Teacher" value={inputField.teacher_id || ''}
-                    onChange={(e) => handleInputChange({ teacher_id: e.target.value }, index)} size='small' >
-                    {teachers.map((teacher) => (
-                      <MenuItem value={teacher.id} key={teacher.id}>
-                        {teacher.name}
-                        <small className='text-muted ms-1'>({teacher.department.name})</small>
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                {/* total marks input */}
-                <Grid item xs={12} sm={2}>
-                  <TextField type='number' fullWidth label="Total Marks" value={inputField.total_marks || ''}
-                    onChange={(e) => handleInputChange({ total_marks: e.target.value }, index)} size='small' />
-                </Grid>
-                {/* exam date */}
-                <Grid item xs={12} sm={2}>
-                  <TextField type='date' fullWidth label="Exam Date" value={inputField.exam_date || ''}
-                    onChange={(e) => handleInputChange({ exam_date: e.target.value }, index)} size='small' />
-                </Grid>
-              </Grid>
-
-              <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-floating btn-sm ms-1 mt-1'>
-                <i className="fas fa-times"></i></button>
-            </Box>
-          </Box>
-        ))}
-
-
-        {/* add new and save button */}
-        <Box className='d-flex align-items-center justify-content-between mt-3'>
-          <Box>
-            {/* Add mew field button */}
-            <button type="button" onClick={() => handleAddField()} className="btn btn-secondary btn-sm">
-              <i className="fas fa-plus me-1"></i> New Course</button>
-
-            {/* save new courses */}
-            {inputValues.length > 0 &&
-              <button type="button" onClick={addSuppleExam} className="btn btn-primary btn-sm ms-2">
-                <i className="fas fa-save me-1"></i> Save</button>}
-          </Box>
-
-        </Box>
       </Box>
 
+
+      {/* add exam modal */}
+      <ModalDialog
+        title={'Add Exams'}
+        content={
+          <Box style={{ minWidth: '550px' }}>
+            {/* dynamic input courses */}
+            {inputValues.map((inputField, index) => (
+              <Box className='border-bottom border-light-grey py-3' key={index}>
+                <Box className='d-flex justify-content-between'>
+
+                  <Grid container spacing={2}>
+                    {/* Course select */}
+                    <Grid item xs={12} sm={4}>
+                      <TextField select fullWidth label="Course" value={inputField.course_id || ''}
+                        onChange={(e) => handleInputChange({ course_id: e.target.value }, index)} size='small' >
+                        {courses.map((course) => (
+                          <MenuItem value={course.id} key={course.id}>
+                            {`${course.course_code} :: ${course.title}`}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    {/* Teacher select */}
+                    <Grid item xs={12} sm={4}>
+                      <TextField select fullWidth label="Teacher" value={inputField.teacher_id || ''}
+                        onChange={(e) => handleInputChange({ teacher_id: e.target.value }, index)} size='small' >
+                        {teachers.map((teacher) => (
+                          <MenuItem value={teacher.id} key={teacher.id}>
+                            {teacher.name}
+                            <small className='text-muted ms-1'>({teacher.department.name})</small>
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    {/* total marks input */}
+                    <Grid item xs={12} sm={2}>
+                      <TextField type='number' fullWidth label="Total Marks" value={inputField.total_marks || ''}
+                        onChange={(e) => handleInputChange({ total_marks: e.target.value }, index)} size='small' />
+                    </Grid>
+                    {/* exam date */}
+                    <Grid item xs={12} sm={2}>
+                      <TextField type='date' fullWidth label="Exam Date" value={inputField.exam_date || ''}
+                        onChange={(e) => handleInputChange({ exam_date: e.target.value }, index)} size='small' />
+                    </Grid>
+                  </Grid>
+
+                  <button type="button" onClick={() => handleRemoveInput(index)} className='btn btn-light btn-floating btn-sm ms-1 mt-1'>
+                    <i className="fas fa-times"></i></button>
+                </Box>
+              </Box>
+            ))}
+
+            {/* add new button */}
+            <button type="button" onClick={() => handleAddField()} className="btn btn-secondary btn-sm mt-2">
+              <i className="fas fa-plus me-1"></i> New Exam</button>
+          </Box>
+        }
+        onOpen={showAddExamModal}
+        onClose={() => {
+          setShowAddExamModal(false);
+          setInputValues([{ course_id: '', teacher_id: '', total_marks: 40, exam_date: convertDate(new Date()) }])
+        }}
+        onConfirm={addSuppleExam}
+        confirmText={'Save'}
+        loading={loading}
+        isFullScreen={true}
+      />
 
 
       {/* edit modal */}

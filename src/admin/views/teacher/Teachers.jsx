@@ -163,7 +163,7 @@ export default function Teachers() {
       name: 'Action',
       button: true,
       cell: row => <Box className="d-flex">
-        <Link to={`/${role}/teachers/profile/${row.id}`}
+        <Link to={`/${role}/teachers/profile/${row.id}`} state={{ profile: row }}
           className="btn btn-light border border-light-grey btn-sm px-2 me-2">
           <i className="fas fa-eye"></i>
         </Link>
