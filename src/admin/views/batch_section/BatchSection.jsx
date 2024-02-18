@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component'
 import axios from 'axios'
-import Swal from 'sweetalert2'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
 import { Box, MenuItem, TextField } from '@mui/material'
@@ -24,11 +23,10 @@ export default function BatchSection() {
   const [filteredBatchs, setFilteredBatchs] = useState([])
 
   const [editableBatch, setEditableBatch] = useState({})
-  const [selectedBatchs, setSelectedBatchs] = useState([])
   const [showEditBatchModal, setShowEditBatchModal] = useState(false)
   const [showAddBatchModal, setShowAddBatchModal] = useState(false)
 
-  // console.log(batchs)
+  // console.log(editableBatch)
   // add & remove input field
   const handleAddField = () => {
     setInputSections([...inputSections, []])
@@ -42,6 +40,21 @@ export default function BatchSection() {
     const list = [...inputSections];
     list.splice(index, 1);
     setInputSections(list);
+  }
+
+  // add, change & remove edit inputs
+  const handleAddEditField = () => {
+    setEditableBatch({ ...editableBatch, sections: [...editableBatch.sections, { section_name: '' }] })
+  }
+  const handleEditInputChange = (field, value, index) => {
+    const list = [...editableBatch.sections];
+    list[index][field] = value.target.value;
+    setEditableBatch({ ...editableBatch, sections: list });
+  }
+  const handleRemoveEditInput = (index) => {
+    const list = [...editableBatch.sections];
+    list.splice(index, 1);
+    setEditableBatch({ ...editableBatch, sections: list });
   }
 
 
@@ -95,6 +108,9 @@ export default function BatchSection() {
         setSuccess(res.data.message)
         getBatchs(selectedDepartment)
         setLoading(false)
+        setShowAddBatchModal(false)
+        setInputBatch({ dept_id: '', batch_name: '' })
+        setInputSections([[]])
         setTimeout(() => { setSuccess('') }, 5000)
       } else {
         setError(res.data.message)
@@ -115,8 +131,9 @@ export default function BatchSection() {
     axios.put(`/api/${role}/batch_section/${editableBatch.id}`, editableBatch).then(res => {
       if (res.status === 200) {
         setSuccess(res.data.message)
-        getBatchs()
+        getBatchs(selectedDepartment)
         setLoading(false)
+        setShowEditBatchModal(false)
         setTimeout(() => { setSuccess('') }, 5000)
       } else {
         setError(res.data.message)
@@ -128,41 +145,6 @@ export default function BatchSection() {
       setLoading(false)
       setTimeout(() => { setError('') }, 5000)
     });
-  }
-
-  // delete central routine
-  const deleteBatchs = () => {
-    let deletableId = { deletableId: selectedBatchs.map((batch) => batch.id) }
-
-    Swal.fire({
-      title: 'Are you sure to delete?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#1976D2',
-      cancelButtonColor: '#707070',
-      confirmButtonText: 'Yes, delete!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setLoading(true)
-        axios.post(`/api/${role}/batch_section/delete`, deletableId).then(res => {
-          if (res.status === 200) {
-            setSuccess(res.data.message)
-            getBatchs()
-            setLoading(false)
-            setTimeout(() => { setSuccess('') }, 5000);
-          } else {
-            setError(res.data.message)
-            setLoading(false)
-            setTimeout(() => { setError('') }, 5000);
-          }
-        }).catch(err => {
-          setError(err.response.data.message)
-          setLoading(false)
-          setTimeout(() => { setError('') }, 5000);
-        });
-      }
-    })
   }
 
 
@@ -285,61 +267,50 @@ export default function BatchSection() {
             highlightOnHover
             noDataComponent={loading ? <span className="spinner-border my-4" role="status" aria-hidden="true"></span>
               : <span className='my-4'>No data found</span>}
-            selectableRows
-            selectableRowsHighlight
-            onSelectedRowsChange={data => setSelectedBatchs(data.selectedRows)}
-            contextActions={<button className="btn btn-danger me-2 px-3" onClick={() => deleteBatchs()}><i className="fas fa-trash-alt"></i></button>}
-            clearSelectedRows={loading}
           />
         </Box>
 
 
-        {/* Edit batch modal */}
-        <Box className="modal" id="editBatchModal" data-mdb-backdrop="static" tabIndex="-1" aria-labelledby="pleModalLabel" aria-hidden="true">
-          <Box className="modal-dialog modal-dialog-centered">
-            <Box className="modal-content">
-              <Box className="modal-header">
-                <h1 className="modal-title fs-5" id="pleModalLabel">{editableBatch.name}</h1>
-                <button type="button" className="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
-              </Box>
+        {/* Edit batch-section modal */}
+        <ModalDialog
+          title={'Edit Batch'}
+          onOpen={showEditBatchModal}
+          content={
+            <Box style={{ maxWidth: '350px' }}>
               <form onSubmit={updateBatch}>
-                <Box className="modal-body">
-                  <Box className="mb-3">
-                    <label htmlFor="name" className="form-label">Name</label>
-                    <input type="text" className="form-control" id="name" value={editableBatch.name}
-                      onChange={(e) => setEditableBatch({ ...editableBatch, name: e.target.value })} maxLength="255" />
-                  </Box>
+                <TextField label="Batch Name" value={editableBatch.batch_name}
+                  onChange={(e) => setEditableBatch({ ...editableBatch, batch_name: e.target.value })} fullWidth margin='normal' size='small' />
 
-                  <Box className="mb-3">
-                    <label htmlFor="email" className="form-label">Email</label>
-                    <input type="email" className="form-control" id="email" value={editableBatch.email}
-                      onChange={(e) => setEditableBatch({ ...editableBatch, email: e.target.value })} maxLength="255" />
-                  </Box>
+                {/* Sections input */}
+                <Box className='border p-3 pe-1 mt-3 rounded-5'>
+                  <label htmlFor="section" className="form-label mb-3">Sections</label>
+                  {editableBatch.sections?.map((inputValue, index) => {
+                    return (
+                      <Box className="mb-3 d-flex">
+                        <TextField fullWidth label="Section name" value={inputValue.section_name}
+                          onChange={(e) => handleEditInputChange('section_name', e, index)} size='small' />
 
-                  <Box className="mb-3">
-                    <label htmlFor="department" className="form-label">Department</label>
-                    <select className="form-select" id='department' value={editableBatch.dept_id}
-                      onChange={(e) => { setEditableBatch({ ...editableBatch, dept_id: e.target.value }) }}>
-                      <option selected disabled>Select Department</option>
-                      {departments.map((department) => (
-                        <option value={department.id}>{department.name}</option>
-                      ))}
-                    </select>
-                  </Box>
-
-                  {error ? setTimeout(() => { setError(""); }, 3000) && <Box className="alert alert-danger mt-3 mb-0">{error}</Box> : ''}
-                </Box>
-                <Box className="modal-footer">
-                  <button type="button" className="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
-                  <button type="submit" className="btn btn-primary">
-                    {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> :
-                      success ? setTimeout(() => { setSuccess(""); }, 3000) && success : 'Update changes'}
-                  </button>
+                        <button type="button" onClick={() => handleRemoveEditInput(index)}
+                          className='btn btn-light btn-floating btn-sm ms-1 mt-1'><i className="fas fa-times"></i></button>
+                      </Box>
+                    )
+                  })}
+                  <Box><button type="button" onClick={() => handleAddEditField()} className="btn btn-rounded btn-sm bg-light text-dark">
+                    <i className="fas fa-plus me-1"></i> New</button></Box>
                 </Box>
               </form>
+
+              <p className='text-danger mt-3'>
+                <i className="fas fa-exclamation-triangle me-1"></i>
+                <span>Removing a section will also delete all students from that section.</span>
+              </p>
             </Box>
-          </Box>
-        </Box >
+          }
+          onClose={() => setShowEditBatchModal(false)}
+          confirmText={'Update'}
+          onConfirm={updateBatch}
+          loading={loading}
+        />
 
 
         {/* Add batch modal */}
@@ -347,7 +318,7 @@ export default function BatchSection() {
           title={'Add Batch'}
           onOpen={showAddBatchModal}
           content={
-            <form onSubmit={addBatch} style={{ minWidth: '350px' }}>
+            <form onSubmit={addBatch} style={{ maxWidth: '350px' }}>
               {role === 'admin' &&
                 <TextField label="Department" select value={inputBatch.dept_id}
                   onChange={(e) => setInputBatch({ ...inputBatch, dept_id: e.target.value })} fullWidth margin='normal' size='small'>

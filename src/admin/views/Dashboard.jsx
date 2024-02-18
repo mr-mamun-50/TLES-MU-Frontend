@@ -1,11 +1,13 @@
 import { Box, MenuItem, TextField } from "@mui/material";
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardCountShowCard from "../../user/components/DashboardCountShowCard";
 import DashboardAvgBloomsLevels from "../../user/components/DashboardAvgBloomsLevels";
 import DashboardAvgGpa from "../../user/components/DashboardAvgGpa";
 import CustomSnackbar from "../../utilities/SnackBar";
+import { useReactToPrint } from "react-to-print";
+import { AdminModDashboardPrint } from "../../user/views/print_views/AdminModDashboard";
 
 export default function AdminDashboard() {
 
@@ -146,6 +148,25 @@ export default function AdminDashboard() {
   }, [getDashboardContent, selectedDepartment, selectedSemester])
 
 
+  const componentRef = useRef(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const handlePrint = useReactToPrint({
+    documentTitle: `Department Dashboard - `,
+    onBeforeGetContent: () => {
+      setIsPrinting(true);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+    },
+    content: () => componentRef.current,
+    onAfterPrint: () => {
+      setIsPrinting(false);
+    }
+  });
+
 
   return (
     <Box className="container">
@@ -153,7 +174,7 @@ export default function AdminDashboard() {
       <Box className='d-flex justify-content-between align-items-center mb-3'>
         <h5 className='mt-2'>Dashboard</h5>
 
-        <Box className='col-8 col-md-6 col-xl-4 d-flex'>
+        <Box className='col-9 col-md-7 col-xl-5 d-flex'>
           <TextField select fullWidth margin='small' size='small' value={selectedDepartment} className="me-2"
             onChange={(e) => {
               setSelectedDepartment(e.target.value);
@@ -173,6 +194,11 @@ export default function AdminDashboard() {
               <MenuItem key={semester.id} value={semester.id}>{semester.name}</MenuItem>
             )}
           </TextField>
+
+          {/* print button */}
+          <button className="btn btn-outline-dark border-grey ms-2 d-flex align-items-center" onClick={handlePrint}>
+            <i className="fas fa-print me-2"></i> Print
+          </button>
         </Box>
       </Box>
 
@@ -280,6 +306,13 @@ export default function AdminDashboard() {
         </Box>
       }
 
+
+      {/* print view */}
+      {isPrinting &&
+        <AdminModDashboardPrint ref={componentRef} dashboardContent={dashboardContent}
+          semester={semesters.find(semester => semester.id === selectedSemester)}
+          department={departments.find(department => department.id === selectedDepartment)} />
+      }
 
 
       {/* Utilities */}

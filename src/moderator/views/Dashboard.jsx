@@ -269,6 +269,7 @@ export default function ModeratorDashboard() {
       }
 
 
+      {/* print view */}
       {isPrinting &&
         <AdminModDashboardPrint ref={componentRef} dashboardContent={dashboardContent}
           semester={semesters.find(semester => semester.id === selectedSemester)} />

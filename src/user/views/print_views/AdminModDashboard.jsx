@@ -8,7 +8,7 @@ import DashboardAvgGpaPrint from "./components/DashboardAvgGpa";
 // eslint-disable-next-line react/display-name
 export const AdminModDashboardPrint = forwardRef((props, ref) => {
 
-  const { dashboardContent, semester } = props;
+  const { dashboardContent, semester, department } = props;
   const moderator = JSON.parse(localStorage.getItem('user')) || JSON.parse(sessionStorage.getItem('user'));
 
   return (
@@ -21,7 +21,11 @@ export const AdminModDashboardPrint = forwardRef((props, ref) => {
             {"Department Dashboard"}
             <small className="fw-normal"> - {semester.name}</small>
           </h5>
-          <h6 className="mb-0">{moderator.department?.name}</h6>
+          <h6 className="mb-0">{
+            moderator.department ?
+              moderator.department.name
+              : department.name
+          }</h6>
         </Box>
       } />
 
@@ -29,7 +33,7 @@ export const AdminModDashboardPrint = forwardRef((props, ref) => {
       <Box className="row mt-2">
 
         {/* heading cards */}
-        <DashboardCountShowCard label={'Semester Classes'} count={dashboardContent.current_classes_count}
+        <DashboardCountShowCard label={'Total Courses'} count={dashboardContent.current_classes_count}
           icon={'fas fa-chalkboard-user'} color={'success'} />
 
         <DashboardCountShowCard label={'Running Students'} count={dashboardContent.running_students}
@@ -46,7 +50,7 @@ export const AdminModDashboardPrint = forwardRef((props, ref) => {
         <Box className="col-12 col-lg-8 mb-3" sx={{ width: '8.27in' }}>
           <Box className="card border border-light-grey h-100">
             <Box className="card-header">
-              <h6 className="mt-2 mb-0">Average Blooms Levels of Classes</h6>
+              <h6 className="mt-2 mb-0">Total Attainment</h6>
             </Box>
 
             <Box className="card-body">
