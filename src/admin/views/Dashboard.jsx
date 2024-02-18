@@ -182,7 +182,7 @@ export default function AdminDashboard() {
         <Box className="row my-2">
 
           {/* heading cards */}
-          <DashboardCountShowCard label={'Semester Classes'} count={dashboardContent.current_classes_count}
+          <DashboardCountShowCard label={'Total Courses'} count={dashboardContent.current_classes_count}
             icon={'fas fa-chalkboard-user'} color={'success'} />
 
           <DashboardCountShowCard label={'Running Students'} count={dashboardContent.running_students}

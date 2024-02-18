@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import CustomSnackbar from "../../../../utilities/SnackBar";
 import Swal from "sweetalert2";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 export default function Exams({ assigned_class }) {
 
@@ -146,20 +147,6 @@ export default function Exams({ assigned_class }) {
     }
   }
 
-  // copy exam ID
-  const handleCopyExamID = (id) => {
-    // integer to hexadecimal
-    const hexID = parseInt(id).toString(16);
-
-    navigator.clipboard.writeText(hexID).then(() => {
-      setSuccess('Exam ID copied!');
-      setTimeout(() => { setSuccess('') }, 5000)
-    }, () => {
-      setError('Failed to copy exam ID!');
-      setTimeout(() => { setError('') }, 5000)
-    });
-  };
-
 
   return (
     <Box className='px-2 pt-1'>
@@ -224,13 +211,15 @@ export default function Exams({ assigned_class }) {
                   <Box className="d-flex justify-content-end mt-4">
                     {/* copy button */}
                     {(exam.exam_type === 'Final' || exam.exam_type === 'Midterm') &&
-                      <button onClick={() => handleCopyExamID(exam.id)} className="btn btn-outline-secondary btn-sm btn-rounded me-2"
-                        title="Copy Exam ID">
-                        <i className="far fa-copy text-info me-1"></i> Copy ID</button>
+                      <CopyToClipboard text={parseInt(exam.id).toString(16)}
+                        onCopy={() => { setSuccess('Exam ID copied!'); setTimeout(() => { setSuccess('') }, 5000) }}>
+                        <button className="btn btn-outline-secondary btn-sm btn-rounded me-2" title="Copy Exam ID For Importing Questions">
+                          <i className="far fa-copy text-info me-1"></i> Copy ID</button>
+                      </CopyToClipboard>
                     }
 
                     {/* edit */}
-                    <button className="btn btn-outline-secondary text-primary btn-sm btn-floating me-2"
+                    <button className="btn btn-outline-secondary text-primary btn-sm btn-floating me-2" title="Edit Exam"
                       onClick={() => {
                         const selectedExam = { ...exam }
                         if (exam.exam_type !== 'Final' && exam.exam_type !== 'Midterm' && exam.exam_type !== 'Class Test' && exam.exam_type !== 'Presentation' && exam.exam_type !== 'Viva') {
@@ -246,7 +235,7 @@ export default function Exams({ assigned_class }) {
                       }}><i className="fas fa-edit"></i></button>
 
                     {/* delete */}
-                    <button className="btn btn-outline-secondary text-danger btn-sm btn-floating"
+                    <button className="btn btn-outline-secondary text-danger btn-sm btn-floating" title="Delete Exam"
                       onClick={() => deleteExam(exam.id)}><i className="fas fa-trash-alt"></i></button>
                   </Box>
                 }

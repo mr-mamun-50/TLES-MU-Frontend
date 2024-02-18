@@ -76,7 +76,7 @@ export default function PasswordChangeDialog({ level, onOpen, onClose, mustChang
       </DialogTitle>
       <DialogContent sx={{ maxWidth: '350px' }}>
         <DialogContentText id="password-change-dialog-description" mb={3} className='text-warning'>
-          {mustChange ? 'Your account is protected by a default password. You must change your password to protect your account.' : ''}
+          {mustChange ? 'You must change your password to protect your account.' : ''}
         </DialogContentText>
         <Box>
           <form onSubmit={handleSubmit}>

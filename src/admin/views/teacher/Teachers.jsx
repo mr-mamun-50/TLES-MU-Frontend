@@ -3,8 +3,11 @@ import DataTable from 'react-data-table-component'
 import axios from 'axios'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
-import { Box, MenuItem, TextField } from '@mui/material'
+import { Box, MenuItem, Tab, TextField } from '@mui/material'
 import { Link } from 'react-router-dom'
+import TabList from '@mui/lab/TabList'
+import TabContext from '@mui/lab/TabContext'
+import TabPanel from '@mui/lab/TabPanel'
 
 export default function Teachers() {
 
@@ -22,9 +25,11 @@ export default function Teachers() {
   const [filteredTeachers, setFilteredTeachers] = useState([])
 
   const [editableTeacher, setEditableTeacher] = useState({})
+  const [inputPassword, setInputPassword] = useState({})
   const [selectedTeachers, setSelectedTeachers] = useState([])
   const [showAddTeacherModal, setShowAddTeacherModal] = useState(false)
   const [showEditTeacherModal, setShowEditTeacherModal] = useState(false)
+  const [tabIndex, setTabIndex] = useState('1');
   const [dhowTeacherDelete, setDhowTeacherDelete] = useState('')
   const [showTeacherDelete, setShowTeacherDelete] = useState(false)
 
@@ -108,6 +113,31 @@ export default function Teachers() {
       setError(err.response.data.message)
       setLoading(false)
       setTimeout(() => { setError('') }, 5000)
+    });
+  }
+
+  // update password
+  const updatePassword = () => {
+    if (inputPassword.password !== inputPassword.confirm_password) {
+      setError('Password does not match')
+      return;
+    }
+    setLoading(true)
+    axios.put(`/api/${role}/teachers/password/${editableTeacher.id}`, inputPassword).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        setShowEditTeacherModal(false)
+        setInputPassword({})
+        setTimeout(() => { setSuccess('') }, 5000)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+    }).finally(() => {
+      setLoading(false)
     });
   }
 
@@ -267,28 +297,49 @@ export default function Teachers() {
           onOpen={showEditTeacherModal}
           content={
             <Box style={{ maxWidth: '350px' }}>
-              <form onSubmit={updateTeacher} style={{ minWidth: '350px' }}>
+              <TabContext value={tabIndex}>
+                <TabList onChange={(_e, val) => { setTabIndex(val), sessionStorage.setItem('selected-class-tab', val) }} className='mb-3 bg-light rounded'>
+                  <Tab label="Basic Info" value='1' className='w-50' />
+                  <Tab label="Password" value='2' className='w-50' />
+                </TabList>
 
-                <TextField label="Name" fullWidth value={editableTeacher.name}
-                  onChange={(e) => setEditableTeacher({ ...editableTeacher, name: e.target.value })} margin='normal' size='small' />
+                <TabPanel value='1' className='p-0'>
+                  <form onSubmit={updateTeacher}>
 
-                <TextField label="Email" fullWidth value={editableTeacher.email}
-                  onChange={(e) => setEditableTeacher({ ...editableTeacher, email: e.target.value })} margin='normal' size='small' />
+                    <TextField label="Name" fullWidth value={editableTeacher.name}
+                      onChange={(e) => setEditableTeacher({ ...editableTeacher, name: e.target.value })} margin='normal' size='small' />
 
-                {role === 'admin' &&
-                  <TextField label="Department" select value={editableTeacher.dept_id}
-                    onChange={(e) => setEditableTeacher({ ...editableTeacher, dept_id: e.target.value })} fullWidth margin='normal' size='small'>
-                    {departments.map((department) => (
-                      <MenuItem value={department.id}>{department.name}</MenuItem>
-                    ))}
-                  </TextField>
-                }
-              </form>
+                    <TextField label="Email" fullWidth value={editableTeacher.email}
+                      onChange={(e) => setEditableTeacher({ ...editableTeacher, email: e.target.value })} margin='normal' size='small' />
+
+                    {role === 'admin' &&
+                      <TextField label="Department" select value={editableTeacher.dept_id}
+                        onChange={(e) => setEditableTeacher({ ...editableTeacher, dept_id: e.target.value })} fullWidth margin='normal' size='small'>
+                        {departments.map((department) => (
+                          <MenuItem value={department.id}>{department.name}</MenuItem>
+                        ))}
+                      </TextField>
+                    }
+                  </form>
+                </TabPanel>
+
+                <TabPanel value='2' className='p-0'>
+                  <form onSubmit={updatePassword}>
+
+                    <TextField label="New Password" fullWidth value={inputPassword.password}
+                      onChange={(e) => setInputPassword({ ...inputPassword, password: e.target.value })} margin='normal' size='small' type='password' />
+
+                    <TextField label="Confirm Password" fullWidth value={inputPassword.confirm_password}
+                      onChange={(e) => setInputPassword({ ...inputPassword, confirm_password: e.target.value })} margin='normal' size='small' type='password' />
+
+                  </form>
+                </TabPanel>
+              </TabContext>
             </Box>
           }
           onClose={() => setShowEditTeacherModal(false)}
-          confirmText={'Update Teacher'}
-          onConfirm={updateTeacher}
+          confirmText={tabIndex === '1' ? 'Update Info' : 'Update Password'}
+          onConfirm={tabIndex === '1' ? updateTeacher : updatePassword}
           loading={loading}
         />
 

@@ -63,11 +63,11 @@ export default function UserLogin() {
             </Box>
           </Box>
 
-          <Box className="d-flex align-items-center justify-content-end">
+          {/* <Box className="d-flex align-items-center justify-content-end">
             <button className="btn btn-secondary">
               <i className="fas fa-book me-2"></i> User Manual
             </button>
-          </Box>
+          </Box> */}
         </Box>
 
         {/* body section */}

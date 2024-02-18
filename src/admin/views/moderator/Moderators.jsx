@@ -3,7 +3,10 @@ import DataTable from 'react-data-table-component'
 import axios from 'axios'
 import CustomSnackbar from '../../../utilities/SnackBar'
 import ModalDialog from '../../../utilities/ModalDialog'
-import { Box, MenuItem, TextField } from '@mui/material'
+import { Box, MenuItem, Tab, TextField } from '@mui/material'
+import TabContext from '@mui/lab/TabContext'
+import TabList from '@mui/lab/TabList'
+import TabPanel from '@mui/lab/TabPanel'
 
 export default function Moderators() {
 
@@ -19,9 +22,11 @@ export default function Moderators() {
   const [filteredModerators, setFilteredModerators] = useState([])
 
   const [editableModerator, setEditableModerator] = useState({})
+  const [inputPassword, setInputPassword] = useState({})
   const [selectedModerators, setSelectedModerators] = useState([])
   const [showAddModeratorModal, setShowAddModeratorModal] = useState(false)
   const [showEditModeratorModal, setShowEditModeratorModal] = useState(false)
+  const [tabIndex, setTabIndex] = useState('1');
   const [deleteModInput, setDeleteModInput] = useState('')
   const [showModDelete, setShowModDelete] = useState(false)
 
@@ -105,6 +110,31 @@ export default function Moderators() {
       setError(err.response.data.message)
       setLoading(false)
       setTimeout(() => { setError('') }, 5000)
+    });
+  }
+
+  // update password
+  const updatePassword = () => {
+    if (inputPassword.password !== inputPassword.confirm_password) {
+      setError('Password does not match')
+      return;
+    }
+    setLoading(true)
+    axios.put(`/api/admin/moderators/password/${editableModerator.id}`, inputPassword).then(res => {
+      if (res.status === 200) {
+        setSuccess(res.data.message)
+        setShowEditModeratorModal(false)
+        setInputPassword({})
+        setTimeout(() => { setSuccess('') }, 5000)
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
+      }
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+    }).finally(() => {
+      setLoading(false)
     });
   }
 
@@ -219,27 +249,48 @@ export default function Moderators() {
           onOpen={showEditModeratorModal}
           content={
             <Box style={{ maxWidth: '350px' }}>
-              <form onSubmit={updateModerator}>
+              <TabContext value={tabIndex}>
+                <TabList onChange={(_e, val) => { setTabIndex(val), sessionStorage.setItem('selected-class-tab', val) }} className='mb-3 bg-light rounded'>
+                  <Tab label="Basic Info" value='1' className='w-50' />
+                  <Tab label="Password" value='2' className='w-50' />
+                </TabList>
 
-                <TextField label="Name" fullWidth value={editableModerator.name}
-                  onChange={(e) => setEditableModerator({ ...editableModerator, name: e.target.value })} margin='normal' size='small' />
+                <TabPanel value='1' className='p-0'>
+                  <form onSubmit={updateModerator}>
 
-                <TextField label="Email" fullWidth value={editableModerator.email}
-                  onChange={(e) => setEditableModerator({ ...editableModerator, email: e.target.value })} margin='normal' size='small' />
+                    <TextField label="Name" fullWidth value={editableModerator.name}
+                      onChange={(e) => setEditableModerator({ ...editableModerator, name: e.target.value })} margin='normal' size='small' />
 
-                <TextField label="Department" select value={editableModerator.dept_id}
-                  onChange={(e) => setEditableModerator({ ...editableModerator, dept_id: e.target.value })} fullWidth margin='normal' size='small'>
-                  {departments.map((department) => (
-                    <MenuItem value={department.id}>{department.name}</MenuItem>
-                  ))}
-                </TextField>
+                    <TextField label="Email" fullWidth value={editableModerator.email}
+                      onChange={(e) => setEditableModerator({ ...editableModerator, email: e.target.value })} margin='normal' size='small' />
 
-              </form>
+                    <TextField label="Department" select value={editableModerator.dept_id}
+                      onChange={(e) => setEditableModerator({ ...editableModerator, dept_id: e.target.value })} fullWidth margin='normal' size='small'>
+                      {departments.map((department) => (
+                        <MenuItem value={department.id}>{department.name}</MenuItem>
+                      ))}
+                    </TextField>
+
+                  </form>
+                </TabPanel>
+
+                <TabPanel value='2' className='p-0'>
+                  <form onSubmit={updatePassword}>
+
+                    <TextField label="New Password" fullWidth value={inputPassword.password}
+                      onChange={(e) => setInputPassword({ ...inputPassword, password: e.target.value })} margin='normal' size='small' type='password' />
+
+                    <TextField label="Confirm Password" fullWidth value={inputPassword.confirm_password}
+                      onChange={(e) => setInputPassword({ ...inputPassword, confirm_password: e.target.value })} margin='normal' size='small' type='password' />
+
+                  </form>
+                </TabPanel>
+              </TabContext>
             </Box>
           }
           onClose={() => setShowEditModeratorModal(false)}
-          confirmText={'Update'}
-          onConfirm={updateModerator}
+          confirmText={tabIndex === '1' ? 'Update Info' : 'Update Password'}
+          onConfirm={tabIndex === '1' ? updateModerator : updatePassword}
           loading={loading}
         />
 

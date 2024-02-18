@@ -6,7 +6,7 @@ import AllRoutes from "./Routes";
 
 
 // axios.defaults.baseURL = 'http://localhost/teaching_learning_evaluation_system_mu/backend/public';
-// axios.defaults.baseURL = 'http://tlesmu-server.000webhostapp.com';
+// axios.defaults.baseURL = 'http://tles-server.ap-south-1.elasticbeanstalk.com';
 axios.defaults.baseURL = 'http://127.0.0.1:8000';
 axios.defaults.headers.post['Accept'] = 'application/json';
 axios.defaults.withCredentials = true;

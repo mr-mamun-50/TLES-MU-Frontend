@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import { AppBar, Avatar, Box, Button, CssBaseline, Divider, Drawer, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import { Outlet, useNavigate } from 'react-router-dom';
-import Swal, { } from "sweetalert2";
 import axios from 'axios';
 import { useState } from 'react';
 import { useEffect } from 'react';
@@ -37,32 +36,19 @@ export default function AdminLayout(props) {
   const handleLogOut = () => {
     setAnchorEl(null)
 
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You will be redirect to login!",
-      icon: 'warning',
-      showCancelButton: true,
-      reverseButtons: true,
-      confirmButtonColor: '#1976D2',
-      cancelButtonColor: '#707070',
-      confirmButtonText: 'Yes, logout!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios.post('/api/admin/logout').then(res => {
-          if (res.status === 200) {
-            localStorage.clear()
-            sessionStorage.clear()
-            navigate('/login')
-          } else {
-            setError(res.data.message)
-            setTimeout(() => { setError('') }, 5000)
-          }
-        }).catch(err => {
-          setError(err.response.data.message)
-          setTimeout(() => { setError('') }, 5000)
-        });
+    axios.post('/api/admin/logout').then(res => {
+      if (res.status === 200) {
+        localStorage.clear()
+        sessionStorage.clear()
+        navigate('/login')
+      } else {
+        setError(res.data.message)
+        setTimeout(() => { setError('') }, 5000)
       }
-    })
+    }).catch(err => {
+      setError(err.response.data.message)
+      setTimeout(() => { setError('') }, 5000)
+    });
   }
 
   // get user details

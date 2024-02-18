@@ -124,7 +124,7 @@ export default function UserDashboard() {
         <Box className="row my-2" id="pdf-content">
 
           {/* heading cards */}
-          <DashboardCountShowCard label={'Semester Classes'} count={dashboardContent.assigned_classes_count}
+          <DashboardCountShowCard label={'Total Courses'} count={dashboardContent.assigned_classes_count}
             icon={'fas fa-chalkboard-user'} color={'success'} />
 
           <DashboardCountShowCard label={'Assigned Students'} count={dashboardContent.assigned_students}
