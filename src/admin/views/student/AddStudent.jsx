@@ -181,6 +181,8 @@ export default function AddStudent() {
     }
   }, [acInfo.batch_id, acInfo.dept_id, getBatchs, role])
 
+
+
   return (
     <div className="container">
       <div className='card my-2'>
@@ -252,7 +254,8 @@ export default function AddStudent() {
 
             {/* submit button */}
             <div className='mb-3 d-flex justify-content-between align-items-center'>
-              <a href="" className='btn-link'>Download .csv demo file</a>
+              <a href='/files/student_input_demo.csv' target='_blank' rel="noopener noreferrer" download="student_input_demo"
+                className='link'>Download .csv demo file</a>
 
               <button onClick={storeCsvData} className="btn btn-dark mt-3" disabled={csvData.length === 0}>
                 {loading ? <span className="spinner-border spinner-border-sm"></span> : <span><i className="fas fa-save fa-lg me-2"></i> Save</span>}
