@@ -254,7 +254,7 @@ export default function AddStudent() {
 
             {/* submit button */}
             <div className='mb-3 d-flex justify-content-between align-items-center'>
-              <a href='/files/student_input_demo.csv' target='_blank' rel="noopener noreferrer" download="student_input_demo"
+              <a href='/files/student_input_demo.csv' target='_blank' rel="noopener noreferrer" download="student_input_demo.csv"
                 className='link'>Download .csv demo file</a>
 
               <button onClick={storeCsvData} className="btn btn-dark mt-3" disabled={csvData.length === 0}>

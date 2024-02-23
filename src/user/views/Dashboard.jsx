@@ -142,7 +142,7 @@ export default function UserDashboard() {
             <Box className="card h-100">
               <Box className="card-header">
                 {/* <h6 className="my-2">Average Blooms Levels of Classes</h6> */}
-                <h6 className="my-2">Total Attainment</h6>
+                <h6 className="my-2">Average Attainment</h6>
               </Box>
 
               <Box className="card-body">

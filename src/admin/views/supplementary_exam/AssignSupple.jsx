@@ -183,9 +183,10 @@ export default function AssignSupple({ selectedSemester, role }) {
         JSON.parse(localStorage.getItem('user')).dept_id
         : JSON.parse(sessionStorage.getItem('user')).dept_id;
 
-      getSuppleExams(modDeptId)
+      getSuppleExams(modDeptId);
+      getDeptCourses(modDeptId);
       if (filterVals.dept_id === 0) {
-        setFilterVals({ dept_id: modDeptId, batch_id: 0, section_id: 0 })
+        setFilterVals({ dept_id: modDeptId, batch_id: 0, section_id: 0 });
       }
     }
 
